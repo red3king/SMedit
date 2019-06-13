@@ -1,8 +1,7 @@
-// g++ -std=c++14 -o gtkmm-example gtkmm-example.cpp `pkg-config --cflags --libs gtkmm-3.0`
-
 #include <iostream>
 #include <memory>
 #include <gtkmm.h>
+
 
 class MainWindow : public Gtk::ApplicationWindow 
 {
@@ -15,16 +14,15 @@ class MainWindow : public Gtk::ApplicationWindow
 
         virtual ~MainWindow() = default;
 
+        void on_close_click()
+        {
+            std::cout << "closing";
+            hide();
+        }
+
     private:
         Glib::RefPtr<Gtk::Builder> builder;
 };
-
-
-void on_close_click()
-{
-    std::cout << "closing\n";
-    Gtk::Main::quit();
-}
 
 
 int main(int argc, char* argv[]) 
@@ -39,8 +37,8 @@ int main(int argc, char* argv[])
 
     Gtk::Button* closeBtn = nullptr;
     builder->get_widget("closebutton", closeBtn);
-    closeBtn->signal_clicked().connect(sigc::ptr_fun(&on_close_click));
-    
+    closeBtn->signal_clicked().connect(sigc::mem_fun(wnd, &MainWindow::on_close_click));
+
     auto r = app->run(*wnd);
     delete wnd;
     return r;
