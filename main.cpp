@@ -5,20 +5,14 @@
 #include <giomm/resource.h>
 #include <epoxy/gl.h>
 
+#define NANOVG_GL3_IMPLEMENTATION
+#include "lib/nanovg/nanovg.h"
+#include "lib/nanovg/nanovg_gl.h"
+
 // for string shader loading stuff
 #include <string>
 #include <fstream>
 #include <streambuf>
-
-enum { X, Y, Z, NUM_AXES };
-
-
-static const GLfloat triangle_vertices[] =
-{
-    0.f,    0.5f,    0.f,    1.f,
-    0.5f,   -0.366f, 0.f,    1.f,
-    -0.5f,  -0.366f, 0.f,    1.f
-};
 
 
 
@@ -29,8 +23,6 @@ class MainWindow : public Gtk::ApplicationWindow
         MainWindow(BaseObjectType* obj, Glib::RefPtr<Gtk::Builder> const& builder) : Gtk::ApplicationWindow(obj) , 
             builder{builder}
         {
-            rotation_angles = std::vector<float>(NUM_AXES, 0.0f);
-            rotate_ctr = 0;
             set_title("smedit2");
                 
             Gtk::Button* closeBtn = nullptr;
@@ -54,39 +46,9 @@ class MainWindow : public Gtk::ApplicationWindow
 
         virtual ~MainWindow() = default;
 
-        int rotate_ctr;
 
         Gtk::GLArea* gl_area;
-        GLuint vao, buffer, program, mvp;
-        std::vector<float> rotation_angles;
-
-        void init_buffers()
-        {
-            glGenVertexArrays(1, &vao);
-            glBindVertexArray(vao);
-
-            glGenBuffers(1, &buffer);
-            glBindBuffer(GL_ARRAY_BUFFER, buffer);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(triangle_vertices), triangle_vertices, GL_STATIC_DRAW);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-        }
-
-        void init_shaders()
-        {
-            GLuint vertex_shader, frag_shader;
-            compile_shader(vertex_shader, GL_VERTEX_SHADER, "shaders/gtkmm-demo-vertex.glsl");
-            compile_shader(frag_shader, GL_FRAGMENT_SHADER, "shaders/gtkmm-demo-frag.glsl");
-
-            program = glCreateProgram();
-            glAttachShader(program, vertex_shader);
-            glAttachShader(program, frag_shader);
-            glLinkProgram(program);
-
-            mvp = glGetUniformLocation(program, "mvp");
-
-            //glDeleteShader called here on both shaders in gtk demo 
-            //same with glDetachShader, not sure why? maybe theyre loaded into program already?
-        }
+        NVGcontext* vg;
 
         bool compile_shader(GLuint& shader, int shader_type, std::string shader_path)
         {
@@ -106,89 +68,46 @@ class MainWindow : public Gtk::ApplicationWindow
             return status == GL_TRUE;
         }
 
-
         
-        static void compute_mvp(float *res,
-                        float phi,
-                        float theta,
-                        float psi)
-{
-  float x       {phi * ((float)G_PI / 180.f)};
-  float y       {theta * ((float)G_PI / 180.f)};
-  float z       {psi * ((float)G_PI / 180.f)};
-  float c1      {cosf (x)};
-  float s1      {sinf (x)};
-  float c2      {cosf (y)};
-  float s2      {sinf (y)};
-  float c3      {cosf (z)};
-  float s3      {sinf (z)};
-  float c3c2    {c3 * c2};
-  float s3c1    {s3 * c1};
-  float c3s2s1  {c3 * s2 * s1};
-  float s3s1    {s3 * s1};
-  float c3s2c1  {c3 * s2 * c1};
-  float s3c2    {s3 * c2};
-  float c3c1    {c3 * c1};
-  float s3s2s1  {s3 * s2 * s1};
-  float c3s1    {c3 * s1};
-  float s3s2c1  {s3 * s2 * c1};
-  float c2s1    {c2 * s1};
-  float c2c1    {c2 * c1};
-
-  /* apply all three rotations using the three matrices:
-   *
-   * ⎡  c3 s3 0 ⎤ ⎡ c2  0 -s2 ⎤ ⎡ 1   0  0 ⎤
-   * ⎢ -s3 c3 0 ⎥ ⎢  0  1   0 ⎥ ⎢ 0  c1 s1 ⎥
-   * ⎣   0  0 1 ⎦ ⎣ s2  0  c2 ⎦ ⎣ 0 -s1 c1 ⎦
-   */
-  res[0] = c3c2;  res[4] = s3c1 + c3s2s1;  res[8] = s3s1 - c3s2c1; res[12] = 0.f;
-  res[1] = -s3c2; res[5] = c3c1 - s3s2s1;  res[9] = c3s1 + s3s2c1; res[13] = 0.f;
-  res[2] = s2;    res[6] = -c2s1;         res[10] = c2c1;          res[14] = 0.f;
-  res[3] = 0.f;   res[7] = 0.f;           res[11] = 0.f;           res[15] = 1.f;
-}
-
-
-
-        void draw_triangle()
-        {
-            float m_vp[16];
-            
-            compute_mvp(m_vp, rotate_ctr, 0, 0);
-
-            glUseProgram(program);
-            glUniformMatrix4fv(mvp, 1, GL_FALSE, &m_vp[0]);
-            glBindBuffer(GL_ARRAY_BUFFER, vao);
-            glEnableVertexAttribArray(0);
-            glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, nullptr);
-            glDrawArrays(GL_TRIANGLES, 0, 3);
-            glDisableVertexAttribArray(0);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-            glUseProgram(0);    
-        }
-
         void on_gl_realize()
         {
             gl_area->make_current();
+
+            vg = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
+            // check if vg is null todo
+
+
             gl_area->throw_if_error();
-            init_buffers();
-            init_shaders(); 
         }
 
         void on_gl_unrealize()
         {
             gl_area->make_current();
             gl_area->throw_if_error();
-            glDeleteBuffers(1, &vao);
-            glDeleteProgram(program);
         }
 
         bool on_gl_render(const Glib::RefPtr<Gdk::GLContext>& context)
         {
             std::cout<<"render";
             gl_area->throw_if_error();
+
+            int width = gl_area->get_allocated_width();
+            int height = gl_area->get_allocated_height();
+            float px_ratio = (float) width / (float) height;
+            glViewport(0, 0, width, height);
+
             glClearColor(0.5, 0.5, 0.5, 1.0);
-            glClear(GL_COLOR_BUFFER_BIT);
-            draw_triangle();
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    
+            nvgBeginFrame(vg, width, height, px_ratio);
+
+            nvgBeginPath(vg);
+            nvgRoundedRect(vg, 20, 20, 100, 100, 5);
+            nvgFillColor(vg, nvgRGBA(200,200,200,255));
+            nvgFill(vg);
+
+            nvgEndFrame(vg);
+    
             glFlush(); 
             return true;
         }
@@ -201,10 +120,6 @@ class MainWindow : public Gtk::ApplicationWindow
 
         void on_rotate_click()
         {
-            rotate_ctr += 13;
-            if(rotate_ctr > 359)
-                rotate_ctr -= 360;
-
             gl_area->queue_draw();
         }
 
