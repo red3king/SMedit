@@ -1,6 +1,26 @@
-just added some basic operations and historymanager stuff,
+x   write GUIState class
 
-now try to integrate gtkglarea
+x   add implementations for DrawContext transformation methods
 
+implement a movement gui operation for state + gui op type class
+    LEFT OFF HERE, JUST WROTE THE GUI_STATE CLASS, PARTIALLY
+        ISSUE - THE CODE IS GETTING SILLY.
+            because i wanted to seperate the data objects from gui state stuff, i have State and GUIState
+            but because i wanted to follow the pointers are bad advice, I decided to store ids
+            now i have a silly double nested loop iterating over all machines, then the found machine's states,
+                all just to find the x,y,w,z coordinates of a single GUIState object. that's ridiculous
+                
+            I think the solution is to either delete the guimodels classes and just operate on the objects themselves, or to restructure and use pointers from guimodel to model. however, that would imply i need to refactor the project to run vectors of pointers to models, instead of vectors of models. (that could be ok since im sure i know where all object creations/deletions happen, but lots of coding) tired so figure out tomorrow
+
+check that the operations (non gui ops, the normal ones) create + delete GUIModels along with the normal models
+
+call set_events() on the gtkglarea
+
+write guimodel for state + the boxguimodel superclass or whatever its called
+
+modify event handling function which checks if it should instantiate any guioperations (if needed)
+
+in main.cpp constructor, hard code bogus project with one state for testing
+    
 
 

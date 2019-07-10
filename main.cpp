@@ -9,7 +9,7 @@
 #include "lib/nanovg/nanovg.h"
 #include "lib/nanovg/nanovg_gl.h"
 
-// for string shader loading stuff
+// for string shader loading stuff, TODO: remove
 #include <string>
 #include <fstream>
 #include <streambuf>

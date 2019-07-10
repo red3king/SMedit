@@ -53,9 +53,9 @@ class Transition : public Entity
 
         TransitionType type;
         string event_name;  // only used for EVENT type
-        unsigned int from_state_id, to_state_id;
 
-        int x0, y0, x1, y1;
+        unsigned int from_state_id, to_state_id;
+        float x0, y0, x1, y1;
 
     private:
 };
