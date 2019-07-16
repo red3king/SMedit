@@ -22,20 +22,20 @@ TEST_CASE("HistoryManager.submit_operation, and undo", "[historymanager]")
     
     // operation should return created machine id
     auto m1 = hm.current_project.machines[0];
-    REQUIRE(m1.id == result);
+    REQUIRE(m1->id == result);
 
     // submit second operation, should work
     auto name = OpMachineName(m1, "bob");
     hm.submit_operation(name);
-    REQUIRE("bob" == hm.current_project.machines[0].name);
+    REQUIRE("bob" == hm.current_project.machines[0]->name);
 
     // undo rename -> machine name should be blank 
     hm.undo();
-    REQUIRE("" == hm.current_project.machines[0].name);
+    REQUIRE("" == hm.current_project.machines[0]->name);
 
     // redo -> name should be bob again
     hm.redo();
-    REQUIRE("bob" == hm.current_project.machines[0].name);
+    REQUIRE("bob" == hm.current_project.machines[0]->name);
 
 }
 
@@ -80,6 +80,6 @@ TEST_CASE("HistoryManager operation collapsing", "[historymanager]")
     auto name2 = OpMachineName(mach, "two");
     hm.submit_operation(name2);
     REQUIRE(2 == hm.operations.size());
-    REQUIRE("two" == hm.current_project.machines[0].name);
+    REQUIRE("two" == hm.current_project.machines[0]->name);
 }
 

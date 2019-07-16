@@ -3,8 +3,6 @@
 #include "entity.h"
 
 
-// TODO remove #define BE_INT_GAP 4
-
 class BoxEntity : public Entity
 {
     public:

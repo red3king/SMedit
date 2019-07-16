@@ -12,20 +12,24 @@ class Project
 {
     public:
         Project(unsigned int id_ctr=0);
+        Project(const Project& other);
+        Project& operator=(const Project& other);
+        ~Project();
 
-        vector<Resource> resources;
-        vector<Machine> machines;  
+        vector<Resource*> resources;
+        vector<Machine*> machines;  
 
         unsigned int get_next_id();
 
-        // get index into machines vector by id
+        Machine* get_machine_by_id(unsigned int id);
         int get_mindex_by_id(unsigned int id);
 
-        // " " for resources
+        Resource* get_resource_by_id(unsigned int id);
         int get_rindex_by_id(unsigned int id);
 
     private:
         unsigned int id_ctr;
+        void _copy_from(const Project& other);
 };
 
 

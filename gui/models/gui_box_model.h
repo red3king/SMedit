@@ -2,12 +2,21 @@
 
 #include "gui_model.h"
 
+#define BM_INT_GAP 4
 
-class GUIBoxModel : public GUIModel
+
+class GMBox : public GUIModel
 {
     public:
-        GUIBoxModel(DrawContext* ctx, GUIModelType type, unsigned int machine_id, unsigned int model_id);
-        virtual void get_coords(Project p, float& x, float& y, float& w, float& h);
-        virtual void set_coords(Project p, float x, float y, float w, float h);
+        GMBox(DrawContext* ctx, EntityType type);
+        virtual void get_coords(float& x, float& y, float& w, float& h)=0;
+        virtual void set_coords(float x, float y, float w, float h)=0;
+        virtual void draw_interior()=0;
+        
+        void draw();
+        bool mouse_in_range(float mouse_x, float mouse_y);
+
+        bool mouse_within(float mouse_x, float mouse_y);
+        bool mouse_on_border(float mouse_x, float mouse_y);
 };
 

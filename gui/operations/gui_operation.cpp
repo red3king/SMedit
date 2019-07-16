@@ -1,15 +1,27 @@
 #include "gui_operation.h"
 
 
-GUIOpResult GUIOperation::should_continue(Project& current_project, GUIState& gui_state, CurrentEvents& current_events) { return END; }
+GUIOpResult GUIOperation::should_continue(GUIState& gui_state, CurrentEvents& current_events) 
+{ 
+    return END; 
+}
 
 
-void GUIOperation::on_continue(Project& current_project, GUIState& gui_state) { }
+bool GUIOperation::on_continue(GUIState& gui_state, CurrentEvents& current_events, Operation*& op) 
+{ 
+    return false;
+}
 
 
-void GUIOperation::on_cancel(Project& current_project, GUIState& gui_state) { }
+bool GUIOperation::on_cancel(GUIState& gui_state, CurrentEvents& current_events, Operation*& op) 
+{
+    return false;
+}
 
 
-void GUIOperation::on_end(Project& current_project, GUIState& gui_state) { }
+bool GUIOperation::on_end(GUIState& gui_state, CurrentEvents& current_events, Operation*& op) 
+{
+    return false;
+}
 
-
+GUIOperation::~GUIOperation(){ }

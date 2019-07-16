@@ -6,8 +6,8 @@
 class DrawContext
 {
     public:
-        DrawContext(NVGcontext* vg);
-
+        DrawContext();
+        void set_nvg_context(NVGcontext* vg);
         // transforms between screen coordinates in pixels and the world
         void world_to_screen(float& screen_x, float& screen_y, float world_x, float world_y); 
         void screen_to_world(float& world_x, float& world_y, float screen_x, float screen_y);
@@ -15,8 +15,9 @@ class DrawContext
         void zoom_in();
         void zoom_out();
 
+        void reset();
+
         NVGcontext* vg;
-        int widget_width, widget_height;
 
         float zoom_factor, woffset_x, woffset_y;
 };

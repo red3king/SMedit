@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_set>
+#include <gdk/gdk.h>
 
 using std::unordered_set;
 
@@ -75,9 +76,12 @@ class CurrentEvents
 
         void clear_current_event();
 
+        bool button_pressed(MouseButton button);
+        bool key_pressed(Key key);
+
         // https://developer.gnome.org/gtkmm/stable/classGtk_1_1Widget.html#a4b64421cad754fbd49ae17cbfe4814d0
-        bool on_button_event(GdkEventButton* button_event);   // for press and release
-        bool on_scroll_event(GdkEventScroll* scroll_event);
-        bool on_key_event(GdkEventKey* key_event);
-        bool on_motion_notify_event(GdkEventMotion* motion_event);
+        void on_button_event(GdkEventButton* button_event);   // for press and release
+        void on_scroll_event(GdkEventScroll* scroll_event);
+        void on_key_event(GdkEventKey* key_event);
+        void on_motion_notify_event(GdkEventMotion* motion_event);
 };

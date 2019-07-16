@@ -18,7 +18,7 @@ class OpMachineCreate : public Operation
 class OpMachineDelete : public Operation
 {
     public:
-        OpMachineDelete(Machine machine);
+        OpMachineDelete(Machine* machine);
         OpMachineDelete* clone();
         
         unsigned int execute(Project& project);
@@ -31,7 +31,7 @@ class OpMachineDelete : public Operation
 class OpMachineName : public Operation
 {
     public:
-        OpMachineName(Machine machine, string name);
+        OpMachineName(Machine* machine, string name);
         OpMachineName* clone();
 
         unsigned int execute(Project& project);
@@ -48,7 +48,7 @@ class OpMachineName : public Operation
 class OpMachineRunOnStart
 {
     public:
-        OpMachineRunOnStart(Machine machine, bool run_on_start);
+        OpMachineRunOnStart(Machine* machine, bool run_on_start);
         OpMachineRunOnStart* clone();
 
         unsigned int execute(Project& project);

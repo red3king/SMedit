@@ -5,15 +5,14 @@
 #include <giomm/resource.h>
 #include <epoxy/gl.h>
 
-#define NANOVG_GL3_IMPLEMENTATION
-#include "lib/nanovg/nanovg.h"
-#include "lib/nanovg/nanovg_gl.h"
+//#define NANOVG_GL3_IMPLEMENTATION
+//#include "lib/nanovg/nanovg.h"
+//#include "lib/nanovg/nanovg_gl.h"
 
-// for string shader loading stuff, TODO: remove
-#include <string>
-#include <fstream>
-#include <streambuf>
-
+#include "historymanager/historymanager.h"
+#include "historymanager/operations/machine_ops.h"
+#include "historymanager/operations/state_ops.h"
+#include "gui/gui_context.h"
 
 
 class MainWindow : public Gtk::ApplicationWindow 
@@ -37,81 +36,26 @@ class MainWindow : public Gtk::ApplicationWindow
             gl_area = nullptr;
             builder->get_widget("gl_area", gl_area);
 
+            history_manager = new HistoryManager(50, 20, 15);
+            
+            auto cr8 = OpMachineCreate();
+            history_manager->submit_operation(cr8);
+            Machine* machine = history_manager->current_project.machines[0];
 
-            gl_area->signal_realize().connect(sigc::mem_fun(this, &MainWindow::on_gl_realize));
-            gl_area->signal_unrealize().connect(sigc::mem_fun(this, &MainWindow::on_gl_unrealize), false);
-            gl_area->signal_render().connect(sigc::mem_fun(this, &MainWindow::on_gl_render), false);
-
+            gui_context = new GUIContext(gl_area, history_manager);
+            
+            gui_context->set_machine(machine);
+            auto sccr8 = OpStateCreate(machine, 20, 20);
+            history_manager->submit_operation(sccr8);
         }
 
         virtual ~MainWindow() = default;
 
+        HistoryManager* history_manager;
 
         Gtk::GLArea* gl_area;
-        NVGcontext* vg;
-
-        bool compile_shader(GLuint& shader, int shader_type, std::string shader_path)
-        {
-            // https://stackoverflow.com/questions/2602013/read-whole-ascii-file-into-c-stdstring
-            std::ifstream st(shader_path);
-            std::string shader_data((std::istreambuf_iterator<char>(st)), (std::istreambuf_iterator<char>()));
-            const char* c_str = shader_data.c_str();
-
-            shader = glCreateShader(shader_type);
-            glShaderSource(shader, 1, &c_str, NULL);
-            glCompileShader(shader);
-            
-            GLint status;
-            glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
-            //char buffer[512];
-            //glGetShaderInfoLog(shader, 512, NULL, buffer);
-            return status == GL_TRUE;
-        }
-
+        GUIContext* gui_context;
         
-        void on_gl_realize()
-        {
-            gl_area->make_current();
-
-            vg = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
-            // check if vg is null todo
-
-
-            gl_area->throw_if_error();
-        }
-
-        void on_gl_unrealize()
-        {
-            gl_area->make_current();
-            gl_area->throw_if_error();
-        }
-
-        bool on_gl_render(const Glib::RefPtr<Gdk::GLContext>& context)
-        {
-            std::cout<<"render";
-            gl_area->throw_if_error();
-
-            int width = gl_area->get_allocated_width();
-            int height = gl_area->get_allocated_height();
-            float px_ratio = (float) width / (float) height;
-            glViewport(0, 0, width, height);
-
-            glClearColor(0.5, 0.5, 0.5, 1.0);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    
-            nvgBeginFrame(vg, width, height, px_ratio);
-
-            nvgBeginPath(vg);
-            nvgRoundedRect(vg, 20, 20, 100, 100, 5);
-            nvgFillColor(vg, nvgRGBA(200,200,200,255));
-            nvgFill(vg);
-
-            nvgEndFrame(vg);
-    
-            glFlush(); 
-            return true;
-        }
-
         void on_close_click()
         {
             std::cout << "closing";
@@ -122,8 +66,6 @@ class MainWindow : public Gtk::ApplicationWindow
         {
             gl_area->queue_draw();
         }
-
-
 
     private:
         Glib::RefPtr<Gtk::Builder> builder;

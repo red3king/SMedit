@@ -5,9 +5,9 @@
 // Create
 unsigned int OpMachineCreate::execute(Project& project)
 {
-    Machine m = Machine(project.get_next_id());
+    Machine* m = new Machine(project.get_next_id());
     project.machines.push_back(m);
-    return m.id;
+    return m->id;
 }
 
 
@@ -18,9 +18,9 @@ OpMachineCreate* OpMachineCreate::clone()
 
 
 // Delete
-OpMachineDelete::OpMachineDelete(Machine machine)
+OpMachineDelete::OpMachineDelete(Machine* machine)
 {
-    id = machine.id;
+    id = machine->id;
 }
 
 
@@ -33,15 +33,16 @@ OpMachineDelete* OpMachineDelete::clone()
 unsigned int OpMachineDelete::execute(Project& project)
 {
     int i = project.get_mindex_by_id(id);
+    delete project.machines[i];
     project.machines.erase(project.machines.begin() + i);
     return id;
 }
 
 
 // Change Name
-OpMachineName::OpMachineName(Machine machine, string name)
+OpMachineName::OpMachineName(Machine* machine, string name)
 {
-    id = machine.id;
+    id = machine->id;
     this->name = name;
 }
 
@@ -54,8 +55,8 @@ OpMachineName* OpMachineName::clone()
 
 unsigned int OpMachineName::execute(Project& project)
 {
-    int i = project.get_mindex_by_id(id);
-    project.machines[i].name = name;
+    Machine* m = project.get_machine_by_id(id);
+    m->name = name;
     return id;
 }
 
@@ -75,9 +76,9 @@ void OpMachineName::collapse(Operation& other)
 
 
 // Change run_on_start
-OpMachineRunOnStart::OpMachineRunOnStart(Machine machine, bool run_on_start)
+OpMachineRunOnStart::OpMachineRunOnStart(Machine* machine, bool run_on_start)
 {
-    id = machine.id;
+    id = machine->id;
     this->run_on_start = run_on_start;
 }
 
@@ -90,8 +91,8 @@ OpMachineRunOnStart* OpMachineRunOnStart::clone()
 
 unsigned int OpMachineRunOnStart::execute(Project& project)
 {
-    int i = project.get_mindex_by_id(id);
-    project.machines[i].run_on_start = run_on_start;
+    Machine* m = project.get_machine_by_id(id);
+    m->run_on_start = run_on_start;
     return id;
 }
 

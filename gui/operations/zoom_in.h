@@ -1,14 +1,15 @@
 #pragma once
 
 #include "gui_operation.h"
+#include "gui/gui_state.h"
 
 
 class ZoomIn : public GUIOperation
 {
     public:
-        static bool maybe_create(Project& current_project, GUIState& gui_state, CurrentEvents& current_events, GUIOperation*& pref);
+        static bool maybe_create(GUIState& gui_state, CurrentEvents& current_events, GUIOperation*& pref);
 
-        void on_end(Project& current_project, GUIState& gui_state);
+        bool on_end(GUIState& gui_state, CurrentEvents& current_events, Operation*& op);
 };
 
 

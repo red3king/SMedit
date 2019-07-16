@@ -12,7 +12,7 @@ TEST_CASE("OpMachineCreate", "[operations][machine_ops]")
     REQUIRE(0 == p.machines.size());
     unsigned int i = OpMachineCreate().execute(p);
     REQUIRE(1 == p.machines.size());
-    REQUIRE(i == p.machines[0].id);
+    REQUIRE(i == p.machines[0]->id);
 }
 
 
@@ -21,8 +21,8 @@ TEST_CASE("Operation.may_collapse", "[operations]")
     //also a test of OpMachineName.may_collapse_impl
     // too lazy to write test operation class
     auto p = Project();
-    auto m1 = Machine(1);
-    auto m2 = Machine(2);
+    auto m1 = new Machine(1);
+    auto m2 = new Machine(2);
     p.machines.push_back(m1);
     p.machines.push_back(m2);
 

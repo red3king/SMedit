@@ -1,10 +1,20 @@
 #pragma once
+
 #include "gui_model.h"
+#include "gui_box_model.h"
 
 
-class GUIResourceLock : public GUIBoxModel
+class GMResourceLock : public GMBox
 {
     public:
+        GMResourceLock(DrawContext* ctx, ResourceLock* resourcelock);
+
+        void get_coords(float& x, float& y, float& w, float& h);
+        void set_coords(float x, float y, float w, float h);
+        void draw_interior();
+        Entity* get_entity();
+
+        ResourceLock* resourcelock;
 
 };
 

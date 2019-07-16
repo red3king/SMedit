@@ -3,8 +3,15 @@
 #include "gui_box_model.h"
 
 
-class GMState : public GUIBoxModel
+class GMState : public GMBox
 {
     public:
-        GMState(DrawContext* ctx, unsigned int machine_id, unsigned int model_id);
+        GMState(DrawContext* ctx, State* state);
+        
+        void get_coords(float& x, float& y, float& w, float& h);
+        void set_coords(float x, float y, float w, float h);
+        void draw_interior();
+        Entity* get_entity();
+
+        State* state;
 }; 

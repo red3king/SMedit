@@ -1,4 +1,5 @@
 #include "historymanager.h"
+#include "signals.h"
 
 
 HistoryManager::HistoryManager(int max_operations, int op_ex_thresh, int min_undos)
@@ -34,12 +35,18 @@ unsigned int HistoryManager::submit_operation(Operation& operation)
 
 void HistoryManager::undo()
 {
+    signals.disable_gui_signals();
+    signals.fire_pre_gui_rebuild_signal();
+
     current_project = initial_project; 
 
     for(int i=0; i < operations.size() - undo_position - 1; i++)
         operations[i]->execute(current_project);
 
     undo_position++;
+    
+    signals.enable_gui_signals();
+    signals.fire_gui_rebuild_signal();
 }
 
 
@@ -75,6 +82,8 @@ void HistoryManager::condense_if_needed()
 
 void HistoryManager::condense_history()
 {
+    signals.disable_gui_signals();
+
     for(int i=0; i<op_ex_thresh; i++)
     {
         operations[i]->execute(initial_project);
@@ -82,6 +91,7 @@ void HistoryManager::condense_history()
     }
 
     operations.erase(operations.begin(), operations.begin() + op_ex_thresh);
+    signals.enable_gui_signals();
 }
 
 

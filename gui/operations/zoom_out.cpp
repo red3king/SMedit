@@ -1,7 +1,7 @@
 #include "zoom_out.h"
 
 
-static bool ZoomOut::maybe_create(Project& current_project, GUIState& gui_state, CurrentEvents& current_events, GUIOperation*& pref)
+bool ZoomOut::maybe_create(GUIState& gui_state, CurrentEvents& current_events, GUIOperation*& pref)
 {
     if(current_events.event_type == ET_SCROLL && current_events.mouse_scroll == SC_DOWN)
     {
@@ -12,7 +12,8 @@ static bool ZoomOut::maybe_create(Project& current_project, GUIState& gui_state,
 }
 
 
-void ZoomOut::on_end(Project& current_project, GUIState& gui_state)
+bool ZoomOut::on_end(GUIState& gui_state, CurrentEvents& current_events, Operation*& op)
 {
     gui_state.draw_context.zoom_out();
+    return false;
 }

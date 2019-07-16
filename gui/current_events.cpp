@@ -69,7 +69,19 @@ void CurrentEvents::clear_current_event()
 }
 
 
-bool CurrentEvents::on_button_event(GdkEventButton* button_event)
+bool CurrentEvents::key_pressed(Key key)
+{
+    return pressed_keys.find(key) != pressed_keys.end();
+}
+
+
+bool CurrentEvents::button_pressed(MouseButton button)
+{
+    return pressed_buttons.find(button) != pressed_buttons.end();
+}
+
+
+void CurrentEvents::on_button_event(GdkEventButton* button_event)
 {
     mouse_x = (float) button_event->x;
     mouse_y = (float) button_event->y;
@@ -93,22 +105,19 @@ bool CurrentEvents::on_button_event(GdkEventButton* button_event)
     {   
         event_type = ET_MB_TRIPLE;
     }
-
-    return true;
 }
 
 
-bool CurrentEvents::on_scroll_event(GdkEventScroll* scroll_event)
+void CurrentEvents::on_scroll_event(GdkEventScroll* scroll_event)
 {
     mouse_x = (float) scroll_event->x;
     mouse_y = (float) scroll_event->y;
     mouse_scroll = get_scroll(scroll_event->direction);
     event_type = ET_SCROLL;
-    return true;
 }
 
 
-bool CurrentEvents::on_key_event(GdkEventKey* key_event)
+void CurrentEvents::on_key_event(GdkEventKey* key_event)
 {
     key = get_key(key_event->keyval);
 
@@ -122,14 +131,12 @@ bool CurrentEvents::on_key_event(GdkEventKey* key_event)
         pressed_keys.erase(key);
         event_type = ET_KEY_RELEASE;
     }
-    return true;
 }
 
 
-bool CurrentEvents::on_motion_notify_event(GdkEventMotion* motion_event)
+void CurrentEvents::on_motion_notify_event(GdkEventMotion* motion_event)
 {
     event_type = ET_M_MOVE;
     mouse_x = (float) motion_event->x;
     mouse_y = (float) motion_event->y;
-    return true;
 }

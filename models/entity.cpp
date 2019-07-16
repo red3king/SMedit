@@ -6,3 +6,4 @@ Entity::Entity(unsigned int id)
     this->id = id;
 }
 
+Entity::~Entity() { }

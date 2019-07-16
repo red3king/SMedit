@@ -38,15 +38,7 @@ class State : public BoxEntity
      *      - since transitions cannot be dangling, a modal pops up to confirm that associated transitions
      *          will be deleted. (if they can be dangling, no need for this modal)
      *
-     *
-     * 
-     *
-     *
-     *
-     *
-     *
-     *
-     * */
+    * */
 
 
     public:

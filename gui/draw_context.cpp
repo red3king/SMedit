@@ -4,19 +4,23 @@
 #define ZFAC 1.2
 
 
-DrawContext::DrawContext(NVGcontext* vg)
+DrawContext::DrawContext()
 {
-    this->vg = vg;
-    woffset_x = 0;
-    woffset_y = 0;
-    zoom_factor = 1;
+    reset();
 }
 
 
-void DrawContext::set_size(int widget_width, int widget_height)
+void DrawContext::set_nvg_context(NVGcontext* vg)
 {
-    this->widget_width = widget_width;
-    this->widget_height = widget_height;
+    this->vg = vg;
+}
+
+
+void DrawContext::reset()
+{
+    woffset_x = 0;
+    woffset_y = 0;
+    zoom_factor = 1;
 }
 
 
@@ -34,13 +38,13 @@ void DrawContext::screen_to_world(float& world_x, float& world_y, float screen_x
 }
 
 
-void zoom_in()
+void DrawContext::zoom_in()
 {
     zoom_factor *= ZFAC;
 }
 
 
-void zoom_in()
+void DrawContext::zoom_out()
 {
     zoom_factor /= ZFAC;
 }

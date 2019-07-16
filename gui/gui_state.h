@@ -13,10 +13,26 @@ class GUIState
 
     public:
 
-        unsigned int current_machine_id;    // id of the state machine thats being edited in the window
+        Machine* current_machine;
         DrawContext draw_context;
         vector<GUIModel*> gui_models;
         
-
         GUIModel* get_model_by_id(unsigned int id);
+
+        void set_nvg_context(NVGcontext* vg);
+        void set_machine(Machine* current_machine);
+        void unset_machine();
+
+        void pre_rebuild_models();
+        void rebuild_models();
+
+        void add_gui_model(EntityType entity_type, unsigned int entity_id);
+        void remove_gui_model(unsigned int entity_id);
+
+        void draw();
+
+    private:
+        void _delete_models();
+        void _create_models();
 };
+

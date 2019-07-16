@@ -1,26 +1,37 @@
 #include "gui_state.h"
 
 
-GMState::GMState(DrawContext* ctx, unsigned int machine_id, unsigned int model_id) : GUIBoxModel(ctx, STATE, machine_id, model_id) { }
-
-
-void GMState::get_coords(Project p, float&x, float&y, float&w, float&h)
+GMState::GMState(DrawContext* ctx, State* state) : GMBox(ctx, STATE)
 {
-    // TODO - THIS IS JUST DUMB
-    for(int i=0; i<p.machines.size(); i++)
-    {
-        if(p.machines[i].id == machine_id)
-        {
-            for(int j=0; j<p.machines[i].states.size(); j++)
-            {   
-                if(p.machines[i].states[j].id == model_id)
-                {
-                    x = p.machines[i].states[j].x;
-                    y = p.machines[i].states[j].y;
-                    w = p.machines[i].states[j].w;
-                    h = p.machines[i].states[j].h;
-                }
-            }
-        }
-    }
+    this->state = state;
+}
+
+
+void GMState::get_coords(float&x, float&y, float&w, float&h)
+{
+    x = state->x;
+    y = state->y;
+    w = state->w;
+    h = state->h;
+}
+
+
+void GMState::set_coords(float x, float y, float w, float h)
+{
+    state->x = x;
+    state->y = y;
+    state->w = w;
+    state->h = h;
+}
+
+
+Entity* GMState::get_entity()
+{
+    return state;
+}
+
+
+void GMState::draw_interior()
+{
+    
 }
