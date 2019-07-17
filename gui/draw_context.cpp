@@ -65,3 +65,8 @@ void DrawContext::zoom(float zoom_amount, float fp_screen_x, float fp_screen_y)
 }
 
 
+void DrawContext::move(float world_dx, float world_dy)
+{
+    woffset_x -= world_dx;
+    woffset_y -= world_dy;
+}

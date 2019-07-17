@@ -10,31 +10,22 @@ MoveState::MoveState(GMState* state_gmodel, float offset_x, float offset_y)
 }
 
 
-bool MoveState::maybe_create(GUIState& gui_state, CurrentEvents& current_events, GUIOperation*& pref)
+bool MoveState::maybe_create(GMState* state, GUIState& gui_state, CurrentEvents& current_events, GUIOperation*& pref)
 {
-    if(current_events.event_type == ET_MB_PRESS)
+    if(current_events.event_type != ET_MB_PRESS)
+        return false;
+    
+    float x, y, w, h;
+    state->get_coords(x, y, w, h);
+
+    if(state->mouse_within(current_events.mouse_x, current_events.mouse_y))
     {
-        for(int i=0; i<gui_state.gui_models.size(); i++)
-        {
-            GUIModel* model = gui_state.gui_models[i];
-            
-            if(model->type != STATE)
-                continue;
-
-            GMState* state = dynamic_cast<GMState*>(model);
-            float x, y, w, h;
-            state->get_coords(x, y, w, h);
-
-            if(state->mouse_within(current_events.mouse_x, current_events.mouse_y))
-            {
-                float mouse_x_world, mouse_y_world;
-                gui_state.draw_context.screen_to_world(mouse_x_world, mouse_y_world, current_events.mouse_x, current_events.mouse_y);
-                float offset_x = mouse_x_world - x;
-                float offset_y = mouse_y_world - y;
-                pref = new MoveState(state, offset_x, offset_y);
-                return true;
-            }
-        }
+        float mouse_x_world, mouse_y_world;
+        gui_state.draw_context.screen_to_world(mouse_x_world, mouse_y_world, current_events.mouse_x, current_events.mouse_y);
+        float offset_x = mouse_x_world - x;
+        float offset_y = mouse_y_world - y;
+        pref = new MoveState(state, offset_x, offset_y);
+        return true;
     }
 
     return false;

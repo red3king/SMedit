@@ -15,6 +15,7 @@ class DrawContext
         void screen_to_world(float& world_x, float& world_y, float screen_x, float screen_y);
         float screen_dist_to_world(float screen_dist);
 
+        void move(float world_dx, float world_dy);  // move viewport, in world coords
         void zoom(float zoom_amount, float fp_screen_x, float fp_screen_y);  // zoom in/out from fixed point
 
         void reset();
