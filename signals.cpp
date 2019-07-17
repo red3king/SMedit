@@ -2,6 +2,12 @@
 #include "gui/gui_context.h"
 
 
+Signals::Signals()
+{
+    gui_signals_enabled = true;
+}
+
+
 void Signals::register_gui_signal_handler(GuiModelSignalHandler handler)
 {
     gui_signal_handlers.push_back(handler);

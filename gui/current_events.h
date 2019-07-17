@@ -68,6 +68,7 @@ class CurrentEvents
         Key key;
         MouseButton mouse_button;
         MouseScroll mouse_scroll;
+        float scroll_amount;
 
         // stuff calculated from past events
         float mouse_x, mouse_y;

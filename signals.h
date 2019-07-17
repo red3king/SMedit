@@ -19,6 +19,8 @@ class Signals
     // GUIModel objects for the glgtkarea 
 
     public:
+        Signals();
+
         void register_gui_signal_handler(GuiModelSignalHandler handler);
         void fire_gui_signal(EntityType entity_type, SignalType signal_type, unsigned int entity_id);
 

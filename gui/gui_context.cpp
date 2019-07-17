@@ -8,8 +8,8 @@
 #include "lib/nanovg/nanovg_gl.h"
 
 #include "gui_context.h"
-
 #include "gui/operations/gui_op_factory.h"
+#include "log.h"
 
 
 GUIContext::GUIContext(Gtk::GLArea* gl_area, HistoryManager* history_manager)
@@ -52,8 +52,9 @@ void GUIContext::register_gtk_signal_handlers()
     gl_area->set_events(Gdk::ALL_EVENTS_MASK);
 
     gl_area->signal_realize().connect(sigc::mem_fun(this, &GUIContext::on_gl_realize));
-    gl_area->signal_unrealize().connect(sigc::mem_fun(this, &GUIContext::on_gl_unrealize));
-    
+    gl_area->signal_unrealize().connect(sigc::mem_fun(this, &GUIContext::on_gl_unrealize), false);
+    gl_area->signal_render().connect(sigc::mem_fun(this, &GUIContext::on_gl_render), false);
+
     gl_area->signal_button_press_event().connect(sigc::mem_fun(this, &GUIContext::handle_button_event));
     gl_area->signal_button_release_event().connect(sigc::mem_fun(this, &GUIContext::handle_button_event));
     gl_area->signal_scroll_event().connect(sigc::mem_fun(this, &GUIContext::handle_scroll_event));
@@ -118,7 +119,6 @@ bool GUIContext::on_gl_render(const Glib::RefPtr<Gdk::GLContext>& context)
 
 void GUIContext::_render()
 {
-
     gl_area->throw_if_error();
     int width = gl_area->get_allocated_width();
     int height = gl_area->get_allocated_height();
@@ -179,33 +179,36 @@ void GUIContext::_handle_event()
     // TODO - code for highlighting nearest object and other gui stuff
     // which is not based on operations goes here
 
-    // _render();   // just for testing because nothing is displaying now for some reason
-
     if(!has_current_operation())
     {
         if(!GUIOpFactory::maybe_create_gui_op(gui_state, current_events, current_operation))
+        {
+            gl_area->queue_draw();
             return;
+        }
     }
-
-    if(!has_current_operation())
-        return;
 
     Operation* new_op = nullptr;
     bool created = false;
 
     GUIOpResult result = current_operation->should_continue(gui_state, current_events);
+    
     if(result == END)
     {
         created = current_operation->on_end(gui_state, current_events, new_op);
+        delete current_operation;
         current_operation = nullptr;
     }
+    
     else if(result == CONTINUE)
     {
         created = current_operation->on_continue(gui_state, current_events, new_op);
     }
+
     else if(result == CANCEL)
     {
         created = current_operation->on_cancel(gui_state, current_events, new_op);
+        delete current_operation;
         current_operation = nullptr;
     }
 
@@ -214,4 +217,6 @@ void GUIContext::_handle_event()
         history_manager->submit_operation(*new_op);
         delete new_op;
     }
+
+    gl_area->queue_draw();
 }

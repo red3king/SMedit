@@ -5,10 +5,7 @@
 #include <giomm/resource.h>
 #include <epoxy/gl.h>
 
-//#define NANOVG_GL3_IMPLEMENTATION
-//#include "lib/nanovg/nanovg.h"
-//#include "lib/nanovg/nanovg_gl.h"
-
+#include "log.h"
 #include "historymanager/historymanager.h"
 #include "historymanager/operations/machine_ops.h"
 #include "historymanager/operations/state_ops.h"
@@ -42,9 +39,9 @@ class MainWindow : public Gtk::ApplicationWindow
             history_manager->submit_operation(cr8);
             Machine* machine = history_manager->current_project.machines[0];
 
-            gui_context = new GUIContext(gl_area, history_manager);
-            
+            gui_context = new GUIContext(gl_area, history_manager);            
             gui_context->set_machine(machine);
+
             auto sccr8 = OpStateCreate(machine, 20, 20);
             history_manager->submit_operation(sccr8);
         }
@@ -58,7 +55,7 @@ class MainWindow : public Gtk::ApplicationWindow
         
         void on_close_click()
         {
-            std::cout << "closing";
+            log("closing.");
             hide();
         }
 

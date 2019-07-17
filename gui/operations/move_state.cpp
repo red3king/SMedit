@@ -12,7 +12,7 @@ MoveState::MoveState(GMState* state_gmodel, float offset_x, float offset_y)
 
 bool MoveState::maybe_create(GUIState& gui_state, CurrentEvents& current_events, GUIOperation*& pref)
 {
-    if(current_events.event_type == ET_M_MOVE && current_events.button_pressed(MB_LEFT))
+    if(current_events.event_type == ET_MB_PRESS)
     {
         for(int i=0; i<gui_state.gui_models.size(); i++)
         {

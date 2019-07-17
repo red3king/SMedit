@@ -31,6 +31,12 @@ void DrawContext::world_to_screen(float& screen_x, float& screen_y, float world_
 }
 
 
+float DrawContext::world_dist_to_screen(float world_dist)
+{
+    return world_dist * zoom_factor;
+}
+
+
 void DrawContext::screen_to_world(float& world_x, float& world_y, float screen_x, float screen_y)
 {
     world_x = (screen_x / zoom_factor) + woffset_x;
@@ -38,14 +44,24 @@ void DrawContext::screen_to_world(float& world_x, float& world_y, float screen_x
 }
 
 
-void DrawContext::zoom_in()
+float DrawContext::screen_dist_to_world(float screen_dist)
 {
-    zoom_factor *= ZFAC;
+    return screen_dist / zoom_factor;
 }
 
 
-void DrawContext::zoom_out()
+void DrawContext::zoom(float zoom_amount, float fp_screen_x, float fp_screen_y)
 {
-    zoom_factor /= ZFAC;
+    float wx1, wx2, wy1, wy2, dx, dy;
+
+    screen_to_world(wx1, wy1, fp_screen_x, fp_screen_y);
+    zoom_factor *= (1 + zoom_amount/10.0);
+    screen_to_world(wx2, wy2, fp_screen_x, fp_screen_y);
+
+    dx = wx2 - wx1;
+    dy = wy2 - wy1;
+    woffset_x -= dx;
+    woffset_y -= dy;
 }
+
 

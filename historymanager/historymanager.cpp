@@ -35,8 +35,8 @@ unsigned int HistoryManager::submit_operation(Operation& operation)
 
 void HistoryManager::undo()
 {
-    signals.disable_gui_signals();
     signals.fire_pre_gui_rebuild_signal();
+    signals.disable_gui_signals();
 
     current_project = initial_project; 
 
