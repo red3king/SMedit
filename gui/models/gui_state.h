@@ -13,5 +13,9 @@ class GMState : public GMBox
         void draw_interior();
         Entity* get_entity();
 
+        NVGcolor get_border_color();
+        NVGcolor get_title_text_color();
+        std::string get_title();
+
         State* state;
 }; 

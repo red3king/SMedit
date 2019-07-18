@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "lib/nanovg/nanovg.h"
 
 
@@ -22,5 +24,15 @@ class DrawContext
 
         NVGcontext* vg;
 
+        void draw_text_noclip(std::string text, int font, float size, NVGcolor color, float x, float y);
+        void draw_text_one_line(std::string text, int font, float size, NVGcolor color, float x, float y,
+                float max_width);
+        void draw_text_many_lines(std::string text, int font, float size, NVGcolor color, float x, float y,
+                float max_width, float max_height);
+
+
+        int font_hack, font_hack_bold;
+
+    private:
         float zoom_factor, woffset_x, woffset_y;
 };

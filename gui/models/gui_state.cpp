@@ -31,7 +31,25 @@ Entity* GMState::get_entity()
 }
 
 
+NVGcolor GMState::get_border_color()
+{
+    return nvgRGBA(255, 255, 255, 255);
+}
+
+
+NVGcolor GMState::get_title_text_color()
+{
+    return nvgRGBA(0, 0, 0, 255);
+}
+
+
+std::string GMState::get_title()
+{
+    return state->name;
+}
+
+
 void GMState::draw_interior()
 {
-    
+        
 }

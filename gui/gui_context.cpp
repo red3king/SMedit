@@ -97,6 +97,7 @@ void GUIContext::handle_pre_gui_rebuild()
 void GUIContext::on_gl_realize()
 {
     gl_area->make_current();
+    gl_area->set_has_stencil_buffer(true);
     vg = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
     gl_area->throw_if_error();
     gui_state.set_nvg_context(vg);

@@ -35,3 +35,21 @@ void GMResourceLock::draw_interior()
 {
 
 }
+
+
+NVGcolor GMResourceLock::get_border_color()
+{
+    return nvgRGBA(50, 240, 50, 255);
+}
+
+
+NVGcolor GMResourceLock::get_title_text_color()
+{
+    return nvgRGBA(255, 255, 255, 255);
+}
+
+
+std::string GMResourceLock::get_title()
+{
+    return "Lock [todo: name here]";
+}

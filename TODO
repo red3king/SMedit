@@ -1,18 +1,18 @@
-
-right now - getting it to work
-    it compiles and runs but is currently showing nothing on the screen 
-        when I add a render call on any event received, the thing sometimes suddenly renders gray everywhere,
-        even outside of the glarea. may have set up the wrong viewport initialization/size stuff..
-
-
-
-    
-
-
+RIGHT NOW LEFT OFF HERE:
+    text seems to be working, but:
+        -the text appears above where i assumed it would be
+        -the text is white (or possibly reusing the same fill color grey from beforoe)
+            instead of the red/black i was testing out
+        -when i zoom way out, i see something going red so the red is being applied,
+            somehow, but not to the text...
 
 
 
 === for later === 
+add error checks to everything that could fail:
+    opengl init
+    font load
+    ... check nanovg examples for all error codes that they check
 
 when done, test to see if things get screwed up if a gui operation is in progress (eg, dragging a state), and you drag away from the gl area, release the mb, and then come back. presumably it would enter a weird state and you would have to click and release once more to release the state.
 

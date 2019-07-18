@@ -42,8 +42,11 @@ class MainWindow : public Gtk::ApplicationWindow
             gui_context = new GUIContext(gl_area, history_manager);            
             gui_context->set_machine(machine);
 
-            auto sccr8 = OpStateCreate(machine, 20, 20);
-            history_manager->submit_operation(sccr8);
+            auto stcr8 = OpStateCreate(machine, 20, 20);
+            history_manager->submit_operation(stcr8);
+            machine->states[0]->name = "NEW STATE!!";
+            auto stcr82 = OpStateCreate(machine, 220, 30);
+            history_manager->submit_operation(stcr82);
         }
 
         virtual ~MainWindow() = default;

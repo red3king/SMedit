@@ -13,6 +13,9 @@ class GMResourceLock : public GMBox
         void set_coords(float x, float y, float w, float h);
         void draw_interior();
         Entity* get_entity();
+        NVGcolor get_border_color();
+        NVGcolor get_title_text_color();
+        std::string get_title();
 
         ResourceLock* resourcelock;
 

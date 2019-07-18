@@ -13,6 +13,8 @@ DrawContext::DrawContext()
 void DrawContext::set_nvg_context(NVGcontext* vg)
 {
     this->vg = vg;
+    font_hack = nvgCreateFont(vg, "hack", "resources/hackfont/Hack-Regular.ttf");
+    font_hack_bold = nvgCreateFont(vg, "hack bold", "resources/hackfont/Hack-Bold.ttf");
 }
 
 
@@ -70,3 +72,28 @@ void DrawContext::move(float world_dx, float world_dy)
     woffset_x -= world_dx;
     woffset_y -= world_dy;
 }
+
+
+void DrawContext::draw_text_noclip(std::string text, int font, float size, NVGcolor color, float x, float y)
+{
+    nvgFontSize(vg, size);;
+    nvgFontFaceId(vg, font);
+    nvgFillColor(vg, color);
+    nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
+    nvgText(vg, x, y, text.c_str(), nullptr);
+}
+
+
+void DrawContext::draw_text_one_line(std::string text, int font, float size, NVGcolor color, float x, float y,
+        float max_width)
+{
+
+}
+
+
+void DrawContext::draw_text_many_lines(std::string text, int font, float size, NVGcolor color, float x,
+        float y, float max_width, float max_height)
+{
+
+}
+
