@@ -35,7 +35,7 @@ class ResourceLock : public BoxEntity
 
     public:
         ResourceLock(unsigned int id=0);
-        unsigned int resource_id;
+        Resource* resource;
 
     private:  
 };

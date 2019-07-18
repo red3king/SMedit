@@ -2,6 +2,8 @@
 
 #include "historymanager/operation.h"
 #include "historymanager/operations/machine_ops.h"
+#include "historymanager/operations/resource_ops.h"
+#include "historymanager/operations/resourcelock_ops.h"
 #include "models/machine.h"
 #include "models/project.h"
 
@@ -39,4 +41,38 @@ TEST_CASE("Operation.may_collapse", "[operations]")
 
     // Can collapse when target same
     REQUIRE(true == a.may_collapse(b));
+}
+
+
+TEST_CASE("Resource operations", "[operations]")
+{
+    auto p = Project();
+    
+    REQUIRE(0 == p.resources.size());
+
+    auto rc = OpResourceCreate("res1", "/res1.py");
+    rc.execute(p);
+
+    REQUIRE(1 == p.resources.size());
+    Resource* res1 = p.resources[0];
+    REQUIRE("res1" == res1->name);
+    REQUIRE("/res1.py" == res1->path);
+
+    auto m = new Machine(1);
+    p.machines.push_back(m);
+
+    auto rlc = OpResourceLockCreate(m, res1, 100, 100);
+    REQUIRE(0 == m->resourcelocks.size());
+    rlc.execute(p);
+    REQUIRE(1 == m->resourcelocks.size());
+    REQUIRE(res1 == m->resourcelocks[0]->resource);
+
+    auto rld = OpResourceLockDelete(m, m->resourcelocks[0]);
+    rld.execute(p);
+    REQUIRE(0 == m->resourcelocks.size());
+
+    auto rd = OpResourceDelete(res1);
+    rd.execute(p);
+    REQUIRE(0 == p.resources.size());
+    
 }

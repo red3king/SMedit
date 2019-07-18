@@ -7,7 +7,9 @@ HistoryManager::HistoryManager(int max_operations, int op_ex_thresh, int min_und
     this->max_operations = max_operations;
     this->op_ex_thresh = op_ex_thresh;
     this->min_undos = min_undos;
+
     project_created = false;
+    undo_position = 0;
 }
 
 
