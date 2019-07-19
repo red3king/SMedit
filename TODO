@@ -1,12 +1,7 @@
 RIGHT NOW LEFT OFF HERE:
-    text seems to be working, but:
-        -the text appears above where i assumed it would be
-        -the text is white (or possibly reusing the same fill color grey from beforoe)
-            instead of the red/black i was testing out
-        -when i zoom way out, i see something going red so the red is being applied,
-            somehow, but not to the text...
-
-
+    just added create/delete ops for resource*
+    need to add move op for resourcelock
+        want to try to make it derive from OpBoxEntityMove ABC
 
 === for later === 
 add error checks to everything that could fail:

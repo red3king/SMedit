@@ -14,21 +14,21 @@
         <child>
           <object class="GtkButton" id="closebutton">
             <property name="label" translatable="yes">close</property>
-            <property name="width_request">200</property>
-            <property name="height_request">80</property>
+            <property name="width_request">166</property>
+            <property name="height_request">47</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
           </object>
           <packing>
-            <property name="x">50</property>
-            <property name="y">448</property>
+            <property name="x">16</property>
+            <property name="y">830</property>
           </packing>
         </child>
         <child>
           <object class="GtkGLArea" id="gl_area">
-            <property name="width_request">400</property>
-            <property name="height_request">400</property>
+            <property name="width_request">800</property>
+            <property name="height_request">800</property>
             <property name="visible">True</property>
             <property name="app_paintable">True</property>
             <property name="can_focus">False</property>
@@ -36,20 +36,6 @@
           <packing>
             <property name="x">5</property>
             <property name="y">5</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkButton" id="rotatebutton">
-            <property name="label" translatable="yes">rotate</property>
-            <property name="width_request">100</property>
-            <property name="height_request">80</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-          </object>
-          <packing>
-            <property name="x">286</property>
-            <property name="y">447</property>
           </packing>
         </child>
       </object>

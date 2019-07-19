@@ -28,3 +28,18 @@ class OpResourceLockDelete : public Operation
         unsigned int machine_id, resourcelock_id;
 };
 
+
+class OpResourceLockMove : public Operation
+{
+    public:
+        OpResourceLockMove(Machine* machine, ResourceLock* resourcelock, float x, float y);
+        OpResourceLockMove* clone();
+
+        unsigned int execute(Project& project);
+        bool may_collapse_impl(Operation& other);
+        void collapse(Operation& other);
+
+    private:
+        unsigned int machine_id, resourcelock_id;
+        float x, y;
+};

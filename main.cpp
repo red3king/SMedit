@@ -9,6 +9,8 @@
 #include "historymanager/historymanager.h"
 #include "historymanager/operations/machine_ops.h"
 #include "historymanager/operations/state_ops.h"
+#include "historymanager/operations/resource_ops.h"
+#include "historymanager/operations/resourcelock_ops.h"
 #include "gui/gui_context.h"
 
 
@@ -25,10 +27,6 @@ class MainWindow : public Gtk::ApplicationWindow
             builder->get_widget("closebutton", closeBtn);
             closeBtn->signal_clicked().connect(sigc::mem_fun(this, &MainWindow::on_close_click));
             
-            Gtk::Button* rotate_button = nullptr;
-            builder->get_widget("rotatebutton", rotate_button);
-            rotate_button->signal_clicked().connect(sigc::mem_fun(this, &MainWindow::on_rotate_click));
-
             // GLArea stuff
             gl_area = nullptr;
             builder->get_widget("gl_area", gl_area);
@@ -47,6 +45,13 @@ class MainWindow : public Gtk::ApplicationWindow
             machine->states[0]->name = "NEW STATE!!";
             auto stcr82 = OpStateCreate(machine, 220, 30);
             history_manager->submit_operation(stcr82);
+
+            auto resource_create = OpResourceCreate("resource #1", "ftp://www.exe");
+            unsigned int res_id = history_manager->submit_operation(resource_create);
+            Resource* res = history_manager->current_project.get_resource_by_id(res_id);
+            auto resourcelock_create = OpResourceLockCreate(machine, res, 20, 222);
+            history_manager->submit_operation(resourcelock_create);
+            
         }
 
         virtual ~MainWindow() = default;
@@ -60,11 +65,6 @@ class MainWindow : public Gtk::ApplicationWindow
         {
             log("closing.");
             hide();
-        }
-
-        void on_rotate_click()
-        {
-            gl_area->queue_draw();
         }
 
     private:
@@ -81,7 +81,6 @@ int main(int argc, char* argv[])
     
     MainWindow* wnd = nullptr;
     builder->get_widget_derived("mainwin", wnd);
-
 
     auto r = app->run(*wnd);
     delete wnd;

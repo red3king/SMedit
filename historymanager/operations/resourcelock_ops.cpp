@@ -73,3 +73,45 @@ OpResourceLockDelete* OpResourceLockDelete::clone()
 {
     return new OpResourceLockDelete(*this);
 }
+
+
+// Move
+
+OpResourceLockMove::OpResourceLockMove(Machine* machine, ResourceLock* resourcelock, float x, float y)
+{
+    machine_id = machine->id;
+    resourcelock_id = resourcelock->id;
+    this->x = x;
+    this->y = y;
+}
+
+
+OpResourceLockMove* OpResourceLockMove::clone()
+{
+    return new OpResourceLockMove(*this);
+}
+
+
+unsigned int OpResourceLockMove::execute(Project& project)
+{
+    Machine* machine = project.get_machine_by_id(machine_id);
+    ResourceLock* lock = machine->get_resourcelock_by_id(resourcelock_id);
+    lock->x = x;
+    lock->y = y;
+    return resourcelock_id;
+}
+
+
+bool OpResourceLockMove::may_collapse_impl(Operation& other)
+{
+    OpResourceLockMove& other_lm = dynamic_cast<OpResourceLockMove&>(other);
+    return other_lm.resourcelock_id == resourcelock_id;
+}
+
+
+void OpResourceLockMove::collapse(Operation& other)
+{
+    OpResourceLockMove& other_lm = dynamic_cast<OpResourceLockMove&>(other);
+    x = other_lm.x;
+    y = other_lm.y;
+}

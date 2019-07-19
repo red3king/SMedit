@@ -1,8 +1,11 @@
 #include "gui_op_factory.h"
 #include "gui_operation.h" 
+
 #include "zoom.h"
 #include "move.h"
 #include "move_state.h"
+#include "move_resourcelock.h"
+
 #include "gui/models/gui_resourcelock.h"
 #include "gui/models/gui_state.h"
 #include "gui/models/gui_transition.h"
@@ -50,6 +53,9 @@ bool _mcgo_transition(GUIModel* model, GUIState& gui_state, CurrentEvents& curre
 bool _mcgo_resourcelock(GUIModel* model, GUIState& gui_state, CurrentEvents& current_events, GUIOperation*& pref)
 {
     GMResourceLock* resourcelock_model = dynamic_cast<GMResourceLock*>(model);
+
+    if(MoveResourceLock::maybe_create(resourcelock_model, gui_state, current_events, pref))
+        return true;
 
     return false;
 }

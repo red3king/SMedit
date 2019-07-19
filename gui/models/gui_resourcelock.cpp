@@ -51,5 +51,5 @@ NVGcolor GMResourceLock::get_title_text_color()
 
 std::string GMResourceLock::get_title()
 {
-    return "Lock [todo: name here]";
+    return "Lock [" + resourcelock->resource->name + "]";
 }
