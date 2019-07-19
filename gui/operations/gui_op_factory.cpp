@@ -5,6 +5,7 @@
 #include "move.h"
 #include "move_state.h"
 #include "move_resourcelock.h"
+#include "resize_box_entity.h"
 
 #include "gui/models/gui_resourcelock.h"
 #include "gui/models/gui_state.h"
@@ -35,6 +36,9 @@ bool _mcgo_state(GUIModel* model, GUIState& gui_state, CurrentEvents& current_ev
 {
     GMState* state_model = dynamic_cast<GMState*>(model);
 
+    if(ResizeBoxEntity::maybe_create(state_model, gui_state, current_events, pref))
+        return true;
+
     if(MoveState::maybe_create(state_model, gui_state, current_events, pref))
         return true;
     
@@ -53,6 +57,9 @@ bool _mcgo_transition(GUIModel* model, GUIState& gui_state, CurrentEvents& curre
 bool _mcgo_resourcelock(GUIModel* model, GUIState& gui_state, CurrentEvents& current_events, GUIOperation*& pref)
 {
     GMResourceLock* resourcelock_model = dynamic_cast<GMResourceLock*>(model);
+
+    if(ResizeBoxEntity::maybe_create(resourcelock_model, gui_state, current_events, pref))
+        return true;
 
     if(MoveResourceLock::maybe_create(resourcelock_model, gui_state, current_events, pref))
         return true;

@@ -48,21 +48,37 @@ bool GMBox::mouse_in_range(float mouse_x, float mouse_y)
 
 bool GMBox::mouse_within(float mouse_x, float mouse_y)
 {
-    float mouse_x_world, mouse_y_world, x, y, w, h;
-    ctx->screen_to_world(mouse_x_world, mouse_y_world, mouse_x, mouse_y);
+    float screen_x, screen_y, screen_w, screen_h, x, y, w, h;
     get_coords(x, y, w, h);
+    screen_w = ctx->world_dist_to_screen(w);
+    screen_h = ctx->world_dist_to_screen(w);
+    ctx->world_to_screen(screen_x, screen_y, x, y);
 
-    return point_in_box(mouse_x_world, mouse_y_world, x + BM_INT_GAP, y + BM_INT_GAP, w - BM_INT_GAP, h - BM_INT_GAP);
+    return point_in_box(mouse_x, mouse_y, screen_x + BM_INT_GAP, screen_y + BM_INT_GAP, 
+            screen_w - 2*BM_INT_GAP, screen_h - 2*BM_INT_GAP);
 }
 
 
-bool GMBox::mouse_on_border(float mouse_x, float mouse_y)
+BorderType GMBox::mouse_on_border(float mouse_x, float mouse_y)
 {
-    float mouse_x_world, mouse_y_world, x, y, w, h;
+    float screen_x, screen_y, screen_w, screen_h, x, y, w, h;
     get_coords(x, y, w, h);
-    ctx->screen_to_world(mouse_x_world, mouse_y_world, mouse_x, mouse_y);
-    
-    return point_in_box(mouse_x_world, mouse_y_world, x - BM_INT_GAP, y - BM_INT_GAP,
-            w + BM_INT_GAP, h + BM_INT_GAP) && !mouse_within(mouse_x, mouse_y);
+    screen_w = ctx->world_dist_to_screen(w);
+    screen_h = ctx->world_dist_to_screen(w);
+    ctx->world_to_screen(screen_x, screen_y, x, y);
+
+    if(point_in_box(mouse_x, mouse_y, screen_x, screen_y - BM_INT_GAP, screen_w, 2 * BM_INT_GAP))
+        return BT_TOP;  
+
+    if(point_in_box(mouse_x, mouse_y, screen_x + screen_w - BM_INT_GAP, screen_y, 2 * BM_INT_GAP, screen_h))
+        return BT_RIGHT;
+
+    if(point_in_box(mouse_x, mouse_y, screen_x, screen_y + screen_h - BM_INT_GAP, screen_w, 2*BM_INT_GAP))
+        return BT_BOTTOM;
+
+    if(point_in_box(mouse_x, mouse_y, screen_x - BM_INT_GAP, screen_y, 2*BM_INT_GAP, screen_h))
+        return BT_LEFT;
+
+    return BT_NONE;    
 };
 

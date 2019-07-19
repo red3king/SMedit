@@ -1,7 +1,9 @@
 RIGHT NOW LEFT OFF HERE:
-    just added create/delete ops for resource*
-    need to add move op for resourcelock
-        want to try to make it derive from OpBoxEntityMove ABC
+    cursor should change when hovering over entities
+    then do the double resize operation (corner drag)
+    then possibly refactor the move state/rlock ops into a single move box entity operation to be consistent
+
+ 
 
 === for later === 
 add error checks to everything that could fail:

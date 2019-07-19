@@ -2,8 +2,7 @@
 #include <gtkmm.h>
 #include <gdkmm/device.h>
 
-#define NANOVG_GL3_IMPLEMENTATION   // TODO - figure out if i need this in both places (in main.cpp as well now)
-                                    // is there even any nanovg stuff in main.cpp anymore?
+#define NANOVG_GL3_IMPLEMENTATION   
 #include "lib/nanovg/nanovg.h"
 #include "lib/nanovg/nanovg_gl.h"
 
@@ -193,7 +192,7 @@ void GUIContext::_handle_event()
     bool created = false;
 
     GUIOpResult result = current_operation->should_continue(gui_state, current_events);
-    
+
     if(result == END)
     {
         created = current_operation->on_end(gui_state, current_events, new_op);
