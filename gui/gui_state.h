@@ -4,6 +4,7 @@
 
 #include "draw_context.h"
 #include "gui/models/gui_model.h"
+#include "signals.h"
 
 
 class GUIState
@@ -29,6 +30,8 @@ class GUIState
         void add_gui_model(EntityType entity_type, unsigned int entity_id);
         void remove_gui_model(unsigned int entity_id);
 
+        CursorType update_models(CurrentEvents& current_events);
+        
         void draw();
 
     private:

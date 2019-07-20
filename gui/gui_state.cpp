@@ -88,6 +88,44 @@ void GUIState::draw()
 }
 
 
+CursorType _filterupdate(vector<GUIModel*>& models, CurrentEvents& current_events, EntityType type)
+{
+    CursorType result = CT_DEFAULT;
+    CursorType res;
+
+    for(int i=0; i<models.size(); i++)
+    {
+        if(models[i]->type == type)
+        {
+            res = models[i]->update(current_events);
+    
+            if(result == CT_DEFAULT)
+                result = res;
+        }
+    }
+
+    return result;
+}
+
+
+CursorType GUIState::update_models(CurrentEvents& current_events)
+{
+    CursorType result = CT_DEFAULT;
+    CursorType current;
+
+    for(int i=0; i<gui_update_order.size(); i++)
+    {
+        EntityType to_update = gui_update_order[i];
+        current = _filterupdate(gui_models, current_events, to_update);
+
+        if(result == CT_DEFAULT)
+            result = current;
+    }
+    
+   return result; 
+}
+
+
 void GUIState::add_gui_model(EntityType entity_type, unsigned int entity_id)
 {
     bool created = true;

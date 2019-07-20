@@ -18,8 +18,8 @@ class GMBox : public GUIModel
         virtual NVGcolor get_title_text_color()=0;
         virtual std::string get_title()=0;
 
+        CursorType update(CurrentEvents& current_events);
         void draw();
-        bool mouse_in_range(float mouse_x, float mouse_y);
 
         bool mouse_within(float mouse_x, float mouse_y);
         BorderType mouse_on_border(float mouse_x, float mouse_y);

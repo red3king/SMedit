@@ -4,6 +4,7 @@
 #include "utils.h"
 #include "log.h"
 
+
 GMBox::GMBox(DrawContext* ctx, EntityType type) : GUIModel(ctx, type) { }
 
 
@@ -11,7 +12,6 @@ void GMBox::draw()
 {
     float x, y, w, h, screen_x, screen_y, screen_w, screen_h;
     get_coords(x, y, w, h);
-
     float title_height = 21.0;
     float border_w = 4.0;
 
@@ -40,12 +40,6 @@ void GMBox::draw()
 }
 
 
-bool GMBox::mouse_in_range(float mouse_x, float mouse_y)
-{
-    return mouse_within(mouse_x, mouse_y);
-}
-
-
 bool GMBox::mouse_within(float mouse_x, float mouse_y)
 {
     float screen_x, screen_y, screen_w, screen_h, x, y, w, h;
@@ -64,7 +58,7 @@ BorderType GMBox::mouse_on_border(float mouse_x, float mouse_y)
     float screen_x, screen_y, screen_w, screen_h, x, y, w, h;
     get_coords(x, y, w, h);
     screen_w = ctx->world_dist_to_screen(w);
-    screen_h = ctx->world_dist_to_screen(w);
+    screen_h = ctx->world_dist_to_screen(h);
     ctx->world_to_screen(screen_x, screen_y, x, y);
 
     if(point_in_box(mouse_x, mouse_y, screen_x, screen_y - BM_INT_GAP, screen_w, 2 * BM_INT_GAP))
@@ -82,3 +76,21 @@ BorderType GMBox::mouse_on_border(float mouse_x, float mouse_y)
     return BT_NONE;    
 };
 
+
+CursorType GMBox::update(CurrentEvents& current_events)
+{
+    switch(mouse_on_border(current_events.mouse_x, current_events.mouse_y))
+    {
+        case BT_TOP:
+        case BT_BOTTOM:
+            return CT_RS_NS;
+        case BT_RIGHT:
+        case BT_LEFT:
+            return CT_RS_EW;
+    }
+    
+    if(mouse_within(current_events.mouse_x, current_events.mouse_y))
+        return CT_MOVE;
+
+    return CT_DEFAULT;    
+}

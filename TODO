@@ -1,5 +1,4 @@
 RIGHT NOW LEFT OFF HERE:
-    cursor should change when hovering over entities
     then do the double resize operation (corner drag)
     then possibly refactor the move state/rlock ops into a single move box entity operation to be consistent
 

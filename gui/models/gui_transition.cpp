@@ -13,9 +13,9 @@ void GMTransition::draw()
 }
 
 
-bool GMTransition::mouse_in_range(float mouse_x, float mouse_y)
+CursorType GMTransition::update(CurrentEvents& current_events)
 {
-    return false;
+    return CT_DEFAULT;
 }
 
 

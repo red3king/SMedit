@@ -11,6 +11,7 @@ class GMState : public GMBox
         void get_coords(float& x, float& y, float& w, float& h);
         void set_coords(float x, float y, float w, float h);
         void draw_interior();
+
         Entity* get_entity();
 
         NVGcolor get_border_color();

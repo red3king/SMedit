@@ -8,6 +8,19 @@ Signals::Signals()
 }
 
 
+void Signals::register_set_cursor_handler(SetCursorHandler handler)
+{
+    set_cursor_handlers.push_back(handler);
+}
+
+
+void Signals::fire_set_cursor(CursorType cursor_type)
+{
+    for(int i=0; i<set_cursor_handlers.size(); i++)
+        set_cursor_handlers[i](cursor_type);
+}
+
+
 void Signals::register_gui_signal_handler(GuiModelSignalHandler handler)
 {
     gui_signal_handlers.push_back(handler);

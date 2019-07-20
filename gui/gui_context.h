@@ -50,6 +50,8 @@ class GUIContext
         GUIState gui_state;
         GUIOperation* current_operation;
 
+        CursorType current_cursor_type;
+
         HistoryManager* history_manager;
 
     private:

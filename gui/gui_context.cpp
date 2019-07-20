@@ -16,7 +16,8 @@ GUIContext::GUIContext(Gtk::GLArea* gl_area, HistoryManager* history_manager)
     this->gl_area = gl_area;
     this->history_manager = history_manager;
     current_operation = nullptr;
-    
+    current_cursor_type = CT_DEFAULT;
+
     register_sm_signal_handlers();
     register_gtk_signal_handlers();
 }
@@ -176,8 +177,16 @@ bool GUIContext::has_current_operation()
 
 void GUIContext::_handle_event()
 {
-    // TODO - code for highlighting nearest object and other gui stuff
-    // which is not based on operations goes here
+    // Let gui models react to mouse being nearby & possibly get new cursor 
+    CursorType new_cursor = gui_state.update_models(current_events);
+    
+    if(new_cursor != current_cursor_type)
+    {
+        current_cursor_type = new_cursor;
+        signals.fire_set_cursor(current_cursor_type);
+    }
+
+    // Maybe start a new gui operation
 
     if(!has_current_operation())
     {
@@ -187,6 +196,8 @@ void GUIContext::_handle_event()
             return;
         }
     }
+
+    // Continue current gui operation
 
     Operation* new_op = nullptr;
     bool created = false;

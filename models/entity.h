@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+
 
 enum EntityType
 {
@@ -22,3 +24,6 @@ class Entity
     private:
 
 };
+
+
+extern std::array<EntityType, 3> gui_update_order;
