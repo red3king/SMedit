@@ -178,8 +178,19 @@ bool GUIContext::has_current_operation()
 void GUIContext::_handle_event()
 {
     // Let gui models react to mouse being nearby & possibly get new cursor 
-    CursorType new_cursor = gui_state.update_models(current_events);
+    bool clear_selected;
+    GUIModel* just_selected;
+    CursorType new_cursor = gui_state.update_models(current_events, just_selected, clear_selected);
     
+    /*
+     * TODO - uncomment when I build the selected item widget factory
+    if(just_selected != nullptr)
+        signals.fire_set_selected(just_selected);
+
+    if(clear_selected)
+        signals.fire_set_selected(nullptr);
+    */
+
     if(new_cursor != current_cursor_type)
     {
         current_cursor_type = new_cursor;

@@ -13,12 +13,12 @@ class GMBox : public GUIModel
 
         virtual void get_coords(float& x, float& y, float& w, float& h)=0; // TODO - since i added get_entity(), these dont have to be virtual and i can remove the implementations from subclasses
         virtual void set_coords(float x, float y, float w, float h)=0;
-        virtual void draw_interior()=0;
+        virtual void draw_interior(float x, float y, float w, float h)=0;
         virtual NVGcolor get_border_color()=0;
         virtual NVGcolor get_title_text_color()=0;
         virtual std::string get_title()=0;
 
-        CursorType update(CurrentEvents& current_events);
+        CursorType update_impl(CurrentEvents& current_events);
         void draw();
 
         bool mouse_within(float mouse_x, float mouse_y);

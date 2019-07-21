@@ -31,7 +31,7 @@ Entity* GMResourceLock::get_entity()
 }
 
 
-void GMResourceLock::draw_interior()
+void GMResourceLock::draw_interior(float x, float y, float w, float h)
 {
 
 }

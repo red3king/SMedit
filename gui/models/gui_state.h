@@ -10,7 +10,7 @@ class GMState : public GMBox
         
         void get_coords(float& x, float& y, float& w, float& h);
         void set_coords(float x, float y, float w, float h);
-        void draw_interior();
+        void draw_interior(float x, float y, float w, float h);
 
         Entity* get_entity();
 

@@ -88,7 +88,7 @@ void GUIState::draw()
 }
 
 
-CursorType _filterupdate(vector<GUIModel*>& models, CurrentEvents& current_events, EntityType type)
+CursorType _filterupdate(vector<GUIModel*>& models, CurrentEvents& current_events, EntityType type, GUIModel*& just_selected)
 {
     CursorType result = CT_DEFAULT;
     CursorType res;
@@ -97,7 +97,7 @@ CursorType _filterupdate(vector<GUIModel*>& models, CurrentEvents& current_event
     {
         if(models[i]->type == type)
         {
-            res = models[i]->update(current_events);
+            res = models[i]->update(current_events, just_selected);
     
             if(result == CT_DEFAULT)
                 result = res;
@@ -108,20 +108,35 @@ CursorType _filterupdate(vector<GUIModel*>& models, CurrentEvents& current_event
 }
 
 
-CursorType GUIState::update_models(CurrentEvents& current_events)
+CursorType GUIState::update_models(CurrentEvents& current_events, GUIModel*& just_selected, bool& clear_selected)
 {
     CursorType result = CT_DEFAULT;
     CursorType current;
+    just_selected = nullptr;
+    clear_selected = false;
 
     for(int i=0; i<gui_update_order.size(); i++)
     {
         EntityType to_update = gui_update_order[i];
-        current = _filterupdate(gui_models, current_events, to_update);
+        current = _filterupdate(gui_models, current_events, to_update, just_selected);
 
         if(result == CT_DEFAULT)
             result = current;
     }
-    
+
+    if(just_selected == nullptr && current_events.event_type == ET_MB_PRESS && 
+            current_events.button_pressed(MB_LEFT))
+        clear_selected = true;
+
+    // GUI models can't tell when they have been deselected
+    // they must be told when something else gets clicked
+    for(int i=0; i<gui_models.size(); i++)
+    {
+        GUIModel* model = gui_models[i];
+        if(clear_selected || (just_selected != nullptr && just_selected != model))
+            model->set_deselected();
+    }
+
    return result; 
 }
 
@@ -192,9 +207,6 @@ void GUIState::remove_gui_model(unsigned int entity_id)
     delete gui_models[index];
     gui_models.erase(gui_models.begin() + index);
 }
-
-
-
 
 
 

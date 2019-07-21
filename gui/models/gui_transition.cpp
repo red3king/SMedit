@@ -13,7 +13,7 @@ void GMTransition::draw()
 }
 
 
-CursorType GMTransition::update(CurrentEvents& current_events)
+CursorType GMTransition::update_impl(CurrentEvents& current_events)
 {
     return CT_DEFAULT;
 }
@@ -22,4 +22,10 @@ CursorType GMTransition::update(CurrentEvents& current_events)
 Entity* GMTransition::get_entity()
 {
     return transition;
+}
+
+
+bool GMTransition::mouse_within(float mouse_x, float mouse_y)
+{
+    return false;
 }

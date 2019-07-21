@@ -1,10 +1,14 @@
 RIGHT NOW LEFT OFF HERE:
+    JUST FINISHED WITH THE HOVER SHADOW AND SELECTED COLOR
     then do the double resize operation (corner drag)
     then possibly refactor the move state/rlock ops into a single move box entity operation to be consistent
-
+    
+    fix drawing order to be same as click event handling order
+        (resourcelocks last, either states or transitions first, i think transitions?)
  
 
 === for later === 
+
 add error checks to everything that could fail:
     opengl init
     font load

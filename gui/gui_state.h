@@ -30,7 +30,7 @@ class GUIState
         void add_gui_model(EntityType entity_type, unsigned int entity_id);
         void remove_gui_model(unsigned int entity_id);
 
-        CursorType update_models(CurrentEvents& current_events);
+        CursorType update_models(CurrentEvents& current_events, GUIModel*& just_selected, bool& clear_selected);
         
         void draw();
 

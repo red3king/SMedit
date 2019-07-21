@@ -49,9 +49,13 @@ std::string GMState::get_title()
 }
 
 
-void GMState::draw_interior()
+void GMState::draw_interior(float x, float y, float w, float h)
 {
-        
+    NVGcontext* vg = ctx->vg;
+    nvgBeginPath(vg);     
+    nvgRect(vg, x, y, w, h);
+    nvgFillColor(vg, nvgRGBA(0x00, 0x2b, 0x36, 155));
+    nvgFill(vg);
 }
 
 

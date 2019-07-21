@@ -9,7 +9,8 @@ class GMTransition : public GUIModel
         GMTransition(DrawContext* ctx, Transition* transition);
 
         void draw();
-        CursorType update(CurrentEvents& current_events);
+        CursorType update_impl(CurrentEvents& current_events);
+        bool mouse_within(float mouse_x, float mouse_y);
         Entity* get_entity();
 
         Transition* transition;
