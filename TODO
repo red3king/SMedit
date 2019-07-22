@@ -1,5 +1,18 @@
+get theta of line
+get theta to mouse relative to that
+solve for height away from line (opposite)
+solve for position along line (adjacent)
+hyp = distance between x0,y0 and mouse
+
+
+
+
 RIGHT NOW LEFT OFF HERE:
-    JUST FINISHED WITH THE HOVER SHADOW AND SELECTED COLOR
+    working on transition ops
+        first do disconnected move
+        then do one end only move with state attachment + detachment
+        then do arc render when connecting to same state twice
+
     then do the double resize operation (corner drag)
     then possibly refactor the move state/rlock ops into a single move box entity operation to be consistent
     

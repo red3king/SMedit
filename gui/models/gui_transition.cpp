@@ -3,6 +3,16 @@
 #include "utils.h"
 
 
+#define D0T .05
+#define D1T .95
+#define LST .1
+#define LET .9
+#define APT .7
+
+#define EP_THRESH 10
+#define LD_THRESH 7
+
+
 GMTransition::GMTransition(DrawContext* ctx, Transition* transition) : GUIModel(ctx, TRANSITION)
 {
     this->transition = transition;
@@ -24,11 +34,11 @@ void GMTransition::draw()
     float apx, apy, alx, aly, arx, ary; // arrow point, arrow left, arrow right
     float d0x, d0y, d1x, d1y;           // dot 0, dot 1
 
-    interp(.05, d0x, d0y);
-    interp(.95, d1x, d1y);
-    interp(.1, lsx, lsy);
-    interp(.9, lex, ley);
-    interp(.7, apx, apy);
+    interp(D0T, d0x, d0y);
+    interp(D1T, d1x, d1y);
+    interp(LST, lsx, lsy);
+    interp(LET, lex, ley);
+    interp(APT, apx, apy);
 
     float theta = atan2(transition->y1 - transition->y0, transition->x1 - transition->x0);
     float theta_al = theta + .75 * M_PI;
@@ -61,16 +71,38 @@ void GMTransition::draw()
     nvgLineTo(vg, arx, ary);
 
     // stroke it
-    nvgStrokeColor(vg, GRAY);
+
+    NVGcolor main_color = selected ? ORANGERED : GRAY;
+    NVGcolor highlight_color = GRAYWHITE;
+
+    if(mouse_over)
+    {
+        nvgStrokeColor(vg, highlight_color);
+        nvgStrokeWidth(vg, 4);
+        nvgStroke(vg);
+    }
+
+    nvgStrokeColor(vg, main_color);
     nvgStrokeWidth(vg, 2.5);
     nvgStroke(vg);
 
     // Draw dots
     nvgReset(vg);
     nvgBeginPath(vg);
+
+    if(mouse_over)
+    {
+        nvgCircle(vg, d0x, d0y, 6);
+        nvgCircle(vg, d1x, d1y, 6);
+        nvgFillColor(vg, highlight_color);
+        nvgFill(vg);
+        nvgReset(vg);
+        nvgBeginPath(vg);
+    }
+
     nvgCircle(vg, d0x, d0y, 4);
     nvgCircle(vg, d1x, d1y, 4);
-    nvgFillColor(vg, GRAY);
+    nvgFillColor(vg, main_color);
     nvgFill(vg);
 }
 
@@ -96,5 +128,20 @@ Entity* GMTransition::get_entity()
 
 bool GMTransition::mouse_within(float mouse_x, float mouse_y)
 {
-    return false;
+    float mouse_wx, mouse_wy;
+    ctx->screen_to_world(mouse_wx, mouse_wy, mouse_x, mouse_y);
+
+    float d0x, d0y, d1x, d1y;
+    interp(D0T, d0x, d0y);
+    interp(D1T, d1x, d1y);
+    
+    if(distance(mouse_wx, mouse_wy, d0x, d0y) < EP_THRESH ||
+            distance(mouse_wx, mouse_wy, d1x, d1y) < EP_THRESH)
+        return true;
+
+    float t, d;
+    distance_to_line(transition->x0, transition->y0, transition->x1, transition->y1,
+            mouse_wx, mouse_wy, t, d);
+
+    return t > 0 && t < 1 && abs(d) < LD_THRESH;
 }
