@@ -14,4 +14,7 @@ class GMTransition : public GUIModel
         Entity* get_entity();
 
         Transition* transition;
+
+    private:
+        void interp(float t, float& x_out, float& y_out);
 };

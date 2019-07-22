@@ -12,6 +12,7 @@
 #include "historymanager/operations/state_ops.h"
 #include "historymanager/operations/resource_ops.h"
 #include "historymanager/operations/resourcelock_ops.h"
+#include "historymanager/operations/transition_ops.h"
 #include "gui/gui_context.h"
 #include "signals.h"
 #include "cursor.h"
@@ -54,7 +55,10 @@ class MainWindow : public Gtk::ApplicationWindow
             Resource* res = history_manager->current_project.get_resource_by_id(res_id);
             auto resourcelock_create = OpResourceLockCreate(machine, res, 20, 222);
             history_manager->submit_operation(resourcelock_create);            
-            
+
+            auto transition_create = OpTransitionCreate(machine, 400, 400, 600, 420);
+            history_manager->submit_operation(transition_create);
+
             gl_area->signal_realize().connect(sigc::mem_fun(this, &MainWindow::connect_cursor_signals));
         }
 

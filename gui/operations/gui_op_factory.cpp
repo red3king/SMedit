@@ -70,7 +70,7 @@ bool _mcgo_resourcelock(GUIModel* model, GUIState& gui_state, CurrentEvents& cur
 
 bool GUIOpFactory::maybe_create_gui_op(GUIState& gui_state, CurrentEvents& current_events, GUIOperation*& pref)
 {
-    if(_apply_on(gui_state, current_events, TRANSITION, _mcgo_resourcelock, pref))
+    if(_apply_on(gui_state, current_events, TRANSITION, _mcgo_transition, pref))
         return true;
 
     if(_apply_on(gui_state, current_events, STATE, _mcgo_state, pref))

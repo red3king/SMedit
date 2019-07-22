@@ -1,5 +1,7 @@
 #pragma once
 
+#define _USE_MATH_DEFINES   // for pi
+#include <cmath>
 #include <string>
 
 using std::string;
@@ -19,3 +21,7 @@ class IOResult
     private:
 
 };
+
+
+void move_in_direction(float x0, float y0, float r, float theta, float& x1, float& y1);
+

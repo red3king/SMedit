@@ -1,5 +1,6 @@
 #include "lib/nanovg/nanovg.h"
 
+#include "gui/colors.h"
 #include "gui_box_model.h"
 #include "utils.h"
 #include "log.h"
@@ -33,7 +34,7 @@ void GMBox::draw()
     nvgRect(vg, screen_x + border_w, screen_y + title_height, screen_w - 2*border_w, 
             screen_h - border_w - title_height);
     nvgPathWinding(vg, NVG_HOLE);    
-    nvgFillColor(vg, selected ? nvgRGBA(0xb0, 0x35, 0x00, 255) : nvgRGBA(0x2f, 0x30, 0x32, 255));
+    nvgFillColor(vg, selected ? ORANGERED : GRAY);
     nvgFill(vg); 
 
     // mouse hover shadow thing
@@ -56,7 +57,7 @@ void GMBox::draw()
     }
 
     // title
-    ctx->draw_text_noclip(get_title(), ctx->font_hack_bold, 16, nvgRGBA(0xe6, 0xe5, 0xca, 255), 
+    ctx->draw_text_noclip(get_title(), ctx->font_hack_bold, 16, WHITE, 
             screen_x + 4, screen_y + 4);
 
     // interior 
