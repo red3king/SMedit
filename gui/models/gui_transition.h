@@ -3,6 +3,9 @@
 #include "gui_model.h"
 
 
+enum TransitionBorder { TB_NONE, TB_BEGIN, TB_MID, TB_END };
+
+
 class GMTransition : public GUIModel
 {
     public:
@@ -14,6 +17,7 @@ class GMTransition : public GUIModel
         Entity* get_entity();
 
         Transition* transition;
+        TransitionBorder mouse_on_border(float mouse_x, float mouse_y);
 
     private:
         void interp(float t, float& x_out, float& y_out);

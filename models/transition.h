@@ -59,6 +59,10 @@ class Transition : public Entity
 
         float x0, y0, x1, y1;
 
+        bool from_connected();
+        bool to_connected();
+        bool any_connected();
+
     private:
 };
 

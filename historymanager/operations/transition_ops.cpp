@@ -69,3 +69,52 @@ OpTransitionDelete* OpTransitionDelete::clone()
 {
     return new OpTransitionDelete(*this);
 }
+
+
+// Move
+
+OpTransitionMove::OpTransitionMove(Machine* machine, Transition* transition, float x0_new, float y0_new)
+{
+    machine_id = machine->id;
+    transition_id = transition->id;
+    this->x0_new = x0_new;
+    this->y0_new = y0_new;
+}
+
+
+OpTransitionMove* OpTransitionMove::clone()
+{
+    return new OpTransitionMove(*this);
+}
+
+
+unsigned int OpTransitionMove::execute(Project& project)
+{
+    Machine* machine = project.get_machine_by_id(machine_id);
+    Transition* transition = machine->get_transition_by_id(transition_id);
+
+    float dy = transition->y1 - transition->y0;
+    float dx = transition->x1 - transition->x0;
+
+    transition->y0 = y0_new;
+    transition->x0 = x0_new;
+    transition->y1 = y0_new + dy;
+    transition->x1 = x0_new + dx;
+
+    return transition_id;
+}
+
+
+bool OpTransitionMove::may_collapse_impl(Operation& other)
+{
+    OpTransitionMove& other_transition = dynamic_cast<OpTransitionMove&>(other);
+    return transition_id == other_transition.transition_id;
+}
+
+
+void OpTransitionMove::collapse(Operation& other)
+{
+    OpTransitionMove& other_transition = dynamic_cast<OpTransitionMove&>(other);
+    x0_new = other_transition.x0_new;
+    y0_new = other_transition.y0_new;
+}

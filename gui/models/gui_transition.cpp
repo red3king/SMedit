@@ -128,6 +128,12 @@ Entity* GMTransition::get_entity()
 
 bool GMTransition::mouse_within(float mouse_x, float mouse_y)
 {
+    return mouse_on_border(mouse_x, mouse_y) != TB_NONE;
+}
+
+
+TransitionBorder GMTransition::mouse_on_border(float mouse_x, float mouse_y)
+{
     float mouse_wx, mouse_wy;
     ctx->screen_to_world(mouse_wx, mouse_wy, mouse_x, mouse_y);
 
@@ -135,13 +141,15 @@ bool GMTransition::mouse_within(float mouse_x, float mouse_y)
     interp(D0T, d0x, d0y);
     interp(D1T, d1x, d1y);
     
-    if(distance(mouse_wx, mouse_wy, d0x, d0y) < EP_THRESH ||
-            distance(mouse_wx, mouse_wy, d1x, d1y) < EP_THRESH)
-        return true;
+    if(distance(mouse_wx, mouse_wy, d0x, d0y) < EP_THRESH)
+        return TB_BEGIN;
+
+    if(distance(mouse_wx, mouse_wy, d1x, d1y) < EP_THRESH)
+        return TB_END;
 
     float t, d;
     distance_to_line(transition->x0, transition->y0, transition->x1, transition->y1,
             mouse_wx, mouse_wy, t, d);
 
-    return t > 0 && t < 1 && abs(d) < LD_THRESH;
+    return t > 0 && t < 1 && abs(d) < LD_THRESH ? TB_MID : TB_NONE;
 }
