@@ -18,6 +18,10 @@ bool MoveTransition::maybe_create(GMTransition* transition_gmodel, GUIState& gui
     if(!current_events.button_pressed(MB_LEFT))
         return false;
 
+    // User may only move transitions like this when not connected
+    if(transition_gmodel->transition->any_connected())
+        return false;
+
     if(transition_gmodel->mouse_on_border(current_events.mouse_x, current_events.mouse_y) != TB_MID)
         return false;
 

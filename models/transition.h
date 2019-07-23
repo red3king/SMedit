@@ -63,7 +63,11 @@ class Transition : public Entity
         bool to_connected();
         bool any_connected();
 
+        void update_positions();    // moves the transtion after connecting to state or movoing state
+
     private:
+        void update_two_positions();
+        void update_single_position(State* connected_state, float& connected_x, float& connected_y, float& free_x, float free_y);
 };
 
 

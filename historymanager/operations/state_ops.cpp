@@ -63,6 +63,21 @@ unsigned int OpStateDelete::execute(Project& project)
 
     signals.fire_gui_signal(STATE, PRE_DELETE, state_id);
 
+    // Unlink attached transitions
+    for(int i=0; i<to_delete->incoming_transitions.size(); i++)
+    {
+        Transition* transition = to_delete->incoming_transitions[i];
+        transition->to_state = nullptr;
+        transition->update_positions();
+    }
+
+    for(int i=0; i<to_delete->outgoing_transitions.size(); i++)
+    {
+        Transition* transition = to_delete->outgoing_transitions[i];
+        transition->from_state = nullptr;
+        transition->update_positions();
+    }
+
     delete to_delete;
     machine->states.erase(machine->states.begin() + i);
     return state_id;
@@ -92,6 +107,7 @@ unsigned int OpStateMove::execute(Project& project)
     State* state = machine->get_state_by_id(state_id);
     state->x = x;
     state->y = y;
+    state->update_transition_positions();
     return state->id;
 }
 

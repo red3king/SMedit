@@ -45,3 +45,19 @@ class OpTransitionMove : public Operation
 };
 
 
+class OpTransitionEndpointMove : public Operation
+{
+    public:
+        OpTransitionEndpointMove(Machine* machine, Transition* transition, bool is_endpoint_0, float x_new, float y_new);
+        OpTransitionEndpointMove(Machine* machine, Transition* transition, bool is_endpoint_0, State* new_state);
+        OpTransitionEndpointMove* clone();
+
+        unsigned int execute(Project& project);
+        bool may_collapse_impl(Operation& other);
+        void collapse(Operation& other);
+
+    private:
+        unsigned int machine_id, transition_id, new_state_id;
+        bool is_endpoint_0;
+        float x_new, y_new;
+};  

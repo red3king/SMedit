@@ -31,3 +31,193 @@ bool Transition::any_connected()
     return from_connected() || to_connected();
 }
 
+
+void Transition::update_positions()
+{
+    // Recalculate dependant transition endpoint positions
+    // Happens when a State moves or user moves free end of 
+    // connected Transition.
+
+    if(from_connected() && to_connected())
+        update_two_positions();
+
+    else if(from_connected())
+        update_single_position(from_state, x0, y0, x1, y1);
+
+    else if(to_connected())
+        update_single_position(to_state, x1, y1, x0, y0);
+}
+
+
+void _clip_to_bounds(float& val, float min, float max)
+{
+    if(val < min)
+        val = min;
+
+    else if(val > max)
+        val = max;
+}   
+
+
+void _adjust_bounds(float& from_val, float& to_val, float from_pos, float from_size, float to_pos, float to_size)
+{
+    float min, max;
+    // get bounds   
+    if(from_pos < to_pos)
+    {
+        max = from_pos + from_size;
+        min = to_pos;
+    }
+
+    else
+    {
+        max = to_pos + to_size;
+        min = from_pos;
+    }
+
+    // clip to bounds
+    _clip_to_bounds(from_val, min, max);
+    _clip_to_bounds(to_val, min, max);
+}
+
+
+void Transition::update_two_positions()
+{
+    bool is_above = to_state->y + to_state->h < from_state->y;
+    bool is_below = to_state->y > from_state->y + from_state->h;
+    bool is_leftof = to_state->x + to_state->w < from_state->x;
+    bool is_rightof = to_state->x > from_state->x + from_state->w;
+
+    // top
+    if(is_above && !is_leftof && !is_rightof)
+    {
+        y0 = from_state->y;
+        y1 = to_state->y + to_state->h;
+        _adjust_bounds(x0, x1, from_state->x, from_state->w, to_state->x, to_state->w);
+    }
+
+    // top-right
+    else if(is_above && is_rightof)
+    {
+        x0 = from_state->x + from_state->w;
+        y0 = from_state->y;
+        x1 = to_state->x;
+        y1 = to_state->y + to_state->h;
+    }
+    
+    // right    
+    else if(is_rightof && !is_above && !is_below)
+    {
+        x0 = from_state->x + from_state->w;
+        x1 = to_state->x;
+        _adjust_bounds(y0, y1, from_state->y, from_state->h, to_state->y, to_state->h);
+    }
+
+    // bottom-right
+    else if(is_below && is_rightof)
+    {
+        x0 = from_state->x + from_state->w;
+        y0 = from_state->y + from_state->h;
+        x1 = to_state->x;
+        y1 = to_state->y;
+    }
+
+    // bottom
+    else if(is_below && !is_rightof && !is_leftof)
+    {
+        y0 = from_state->y + from_state->h;
+        y1 = to_state->y;
+        _adjust_bounds(x0, x1, from_state->x, from_state->w, to_state->x, to_state->w);
+    }
+    
+    // bottom-left
+    else if(is_below && is_leftof)
+    {
+        x0 = from_state->x;
+        y0 = from_state->y + from_state->h;
+        x1 = to_state->x + to_state->w;
+        y1 = to_state->y;
+    }
+
+    // left
+    else if(is_leftof && !is_below && !is_above)
+    {
+        x0 = from_state->x;
+        x1 = to_state->x + to_state->w;
+        _adjust_bounds(y0, y1, from_state->y, from_state->h, to_state->y, to_state->h);
+    }
+
+    // top-left
+    else if(is_leftof && is_above)
+    {
+        x0 = from_state->x;
+        y0 = from_state->y;
+        x1 = to_state->x + to_state->w;
+        y1 = to_state->y + to_state->h;
+    }
+}
+
+
+void Transition::update_single_position(State* connected_state, float& connected_x, float& connected_y, float& free_x, float free_y)
+{
+    bool is_above = free_y < connected_state->y;
+    bool is_below = free_y > connected_state->y + connected_state->h;
+    bool is_rightof = free_x > connected_state->x + connected_state->w;
+    bool is_leftof = free_x < connected_state->x; 
+   
+    // top 
+    if(is_above && !is_rightof && !is_leftof)
+    {
+        connected_y = connected_state->y;
+        connected_x = free_x;
+    }    
+       
+    // top-right
+    else if(is_above && is_rightof)
+    {
+        connected_y = connected_state->y;
+        connected_x = connected_state->x + connected_state->w;
+    }
+    
+    // right
+    else if(is_rightof && !is_above && !is_below)
+    {
+        connected_y = free_y;
+        connected_x = connected_state->x + connected_state->w;
+    }   
+
+    // bottom-right
+    else if(is_rightof && is_below)
+    {
+        connected_y = connected_state->y + connected_state->h;
+        connected_x = connected_state->x + connected_state->w;
+    }
+
+    // bottom
+    else if(is_below && !is_rightof && !is_leftof)
+    {
+        connected_y = connected_state->y + connected_state->h;
+        connected_x = free_x;
+    }
+
+    // bottom-left
+    else if(is_below && is_leftof)
+    {
+        connected_y = connected_state->y + connected_state->h;
+        connected_x = connected_state->x;
+    }
+    
+    // left
+    else if(is_leftof && !is_below && !is_above)
+    {
+        connected_y = free_y;
+        connected_x = connected_state->x;
+    }
+
+    // top-left
+    else if(is_leftof && is_above)
+    {
+        connected_y = connected_state->y;
+        connected_x = connected_state->x;
+    }
+}

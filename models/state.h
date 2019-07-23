@@ -1,13 +1,16 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include "boxentity.h"
 
 using std::string;
-
+using std::vector;
 
 enum StateType { INITIAL, CODE, RETURN, SPAWN, JOIN, RUN };
+
+class Transition;
 
 
 class State : public BoxEntity
@@ -48,6 +51,12 @@ class State : public BoxEntity
         StateType type;
         string code;    // only used in CODE type 
         bool initial;
+
+        vector<Transition*> incoming_transitions, outgoing_transitions;
+
+        void add_transition(Transition* transition, bool incoming);
+        void remove_transition(Transition* transition, bool incoming);
+        void update_transition_positions();
 
     private:
 };

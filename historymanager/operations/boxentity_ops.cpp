@@ -20,7 +20,8 @@ OpBoxEntityResize* OpBoxEntityResize::clone()
 unsigned int OpBoxEntityResize::execute(Project& project)
 {
     Machine* machine = project.get_machine_by_id(machine_id);
-    BoxEntity* box_entity = machine->get_state_by_id(entity_id);
+    State* state = machine->get_state_by_id(entity_id);
+    BoxEntity* box_entity = state;
 
     if(box_entity == nullptr)
         box_entity = machine->get_resourcelock_by_id(entity_id);
@@ -45,6 +46,9 @@ unsigned int OpBoxEntityResize::execute(Project& project)
             box_entity->x = new_position;
             break;
     }
+
+    if(state != nullptr)// TODO - this feels hacky because this class is for boxentities. should i subclass this and put this in an _impl() method?
+        state->update_transition_positions();
 
     return entity_id;
 }

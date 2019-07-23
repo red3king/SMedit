@@ -59,6 +59,14 @@ unsigned int OpTransitionDelete::execute(Project& project)
     }
 
     signals.fire_gui_signal(TRANSITION, PRE_DELETE, transition_id);
+
+    // Unlink from to and from states
+    if(transition->from_state != nullptr)
+        transition->from_state->remove_transition(transition, false);
+    
+    if(transition->to_state != nullptr)
+        transition->to_state->remove_transition(transition, true);
+
     delete transition;
     machine->transitions.erase(machine->transitions.begin()+i);
     return transition_id;
@@ -118,3 +126,97 @@ void OpTransitionMove::collapse(Operation& other)
     x0_new = other_transition.x0_new;
     y0_new = other_transition.y0_new;
 }
+
+
+// Endpoint Move
+
+OpTransitionEndpointMove::OpTransitionEndpointMove(Machine* machine, Transition* transition, bool is_endpoint_0, float x_new, float y_new)
+{
+    machine_id = machine->id;
+    transition_id = transition->id;
+    this->is_endpoint_0 = is_endpoint_0;
+    this->x_new = x_new;
+    this->y_new = y_new;
+    new_state_id = -1;
+}
+
+
+OpTransitionEndpointMove::OpTransitionEndpointMove(Machine* machine, Transition* transition, bool is_endpoint_0, State* new_state)
+{
+    machine_id = machine->id;
+    transition_id = transition->id;
+    this->is_endpoint_0 = is_endpoint_0;
+    new_state_id = new_state->id;
+    this->x_new = 0;
+    this->y_new = 0;
+}
+
+
+OpTransitionEndpointMove* OpTransitionEndpointMove::clone()
+{
+    return new OpTransitionEndpointMove(*this);
+}
+
+
+unsigned int OpTransitionEndpointMove::execute(Project& project)
+{
+    Machine* machine = project.get_machine_by_id(machine_id);
+    Transition* transition = machine->get_transition_by_id(transition_id);
+    
+    if(new_state_id == -1)
+    {
+        if(is_endpoint_0)
+        {
+            transition->x0 = x_new;
+            transition->y0 = y_new;
+
+            if(transition->from_state != nullptr)
+                transition->from_state->remove_transition(transition, false);
+            
+            transition->from_state = nullptr;
+    
+        }
+        else
+        {
+            transition->x1 = x_new;
+            transition->y1 = y_new;
+            
+            if(transition->to_state != nullptr)
+                transition->to_state->remove_transition(transition, true);
+
+            transition->to_state = nullptr;
+        }
+    }
+
+    else
+    {
+        State* new_state = machine->get_state_by_id(new_state_id);
+
+        if(is_endpoint_0)
+            transition->from_state = new_state;
+        else
+            transition->to_state = new_state;
+
+        new_state->add_transition(transition, !is_endpoint_0);
+    }
+
+    transition->update_positions();
+}
+
+
+bool OpTransitionEndpointMove::may_collapse_impl(Operation& other)
+{
+    OpTransitionEndpointMove& other_op = dynamic_cast<OpTransitionEndpointMove&>(other);
+    return transition_id == other_op.transition_id && is_endpoint_0 == other_op.is_endpoint_0;
+}
+
+
+void OpTransitionEndpointMove::collapse(Operation& other)
+{
+    OpTransitionEndpointMove& other_op = dynamic_cast<OpTransitionEndpointMove&>(other);
+    x_new = other_op.x_new;
+    y_new = other_op.y_new;
+    new_state_id = other_op.new_state_id;
+}
+
+

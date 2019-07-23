@@ -1,13 +1,10 @@
-get theta of line
-get theta to mouse relative to that
-solve for height away from line (opposite)
-solve for position along line (adjacent)
-hyp = distance between x0,y0 and mouse
-
-
-
 
 RIGHT NOW LEFT OFF HERE:
+    JUST WROTE THE MOVE SINGLE ENDPOINT CODE, need to:
+        -modify state and transition delete code to delete pointers
+            note: THE TRANSITION DELETE HAD BETTER DOUBLE REMOVE THE TRANSITIN FOR LOOPY TRANSITIONS
+        -then try to get it to compile and run
+
     working on transition ops
         first do disconnected move
         then do one end only move with state attachment + detachment
@@ -21,6 +18,10 @@ RIGHT NOW LEFT OFF HERE:
  
 
 === for later === 
+
+add minimum size to resize operations
+
+text clipping for boxentity titles
 
 add error checks to everything that could fail:
     opengl init

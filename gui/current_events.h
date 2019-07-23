@@ -49,8 +49,6 @@ enum CurrentEventType
 
 class CurrentEvents
 {
-    //TODO
-
     // holds current set of keys held down, click events just made by user,
     // etc
 

@@ -100,9 +100,17 @@ void GMTransition::draw()
         nvgBeginPath(vg);
     }
 
+    NVGcolor from_color = transition->from_connected() ? WHITE : main_color;
+    NVGcolor to_color = transition->to_connected() ? WHITE : main_color;
+
     nvgCircle(vg, d0x, d0y, 4);
+    nvgFillColor(vg, from_color);
+    nvgFill(vg);
+    
+    nvgReset(vg);
+    nvgBeginPath(vg);
     nvgCircle(vg, d1x, d1y, 4);
-    nvgFillColor(vg, main_color);
+    nvgFillColor(vg, to_color);
     nvgFill(vg);
 }
 
