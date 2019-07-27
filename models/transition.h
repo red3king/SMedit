@@ -9,6 +9,7 @@ using std::string;
 
 
 enum TransitionType { EVENT, TIMEOUT, CATCHALL };
+enum CornerPosition { CP_NONE=-1, CP_TL=0, CP_TR=1, CP_BL=2, CP_BR=3 };
 
 
 class Transition : public Entity 
@@ -67,6 +68,8 @@ class Transition : public Entity
         void update_positions();    // moves the transtion after connecting to state or movoing state
 
     private:
+        CornerPosition loopback_position;
+
         void update_loopback();
         void update_two_positions();
         void update_single_position(State* connected_state, float& connected_x, float& connected_y, float& free_x, float free_y);

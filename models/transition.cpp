@@ -7,6 +7,7 @@ Transition::Transition(unsigned int id) : Entity(id)
     from_state = nullptr;
     to_state = nullptr;
     type = EVENT;
+    loopback_position = CP_NONE;
     event_name = "";
     x0 = 0;
     y0 = 0;
@@ -45,10 +46,15 @@ void Transition::update_positions()
     // Happens when a State moves or user moves free end of 
     // connected Transition.
 
+    bool _is_loopback = false;
+
     if(from_connected() && to_connected())
     {
         if(is_loopback())
+        {
+            _is_loopback = true;
             update_loopback();
+        }
         else
             update_two_positions();
     }
@@ -58,34 +64,41 @@ void Transition::update_positions()
 
     else if(to_connected())
         update_single_position(to_state, x1, y1, x0, y0);
+
+    if(!_is_loopback)
+        loopback_position = CP_NONE;
 }
 
 
 void Transition::update_loopback()
 {
-    float x = (x1 + x0) / 2.0;
-    float y = (y1 + y0) / 2.0;
-
     float xposes[] = { from_state->x, from_state->x + from_state->w, from_state->x, from_state->x + from_state->w };
     float yposes[] = { from_state->y, from_state->y, from_state->y + from_state->h, from_state->y + from_state->h };
-    
-    float min_dist = 100000;
-    int min_index = -1;
 
-    for(int i=0; i<4; i++)
+    if(loopback_position == CP_NONE)
     {
-        float dist = distance(x, y, xposes[i], yposes[i]);
-        if(dist < min_dist)
+        float min_dist = 100000;
+        int min_index = -1;
+        float x = (x1 + x0) / 2.0;
+        float y = (y1 + y0) / 2.0;
+
+        for(int i=0; i<4; i++)
         {
-            min_dist = dist;
-            min_index = i;
+            float dist = distance(x, y, xposes[i], yposes[i]);
+            if(dist < min_dist)
+            {
+                min_dist = dist;
+                min_index = i;
+            }
         }
+
+        loopback_position = (CornerPosition)min_index;
     }
 
-    x0 = xposes[min_index];
-    y0 = yposes[min_index];
-    x1 = xposes[min_index];
-    y1 = yposes[min_index];
+    x0 = xposes[loopback_position];
+    y0 = yposes[loopback_position];
+    x1 = xposes[loopback_position];
+    y1 = yposes[loopback_position];
 }
 
 
