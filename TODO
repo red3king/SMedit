@@ -1,5 +1,9 @@
 
 RIGHT NOW LEFT OFF HERE:
+    WORKING ON TRANSITION ARC RENDER, see code for details
+        just added the is_arc_upwards function, gotta use that to make the arcs upwards on the top half
+        also clean up todo
+
     JUST WROTE THE MOVE SINGLE ENDPOINT CODE, need to:
         -modify state and transition delete code to delete pointers
             note: THE TRANSITION DELETE HAD BETTER DOUBLE REMOVE THE TRANSITIN FOR LOOPY TRANSITIONS

@@ -1,4 +1,5 @@
 #include "transition.h"
+#include "utils.h"
 
 
 Transition::Transition(unsigned int id) : Entity(id) 
@@ -26,6 +27,12 @@ bool Transition::to_connected()
 }
 
 
+bool Transition::is_loopback()
+{
+    return to_state == from_state && to_state != nullptr;
+}
+
+
 bool Transition::any_connected()
 {
     return from_connected() || to_connected();
@@ -39,13 +46,46 @@ void Transition::update_positions()
     // connected Transition.
 
     if(from_connected() && to_connected())
-        update_two_positions();
+    {
+        if(is_loopback())
+            update_loopback();
+        else
+            update_two_positions();
+    }
 
     else if(from_connected())
         update_single_position(from_state, x0, y0, x1, y1);
 
     else if(to_connected())
         update_single_position(to_state, x1, y1, x0, y0);
+}
+
+
+void Transition::update_loopback()
+{
+    float x = (x1 + x0) / 2.0;
+    float y = (y1 + y0) / 2.0;
+
+    float xposes[] = { from_state->x, from_state->x + from_state->w, from_state->x, from_state->x + from_state->w };
+    float yposes[] = { from_state->y, from_state->y, from_state->y + from_state->h, from_state->y + from_state->h };
+    
+    float min_dist = 100000;
+    int min_index = -1;
+
+    for(int i=0; i<4; i++)
+    {
+        float dist = distance(x, y, xposes[i], yposes[i]);
+        if(dist < min_dist)
+        {
+            min_dist = dist;
+            min_index = i;
+        }
+    }
+
+    x0 = xposes[min_index];
+    y0 = yposes[min_index];
+    x1 = xposes[min_index];
+    y1 = yposes[min_index];
 }
 
 

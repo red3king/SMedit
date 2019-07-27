@@ -21,4 +21,13 @@ class GMTransition : public GUIModel
 
     private:
         void interp(float t, float& x_out, float& y_out);
+        void calc_arc_params(float& cx, float& cy, float& r, float& a0, float& a1, int& dir); // in world coords
+        void draw_as_line();
+        void draw_as_arc();
+
+        bool is_arc();
+        bool arc_loop_upwards();
+
+        NVGcolor get_main_color();
+        NVGcolor get_highlight_color();
 };
