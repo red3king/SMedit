@@ -1,19 +1,14 @@
 
-RIGHT NOW LEFT OFF HERE:
-    WORKING ON TRANSITION ARC RENDER, see code for details
-        just added the is_arc_upwards function, gotta use that to make the arcs upwards on the top half
-        also clean up todo
+RIGHT NOW LEFT OFF HERE - transition rendering:
+    interp kind of works, enough foor what i have now
+        got to undo the last commit and re-commit with current un-committed changes
 
-    JUST WROTE THE MOVE SINGLE ENDPOINT CODE, need to:
-        -modify state and transition delete code to delete pointers
-            note: THE TRANSITION DELETE HAD BETTER DOUBLE REMOVE THE TRANSITIN FOR LOOPY TRANSITIONS
-        -then try to get it to compile and run
+    then, work on click detection when in arc mode
+        then tie this into mouse cursor changing code
 
-    working on transition ops
-        first do disconnected move
-        then do one end only move with state attachment + detachment
-        then do arc render when connecting to same state twice
 
+
+box entity stuff
     then do the double resize operation (corner drag)
     then possibly refactor the move state/rlock ops into a single move box entity operation to be consistent
     

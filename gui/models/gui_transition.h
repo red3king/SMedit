@@ -20,10 +20,13 @@ class GMTransition : public GUIModel
         TransitionBorder mouse_on_border(float mouse_x, float mouse_y);
 
     private:
-        void interp(float t, float& x_out, float& y_out);
+        float interp(float t, float& x_out, float& y_out, bool force_linear=false);
         void calc_arc_params(float& cx, float& cy, float& r, float& a0, float& a1, int& dir); // in world coords
         void draw_as_line();
         void draw_as_arc();
+        void main_color_stroke();
+
+        void get_dts(float& d0t, float& d1t);
 
         bool is_arc();
         bool arc_loop_upwards();
