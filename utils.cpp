@@ -1,6 +1,9 @@
 
 #include "utils.h"
 
+#include <algorithm>
+#include <iostream>
+
 
 bool point_in_box(float pt_x, float pt_y, float box_x, float box_y, float box_w, float box_h)
 {
@@ -39,4 +42,34 @@ IOResult::IOResult(bool success, string fail_msg)
 {
     this->success = success;
     this->fail_msg = fail_msg;
+}
+
+
+void clip_angle(float& theta)
+{
+    while(theta < 0)
+        theta += 2.0 * M_PI;
+
+    while(theta > 2.0 * M_PI)
+        theta -= 2.0 * M_PI;
+}
+
+
+bool angle_within(float theta, float a0, float a1, bool counterclockwise)
+{
+    clip_angle(a0);
+    clip_angle(a1);
+    clip_angle(theta);
+
+    bool order_incorrect = a1 < a0;    
+    float max = std::max(a0, a1);
+    float min = std::min(a0, a1);
+
+    return  (theta > min && theta < max) != order_incorrect != counterclockwise;
+}
+
+
+void print_angle(float angle)
+{
+    std::cout << 360.0 * angle / (2.0 * M_PI);
 }

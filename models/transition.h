@@ -54,11 +54,14 @@ class Transition : public Entity
 
         TransitionType type;
         string event_name;  // only used for EVENT type
+        float timeout;      // only for TIMEOUT type
 
         State* from_state;
         State* to_state;
 
         float x0, y0, x1, y1;
+
+        string describe();
 
         bool from_connected();
         bool to_connected();

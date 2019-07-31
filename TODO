@@ -1,11 +1,10 @@
 
 RIGHT NOW LEFT OFF HERE - transition rendering:
-    interp kind of works, enough foor what i have now
-        got to undo the last commit and re-commit with current un-committed changes
+    got click detection working, added transition text
+        however, text (t=.5) doesnt work when its in loopback mode attached to top of state
+        need to fix interp here
 
-    then, work on click detection when in arc mode
-        then tie this into mouse cursor changing code
-
+NEXT MAKE A MAKEFILE SO I ONLY RECOMPILE WHATS NEEDED
 
 
 box entity stuff

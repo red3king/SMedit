@@ -3,14 +3,11 @@
 #include "utils.h"
 
 
-#include <iostream>
-
-
 // Positions of graphical components
-#define D0T .05     // dot 0
-#define D1T .95     // dot 1
-#define LST .1      // line start
-#define LET .9      // line end
+#define D0T .04     // dot 0
+#define D1T .96     // dot 1
+#define LST .08      // line start
+#define LET .92      // line end
 #define APT .7      // arrow point
 
 // Highlight distances
@@ -108,6 +105,12 @@ void GMTransition::draw()
     nvgLineTo(vg, arx, ary);
 
     main_color_stroke();
+
+    // text
+    float tx, ty;
+    interp(.5, tx, ty);
+    ctx->world_to_screen(tx, ty, tx, ty);
+    ctx->draw_text_noclip(transition->describe(), ctx->font_hack_bold, 16, WHITE, tx, ty);
 }
 
 
@@ -208,7 +211,7 @@ void GMTransition::calc_arc_params(float& cx, float& cy, float& r, float& a0, fl
     if(d == 0 && flip)
     {
         a0 = M_PI / 2.0;
-        a1 = -1.5 * M_PI;
+        a1 = a0;
         return;
     }
 
@@ -233,6 +236,10 @@ void GMTransition::draw_as_arc()
     NVGcontext* vg = ctx->vg;
     nvgReset(vg);
     nvgBeginPath(vg);
+
+    // Add 2pi because nanovg won't go in a circle from theta to theta
+    if(abs(a0 - a1) < .0001)
+        a0 += 2.0 * M_PI;
 
     nvgArc(vg, cx, cy, r, a0, a1, dir);
     main_color_stroke();
@@ -271,12 +278,20 @@ float GMTransition::interp(float t, float& x_out, float& y_out, bool force_linea
         theta = a1 + t * (a0 - a1);
 
     move_in_direction(cx, cy, r, theta, x_out, y_out);
+
     return theta + (dir == NVG_CW ? -M_PI/2.0 : M_PI/2.0);
 }
 
 
 CursorType GMTransition::update_impl(CurrentEvents& current_events)
 {
+    TransitionBorder bord = mouse_on_border(current_events.mouse_x, current_events.mouse_y);
+    if(!transition->any_connected() && bord != TB_NONE)
+        return CT_MOVE;
+
+    if(bord == TB_BEGIN || bord == TB_END)
+        return CT_MOVE;
+
     return CT_DEFAULT;
 }
 
@@ -301,9 +316,10 @@ void GMTransition::get_dts(float& d0t, float& d1t)
         d1t = 1.0;
         return;
     }
-
-    d0t = transition->from_connected() ? D0T : 0.0;
-    d1t = transition->to_connected() ? D1T : 1.0;
+    
+    bool arc = is_arc();
+    d0t = !arc && transition->from_connected() ? D0T : 0.0;
+    d1t = !arc && transition->to_connected() ? D1T : 1.0;
 }
 
 
@@ -322,6 +338,23 @@ TransitionBorder GMTransition::mouse_on_border(float mouse_x, float mouse_y)
 
     if(distance(mouse_wx, mouse_wy, d1x, d1y) < EP_THRESH)
         return TB_END;
+
+    if(is_arc())
+    {
+        float cx, cy, r, a0, a1;
+        int dir;
+        calc_arc_params(cx, cy, r, a0, a1, dir);
+        
+        if(abs(r - distance(cx, cy, mouse_wx, mouse_wy)) > 5)
+            return TB_NONE;
+
+        float theta = atan2(mouse_wy - cy, mouse_wx - cx);
+
+        if(!transition->is_loopback() && !angle_within(theta, a0, a1, dir == NVG_CCW))
+            return TB_NONE;
+        
+        return TB_MID;
+    }
 
     float t, d;
     distance_to_line(transition->x0, transition->y0, transition->x1, transition->y1,

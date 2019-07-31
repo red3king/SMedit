@@ -1,6 +1,9 @@
 #include "transition.h"
 #include "utils.h"
 
+#include <sstream>
+#include <iomanip>
+
 
 Transition::Transition(unsigned int id) : Entity(id) 
 { 
@@ -13,6 +16,24 @@ Transition::Transition(unsigned int id) : Entity(id)
     y0 = 0;
     x1 = 0;
     y1 = 0;
+    timeout = 0;
+}
+
+
+string Transition::describe()
+{
+    if(type == EVENT)
+        return "ev: " + event_name;
+
+    if(type == TIMEOUT)
+    {
+        std::stringstream stream;
+        stream << std::fixed << std::setprecision(2) << "timeout (" << timeout << ")";
+        return stream.str();
+    }
+
+    if(type == CATCHALL)
+        return "else";
 }
 
 

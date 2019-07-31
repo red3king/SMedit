@@ -21,6 +21,15 @@ void distance_to_line(float x0, float y0, float x1, float y1, float ptx, float p
 
 float distance(float x0, float y0, float x1, float y1);
 
+// clip angle to between 0 and 2pi
+void clip_angle(float& theta);
+
+// return true if theta is between a0 and a1
+bool angle_within(float theta, float a0, float a1, bool counterclockwise);
+
+
+void print_angle(float angle);
+
 
 class IOResult
 {

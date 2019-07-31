@@ -8,7 +8,7 @@
 
 GMBox::GMBox(DrawContext* ctx, EntityType type) : GUIModel(ctx, type) 
 { 
-    mouse_over = false;
+
 }
 
 
