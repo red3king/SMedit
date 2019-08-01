@@ -58,6 +58,10 @@ class MainWindow : public Gtk::ApplicationWindow
 
             auto transition_create = OpTransitionCreate(machine, 400, 400, 600, 420);
             history_manager->submit_operation(transition_create);
+    
+            auto transition = machine->transitions[0];
+            auto tenco = OpTransitionEvName(machine, transition, "on death");
+            history_manager->submit_operation(tenco);
 
             gl_area->signal_realize().connect(sigc::mem_fun(this, &MainWindow::connect_cursor_signals));
         }

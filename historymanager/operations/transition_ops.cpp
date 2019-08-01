@@ -220,3 +220,81 @@ void OpTransitionEndpointMove::collapse(Operation& other)
 }
 
 
+// TransitionChgOperation
+
+TransitionChgOperation::TransitionChgOperation(Machine* machine, Transition* transition)
+{
+    machine_id = machine->id;
+    transition_id = transition->id;
+}
+
+
+unsigned int TransitionChgOperation::execute(Project& project)
+{
+    Machine* machine = project.get_machine_by_id(machine_id);
+    Transition* transition = machine->get_transition_by_id(transition_id);
+    execute_impl(transition);
+    return transition_id;
+}
+
+
+
+// Type change
+
+OpTransitionType::OpTransitionType(Machine* machine, Transition* transition, TransitionType type) : TransitionChgOperation(machine, transition)
+{
+    this->type = type;
+}
+
+
+OpTransitionType* OpTransitionType::clone()
+{
+    return new OpTransitionType(*this);
+}
+
+
+void OpTransitionType::execute_impl(Transition* transition)
+{
+    transition->type = type;
+}
+
+
+// Timeout change
+
+OpTransitionTimeout::OpTransitionTimeout(Machine* machine, Transition* transition, float timeout) : TransitionChgOperation(machine, transition)
+{
+    this->timeout = timeout;
+}
+
+
+OpTransitionTimeout* OpTransitionTimeout::clone()
+{
+    return new OpTransitionTimeout(*this);
+}
+
+
+void OpTransitionTimeout::execute_impl(Transition* transition)
+{
+    transition->timeout = timeout;
+}
+
+
+// Event name change
+
+OpTransitionEvName::OpTransitionEvName(Machine* machine, Transition* transition, string event_name) : TransitionChgOperation(machine, transition)
+{
+    this->event_name = event_name;
+}
+
+
+OpTransitionEvName* OpTransitionEvName::clone()
+{
+    return new OpTransitionEvName(*this);
+}
+
+
+void OpTransitionEvName::execute_impl(Transition* transition)
+{
+    transition->event_name = event_name;
+}
+

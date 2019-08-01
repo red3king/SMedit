@@ -1,11 +1,9 @@
-
-RIGHT NOW LEFT OFF HERE - transition rendering:
-    got click detection working, added transition text
-        however, text (t=.5) doesnt work when its in loopback mode attached to top of state
-        need to fix interp here
+just added some operations
 
 NEXT MAKE A MAKEFILE SO I ONLY RECOMPILE WHATS NEEDED
 
+THEN, START ON THE BUTTONS TO CREATE/DELETE ENTITIES,
+    THEN THE SELECTED ENTITY EDITOR! NICE!
 
 box entity stuff
     then do the double resize operation (corner drag)

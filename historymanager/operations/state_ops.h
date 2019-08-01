@@ -4,6 +4,18 @@
 #include "models/state.h"
 
 
+class StateChgOperation : public Operation  // abc for state modification
+{
+    public:
+        StateChgOperation(Machine* machine, State* state);
+        unsigned int execute(Project& project);
+        virtual void execute_impl(State* state)=0;
+        
+    private:
+        unsigned int machine_id, state_id;
+};
+
+
 class OpStateCreate : public Operation
 {
     public:
@@ -45,4 +57,50 @@ class OpStateMove : public Operation
 };
 
 
+class OpStateType : public StateChgOperation
+{
+    public:
+        OpStateType(Machine* machine, State* state, StateType type);
+        OpStateType* clone();
+        void execute_impl(State* state);
+
+    private:
+        StateType type;
+};
+
+
+class OpStateInitial : public StateChgOperation
+{
+    public:
+        OpStateInitial(Machine* machine, State* state, bool initial);
+        OpStateInitial* clone();
+        void execute_impl(State* state);
+
+    private:
+        bool initial;
+};
+
+
+class OpStateName : public StateChgOperation
+{
+    public:
+        OpStateName(Machine* machine, State* state, string name);
+        OpStateName* clone();
+        void execute_impl(State* state);
+
+    private:
+        string name;
+};
+
+
+class OpStateCode : public StateChgOperation
+{
+    public:
+        OpStateCode(Machine* machine, State* state, string code);
+        OpStateCode* clone();
+        void execute_impl(State* state);
+
+    private:
+        string code;
+};
 

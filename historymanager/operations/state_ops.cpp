@@ -2,6 +2,23 @@
 #include "signals.h"
 
 
+// Abstract modify
+StateChgOperation::StateChgOperation(Machine* machine, State* state)
+{
+    machine_id = machine->id;
+    state_id = state->id;
+}
+
+
+unsigned int StateChgOperation::execute(Project& project)
+{
+    Machine* machine = project.get_machine_by_id(machine_id);
+    State* state = machine->get_state_by_id(state_id);
+    execute_impl(state);
+    return state_id;
+}
+
+
 // Create
 
 OpStateCreate::OpStateCreate(Machine* machine, float x, float y)
@@ -132,4 +149,84 @@ OpStateMove* OpStateMove::clone()
     return new OpStateMove(*this);
 }
 
-// 
+
+// Type change
+
+OpStateType::OpStateType(Machine* machine, State* state, StateType type) : StateChgOperation(machine, state)
+{
+    this->type = type;
+}
+
+
+OpStateType* OpStateType::clone()
+{
+    return new OpStateType(*this);
+}
+
+
+void OpStateType::execute_impl(State* state)
+{
+    state->type = type;
+}
+
+
+// Initial flag change
+
+OpStateInitial::OpStateInitial(Machine* machine, State* state, bool initial) : StateChgOperation(machine, state)
+{
+    this->initial = initial;
+}
+
+
+OpStateInitial* OpStateInitial::clone()
+{
+    return new OpStateInitial(*this);
+}
+
+
+void OpStateInitial::execute_impl(State* state)
+{
+    state->initial = initial;
+}
+
+
+// Name change
+
+OpStateName::OpStateName(Machine* machine, State* state, string name) : StateChgOperation(machine, state)
+{
+    this->name = name;
+}
+
+
+OpStateName* OpStateName::clone()
+{
+    return new OpStateName(*this);
+}
+
+
+void OpStateName::execute_impl(State* state)
+{
+    state->name = name;
+}
+
+
+// Code change
+
+OpStateCode::OpStateCode(Machine* machine, State* state, string code) : StateChgOperation(machine, state)
+{
+    this->code = code;
+}
+
+
+OpStateCode* OpStateCode::clone()
+{
+    return new OpStateCode(*this);
+}
+
+
+void OpStateCode::execute_impl(State* state)
+{
+    state->code = code;
+}
+
+

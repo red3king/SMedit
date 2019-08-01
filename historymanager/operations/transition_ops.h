@@ -4,6 +4,18 @@
 #include "models/transition.h"
 
 
+class TransitionChgOperation : public Operation  // abstract
+{
+    public:
+        TransitionChgOperation(Machine* machine, Transition* transition);
+        unsigned int execute(Project& project);
+        virtual void execute_impl(Transition* transition)=0;
+
+    private:
+        unsigned int machine_id, transition_id;
+};
+
+
 class OpTransitionCreate : public Operation
 {
     public:
@@ -61,3 +73,42 @@ class OpTransitionEndpointMove : public Operation
         bool is_endpoint_0;
         float x_new, y_new;
 };  
+
+
+class OpTransitionType : public TransitionChgOperation
+{
+    public:
+        OpTransitionType(Machine* machine, Transition* transition, TransitionType type);
+        void execute_impl(Transition* transition);
+        OpTransitionType* clone();
+
+    private:
+        TransitionType type;
+};
+
+
+class OpTransitionTimeout : public TransitionChgOperation
+{
+    public:
+        OpTransitionTimeout(Machine* machine, Transition* transition, float timeout);
+        void execute_impl(Transition* transition);
+        OpTransitionTimeout* clone();
+
+    private:
+        float timeout;
+};
+
+
+class OpTransitionEvName : public TransitionChgOperation
+{
+    public:
+        OpTransitionEvName(Machine* machine, Transition* transition, string event_name);
+        void execute_impl(Transition* transition);
+        OpTransitionEvName* clone();
+
+    private:
+        string event_name;
+};
+
+
+
