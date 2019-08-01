@@ -4,6 +4,18 @@
 #include "models/resource.h"
 
 
+class ResourceChgOperation : public Operation
+{
+    public:
+        ResourceChgOperation(Resource* resource);
+        unsigned int execute(Project& project);
+        virtual void execute_impl(Resource* resource)=0;
+
+    private:
+        unsigned int resource_id;
+};
+
+
 class OpResourceCreate : public Operation
 {
     public:
@@ -28,4 +40,25 @@ class OpResourceDelete : public Operation
 };
 
 
+class OpResourcePath : public ResourceChgOperation
+{
+    public:
+        OpResourcePath(Resource* resource, string path);
+        OpResourcePath* clone();
+        void execute_impl(Resource* resource);
 
+    private:
+        string path;
+};
+
+
+class OpResourceName : public ResourceChgOperation
+{
+    public:
+        OpResourceName(Resource* resource, string name);
+        OpResourceName* clone();
+        void execute_impl(Resource* resource);
+
+    private:
+        string name;
+};

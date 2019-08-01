@@ -2,6 +2,22 @@
 #include "signals.h"
 
 
+// Abstract change
+
+ResourceChgOperation::ResourceChgOperation(Resource* resource)
+{
+    resource_id = resource->id;
+}
+
+
+unsigned int ResourceChgOperation::execute(Project& project)
+{
+    Resource* resource = project.get_resource_by_id(resource_id);
+    execute_impl(resource);
+    return resource_id;
+}
+
+
 // Create
 
 OpResourceCreate::OpResourceCreate(string name, string path)
@@ -53,3 +69,44 @@ OpResourceDelete* OpResourceDelete::clone()
 {
     return new OpResourceDelete(*this);
 }
+
+
+// Path change
+
+OpResourcePath::OpResourcePath(Resource* resource, string path) : ResourceChgOperation(resource)
+{
+    this->path = path;
+}
+
+
+OpResourcePath* OpResourcePath::clone()
+{
+    return new OpResourcePath(*this);
+}
+
+
+void OpResourcePath::execute_impl(Resource* resource)
+{
+    resource->path = path;
+}
+
+
+// Name change
+
+OpResourceName::OpResourceName(Resource* resource, string name) : ResourceChgOperation(resource)
+{
+    this->name = name;
+}
+
+
+OpResourceName* OpResourceName::clone()
+{
+    return new OpResourceName(*this);
+}
+
+
+void OpResourceName::execute_impl(Resource* resource)
+{
+    resource->name = name;
+}
+
