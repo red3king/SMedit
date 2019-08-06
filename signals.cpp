@@ -55,7 +55,7 @@ void Signals::disable_gui_signals()
 }
 
 
-void Signals::register_gui_rebuild_handler(GuiRebuildHandler handler)
+void Signals::register_gui_rebuild_handler(NoArgHandler handler)
 {
     gui_rebuild_handlers.push_back(handler);
 }
@@ -71,7 +71,7 @@ void Signals::fire_gui_rebuild_signal()
 }
 
 
-void Signals::register_pre_gui_rebuild_handler(GuiRebuildHandler handler)
+void Signals::register_pre_gui_rebuild_handler(NoArgHandler handler)
 {
     pre_gui_rebuild_handlers.push_back(handler);
 }
@@ -109,6 +109,7 @@ void Signals::unregister_gui_context(GUIContext* gui_context)
         gui_contexts.erase(gui_contexts.begin() + index);
     
 }
+
 
 
 Signals signals;
