@@ -42,7 +42,7 @@ unsigned int OpStateCreate::execute(Project& project)
     Machine* machine = project.get_machine_by_id(machine_id);
     machine->states.push_back(state);
 
-    signals.fire_gui_signal(STATE, CREATE, state->id);
+    signals.fire_model_changed(STATE, CREATE, state->id);
     return state->id;
 }
 
@@ -78,7 +78,7 @@ unsigned int OpStateDelete::execute(Project& project)
         }
     }
 
-    signals.fire_gui_signal(STATE, PRE_DELETE, state_id);
+    signals.fire_model_changed(STATE, PRE_DELETE, state_id);
 
     // Unlink attached transitions
     for(int i=0; i<to_delete->incoming_transitions.size(); i++)

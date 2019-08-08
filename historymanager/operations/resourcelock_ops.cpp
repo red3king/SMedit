@@ -26,7 +26,7 @@ unsigned int OpResourceLockCreate::execute(Project& project)
     lock->h = 200;
 
     machine->resourcelocks.push_back(lock);
-    signals.fire_gui_signal(RESOURCELOCK, CREATE, lock->id);
+    signals.fire_model_changed(RESOURCELOCK, CREATE, lock->id);
     return lock->id;
 }
 
@@ -61,7 +61,7 @@ unsigned int OpResourceLockDelete::execute(Project& project)
             break;
     }
 
-    signals.fire_gui_signal(RESOURCELOCK, PRE_DELETE, lock->id);
+    signals.fire_model_changed(RESOURCELOCK, PRE_DELETE, lock->id);
 
     delete lock;
     machine->resourcelocks.erase(machine->resourcelocks.begin() + i);

@@ -1,7 +1,8 @@
-RIGHT NOW - ADDED SIGNALS, PROJECT OPEN/CLOSE
-    NEED TO REFACTOR TO USE SIGC MEM_FUNS TO TAKE IN CLASS FUNCTIONS
-    THEN KEEP WIRING STUFF UP
-
+selection and name editing of resources works
+    all the resourcecontroller needs is:
+        -wire up create/deletee buttons
+            LEFT OFF HERE - SEELCTION IS WRONG AFTER CREATE, WTF
+        -make the path chooser widget functional
 
 NEXT MAKE A MAKEFILE SO I ONLY RECOMPILE WHATS NEEDED
 

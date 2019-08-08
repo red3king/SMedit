@@ -10,7 +10,7 @@ using std::vector;
 
 class GUIContext;
 
-enum SignalType { CREATE, PRE_DELETE };
+enum SignalType { CREATE, PRE_DELETE, MODIFY };
 enum CursorType { CT_DEFAULT, CT_MOVE, CT_RS_EW, CT_RS_NS, CT_RS_NW_SE, CT_RS_NE_SW };
 
 typedef void(*GuiModelSignalHandler)(EntityType, SignalType, unsigned int);
@@ -22,20 +22,17 @@ class Machine;
 
 class Signals
 {
-    // note: "gui signals" here means signals which are used to create / delete the 
-    // GUIModel objects for the glgtkarea 
-
     public:
         Signals();
 
         sigc::signal<void> project_open, project_close;
         sigc::signal<void, Machine*> machine_selected;
+        sigc::signal<void, EntityType, SignalType, unsigned int> model_changed;
 
         void register_set_cursor_handler(SetCursorHandler handler);
         void fire_set_cursor(CursorType cursor_type);
 
-        void register_gui_signal_handler(GuiModelSignalHandler handler);
-        void fire_gui_signal(EntityType entity_type, SignalType signal_type, unsigned int entity_id);
+        void fire_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id);
 
         void enable_gui_signals();
         void disable_gui_signals();

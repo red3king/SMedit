@@ -25,7 +25,7 @@ unsigned int OpTransitionCreate::execute(Project& project)
     new_transition->y1 = y1;
 
     machine->transitions.push_back(new_transition);
-    signals.fire_gui_signal(TRANSITION, CREATE, new_transition->id);
+    signals.fire_model_changed(TRANSITION, CREATE, new_transition->id);
     return new_transition->id;
 }
 
@@ -58,7 +58,7 @@ unsigned int OpTransitionDelete::execute(Project& project)
             break;
     }
 
-    signals.fire_gui_signal(TRANSITION, PRE_DELETE, transition_id);
+    signals.fire_model_changed(TRANSITION, PRE_DELETE, transition_id);
 
     // Unlink from to and from states
     if(transition->from_state != nullptr)

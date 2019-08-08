@@ -14,6 +14,7 @@ unsigned int ResourceChgOperation::execute(Project& project)
 {
     Resource* resource = project.get_resource_by_id(resource_id);
     execute_impl(resource);
+    signals.fire_model_changed(RESOURCE, MODIFY, resource_id);
     return resource_id;
 }
 
@@ -34,7 +35,7 @@ unsigned int OpResourceCreate::execute(Project& project)
     resource->path = path;
     project.resources.push_back(resource);
     
-    signals.fire_gui_signal(RESOURCE, CREATE, resource->id);
+    signals.fire_model_changed(RESOURCE, CREATE, resource->id);
     return resource->id;
 }
 
@@ -57,7 +58,7 @@ unsigned int OpResourceDelete::execute(Project& project)
 {
     int rindex = project.get_rindex_by_id(to_delete_id);
 
-    signals.fire_gui_signal(RESOURCE, PRE_DELETE, to_delete_id);
+    signals.fire_model_changed(RESOURCE, PRE_DELETE, to_delete_id);
 
     delete project.resources[rindex];
     project.resources.erase(project.resources.begin() + rindex);

@@ -21,20 +21,14 @@ void Signals::fire_set_cursor(CursorType cursor_type)
 }
 
 
-void Signals::register_gui_signal_handler(GuiModelSignalHandler handler)
-{
-    gui_signal_handlers.push_back(handler);
-}
-
-
-void Signals::fire_gui_signal(EntityType entity_type, SignalType signal_type, unsigned int entity_id)
+void Signals::fire_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id)
 {
     if(!gui_signals_enabled)
         return;
 
-    for(int i=0; i<gui_signal_handlers.size(); i++)
-        gui_signal_handlers[i](entity_type, signal_type, entity_id);
+    model_changed.emit(entity_type, signal_type, entity_id);
 
+    // TODO - this can probably be deleted and replaced with the sigc++ signals
     for(int i=0; i<gui_contexts.size(); i++)
     {
         gui_contexts[i]->handle_create(entity_type, signal_type, entity_id);

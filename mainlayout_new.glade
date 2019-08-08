@@ -2,34 +2,6 @@
 <!-- Generated with glade 3.22.1 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
-  <object class="GtkListStore" id="mach_list_store">
-    <columns>
-      <!-- column-name machine -->
-      <column type="gchararray"/>
-    </columns>
-    <data>
-      <row>
-        <col id="0" translatable="yes">sdfsadfasd</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">poipoipo</col>
-      </row>
-    </data>
-  </object>
-  <object class="GtkListStore" id="res_list_store">
-    <columns>
-      <!-- column-name resource -->
-      <column type="gchararray"/>
-    </columns>
-    <data>
-      <row>
-        <col id="0" translatable="yes">sdfsadfasd</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">poipoipo</col>
-      </row>
-    </data>
-  </object>
   <object class="GtkApplicationWindow" id="main_window">
     <property name="can_focus">False</property>
     <child>
@@ -216,7 +188,7 @@
                     <property name="can_focus">False</property>
                     <property name="orientation">vertical</property>
                     <child>
-                      <object class="GtkTreeView" id="resource_list_view">
+                      <object class="GtkTreeView" id="resource_tree_view">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="margin_left">10</property>
@@ -225,7 +197,6 @@
                         <property name="margin_bottom">15</property>
                         <property name="hexpand">True</property>
                         <property name="vexpand">True</property>
-                        <property name="model">res_list_store</property>
                         <child internal-child="selection">
                           <object class="GtkTreeSelection"/>
                         </child>
@@ -237,7 +208,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="delete_resource_btn">
+                      <object class="GtkButton" id="delete_resource_button">
                         <property name="label" translatable="yes">Delete</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -254,7 +225,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="create_resource_btn">
+                      <object class="GtkButton" id="create_resource_button">
                         <property name="label" translatable="yes">Create</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -281,7 +252,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkLabel">
+                      <object class="GtkLabel" id="resource_name_label">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="margin_left">4</property>
@@ -296,7 +267,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkLabel">
+                      <object class="GtkLabel" id="resource_path_label">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="margin_left">4</property>
@@ -311,7 +282,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkEntry">
+                      <object class="GtkEntry" id="resource_name_entry">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="margin_left">4</property>
@@ -325,7 +296,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkFileChooserButton">
+                      <object class="GtkFileChooserButton" id="resource_path_file_chooser">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="margin_left">4</property>
@@ -361,14 +332,13 @@
                     <property name="can_focus">False</property>
                     <property name="orientation">vertical</property>
                     <child>
-                      <object class="GtkTreeView" id="machine_list_view">
+                      <object class="GtkTreeView" id="machine_tree_view">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="margin_top">15</property>
                         <property name="margin_bottom">15</property>
                         <property name="hexpand">True</property>
                         <property name="vexpand">True</property>
-                        <property name="model">mach_list_store</property>
                         <property name="search_column">0</property>
                         <child internal-child="selection">
                           <object class="GtkTreeSelection"/>
@@ -381,7 +351,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="delete_machine_btn">
+                      <object class="GtkButton" id="delete_machine_button">
                         <property name="label" translatable="yes">Delete</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -398,7 +368,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="create_machine_btn">
+                      <object class="GtkButton" id="create_machine_button">
                         <property name="label" translatable="yes">Create</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
