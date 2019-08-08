@@ -100,6 +100,7 @@ void ResourcesController::on_selection_changed(unsigned int entity_id)
 void ResourcesController::on_project_open()
 {
     project_open = true;
+    _rebuild_treeview(0);
     _update_enabled();
 }
 
@@ -109,7 +110,7 @@ void ResourcesController::on_project_close()
     project_open = false;
     num_items = 0;
     selected_resource = nullptr;
-
+    list_view_controller->clear();
     _update_enabled();
 }
 
@@ -131,12 +132,18 @@ void ResourcesController::on_model_changed(EntityType entity_type, SignalType si
     }
 
     // if it's a create/delete, just rebuild the tree view
+    unsigned int deleted_id = signal_type == PRE_DELETE ? entity_id : 0;
+    _rebuild_treeview(deleted_id);
+}
+
+
+void ResourcesController::_rebuild_treeview(unsigned int deleted_id)
+{
     list_view_controller->clear();
     
     auto resources = history_manager->current_project.resources;
     num_items = resources.size();
 
-    unsigned int deleted_id = signal_type == PRE_DELETE ? entity_id : 0;
     for(int i=0; i<num_items; i++)
     {
         if(resources[i]->id != deleted_id)

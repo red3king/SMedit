@@ -39,5 +39,7 @@ class ResourcesController
 
         void on_create_clicked();
         void on_delete_clicked();
+
+        void _rebuild_treeview(unsigned int deleted_id);
         void _update_enabled();
 };
