@@ -12,7 +12,7 @@ TEST_CASE("OpMachineCreate", "[operations][machine_ops]")
 {
     Project p;
     REQUIRE(0 == p.machines.size());
-    unsigned int i = OpMachineCreate().execute(p);
+    unsigned int i = OpMachineCreate("").execute(p);
     REQUIRE(1 == p.machines.size());
     REQUIRE(i == p.machines[0]->id);
 }

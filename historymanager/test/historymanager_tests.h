@@ -14,7 +14,7 @@ TEST_CASE("HistoryManager.submit_operation, and undo", "[historymanager]")
     auto hm = HistoryManager(100, 20, 20);
     hm.new_project();
 
-    auto create = OpMachineCreate();
+    auto create = OpMachineCreate("asdf");
     unsigned int result = hm.submit_operation(create);
     
     // machine should have been created
@@ -48,14 +48,14 @@ TEST_CASE("HistoryManager.condense_history()", "[historymanager]")
 
     for(int i=0; i<13; i++)
     {
-        auto op = OpMachineCreate();
+        auto op = OpMachineCreate("");
         hm.submit_operation(op);
     }
 
     REQUIRE(0 == hm.initial_project.machines.size());
     REQUIRE(13 == hm.current_project.machines.size());
 
-    auto create = OpMachineCreate();
+    auto create = OpMachineCreate("asdf");
     hm.submit_operation(create);
 
     REQUIRE(3 == hm.initial_project.machines.size()); 
@@ -68,7 +68,7 @@ TEST_CASE("HistoryManager operation collapsing", "[historymanager]")
     auto hm = HistoryManager(100, 20, 20);
     hm.new_project();
 
-    auto create = OpMachineCreate();
+    auto create = OpMachineCreate("asdf");
     hm.submit_operation(create);
     REQUIRE(1 == hm.operations.size());
 
