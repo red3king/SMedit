@@ -1,8 +1,9 @@
-selection and name editing of resources works
-    all the resourcecontroller needs is:
-        -wire up create/deletee buttons
-            LEFT OFF HERE - SEELCTION IS WRONG AFTER CREATE, WTF
-        -make the path chooser widget functional
+working on machines controller
+    just finished wiring up all signals on machinescontroller
+        need to:
+            -make the gui update when create state/transition/rl buttons are clicked
+            -make the gui switch between machines on machine list element select
+
 
 NEXT MAKE A MAKEFILE SO I ONLY RECOMPILE WHATS NEEDED
 

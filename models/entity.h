@@ -19,7 +19,7 @@ class Entity
         Entity(unsigned int id=0);
         virtual ~Entity() = 0;        
 
-        unsigned int id;        
+        unsigned int id;  // ids start at 1, 0 is reserved for representing null to functions        
 
     private:
 

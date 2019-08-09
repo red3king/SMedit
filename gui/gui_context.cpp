@@ -140,7 +140,7 @@ void GUIContext::_render()
 bool GUIContext::handle_button_event(GdkEventButton* button_event)
 {
     current_events.on_button_event(button_event);
-    _handle_event();
+    update();
     return true;
 }
 
@@ -148,7 +148,7 @@ bool GUIContext::handle_button_event(GdkEventButton* button_event)
 bool GUIContext::handle_scroll_event(GdkEventScroll* scroll_event)
 {
     current_events.on_scroll_event(scroll_event);
-    _handle_event();
+    update();
     return true;
 }
 
@@ -156,7 +156,7 @@ bool GUIContext::handle_scroll_event(GdkEventScroll* scroll_event)
 bool GUIContext::handle_key_event(GdkEventKey* key_event)
 {
     current_events.on_key_event(key_event);
-    _handle_event();
+    update();
     return true;
 }
 
@@ -164,7 +164,7 @@ bool GUIContext::handle_key_event(GdkEventKey* key_event)
 bool GUIContext::handle_motion_notify_event(GdkEventMotion* motion_event)
 {
     current_events.on_motion_notify_event(motion_event);
-    _handle_event();
+    update();
     return true;
 }
 
@@ -175,7 +175,7 @@ bool GUIContext::has_current_operation()
 }
 
 
-void GUIContext::_handle_event()
+void GUIContext::update()
 {
     // Let gui models react to mouse being nearby & possibly get new cursor 
     bool clear_selected;

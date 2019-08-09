@@ -92,7 +92,6 @@ void ResourcesController::on_selection_changed(unsigned int entity_id)
     }
 
     disable_input_signals = false;
-
     _update_enabled();
 }
 

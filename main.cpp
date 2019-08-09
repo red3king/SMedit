@@ -19,9 +19,10 @@ MainWindow::MainWindow(BaseObjectType* obj, Glib::RefPtr<Gtk::Builder> const& bu
     prepare_signals();
 
     history_manager = new HistoryManager(50, 20, 15);
-    resources_controller = new ResourcesController(history_manager, builder);
-
     gui_context = new GUIContext(machine_edit_gl_area, history_manager);            
+    
+    resources_controller = new ResourcesController(history_manager, builder);
+    machines_controller = new MachinesController(history_manager, builder, &(gui_context->gui_state.draw_context));
 
     machine_edit_gl_area->signal_realize().connect(sigc::mem_fun(this, &MainWindow::connect_cursor_signals));
 }
@@ -64,7 +65,7 @@ void MainWindow::prepare_signals()
 
 void MainWindow::temp_create_operations()
 {
-    auto cr8 = OpMachineCreate();
+    auto cr8 = OpMachineCreate("machine one");
     history_manager->submit_operation(cr8);
     Machine* machine = history_manager->current_project.machines[0];
 

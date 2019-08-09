@@ -10,8 +10,12 @@
 class OpMachineCreate : public Operation
 {
     public:
+        OpMachineCreate(string name);
         unsigned int execute(Project& project);
         OpMachineCreate* clone();
+
+    private:
+        string name;
 };
 
 
@@ -45,7 +49,7 @@ class OpMachineName : public Operation
 };
 
 
-class OpMachineRunOnStart
+class OpMachineRunOnStart : public Operation
 {
     public:
         OpMachineRunOnStart(Machine* machine, bool run_on_start);

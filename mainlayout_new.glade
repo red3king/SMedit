@@ -408,7 +408,7 @@
                             <property name="margin_top">4</property>
                             <property name="margin_bottom">4</property>
                             <child>
-                              <object class="GtkLabel">
+                              <object class="GtkLabel" id="machine_name_label">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="margin_left">4</property>
@@ -437,7 +437,7 @@
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkLabel">
+                              <object class="GtkLabel" id="machine_launch_on_start_label">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="margin_left">4</property>
@@ -452,7 +452,7 @@
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkSwitch" id="launch_on_start_switch">
+                              <object class="GtkSwitch" id="machine_launch_on_start_switch">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="margin_left">4</property>

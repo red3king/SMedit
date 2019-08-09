@@ -33,6 +33,7 @@ void Signals::fire_model_changed(EntityType entity_type, SignalType signal_type,
     {
         gui_contexts[i]->handle_create(entity_type, signal_type, entity_id);
         gui_contexts[i]->handle_delete(entity_type, signal_type, entity_id);
+        gui_contexts[i]->update();
     }
 }
 
@@ -101,7 +102,6 @@ void Signals::unregister_gui_context(GUIContext* gui_context)
     
     if(index != -1)
         gui_contexts.erase(gui_contexts.begin() + index);
-    
 }
 
 

@@ -43,6 +43,8 @@ class GUIContext
         void handle_gui_rebuild();
         void handle_pre_gui_rebuild();
 
+        void update();
+
         Gtk::GLArea* gl_area;
         NVGcontext* vg;
 
@@ -59,6 +61,5 @@ class GUIContext
         void register_gtk_signal_handlers();
         void register_sm_signal_handlers();
         void unregister_sm_signal_handlers();
-        void _handle_event();
         void _render();
 };

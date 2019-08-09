@@ -1,12 +1,22 @@
 #include "machine_ops.h"
 #include "models/project.h"
+#include "signals.h"
 
 
 // Create
+OpMachineCreate::OpMachineCreate(string name)
+{
+    this->name = name;
+}
+
+
 unsigned int OpMachineCreate::execute(Project& project)
 {
-    Machine* m = new Machine(project.get_next_id());
+    unsigned int machine_id = project.get_next_id();
+    Machine* m = new Machine(machine_id);
+    m->name = name;
     project.machines.push_back(m);
+    signals.fire_model_changed(MACHINE, CREATE, machine_id);
     return m->id;
 }
 
@@ -32,6 +42,7 @@ OpMachineDelete* OpMachineDelete::clone()
 
 unsigned int OpMachineDelete::execute(Project& project)
 {
+    signals.fire_model_changed(MACHINE, PRE_DELETE, id);
     int i = project.get_mindex_by_id(id);
     delete project.machines[i];
     project.machines.erase(project.machines.begin() + i);
@@ -57,6 +68,7 @@ unsigned int OpMachineName::execute(Project& project)
 {
     Machine* m = project.get_machine_by_id(id);
     m->name = name;
+    signals.fire_model_changed(MACHINE, MODIFY, id);
     return id;
 }
 
@@ -93,6 +105,7 @@ unsigned int OpMachineRunOnStart::execute(Project& project)
 {
     Machine* m = project.get_machine_by_id(id);
     m->run_on_start = run_on_start;
+    signals.fire_model_changed(MACHINE, MODIFY, id);
     return id;
 }
 

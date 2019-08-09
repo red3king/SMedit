@@ -9,6 +9,7 @@
 #include <epoxy/gl.h>
 
 #include "controllers/resources_controller.h"
+#include "controllers/machines_controller.h"
 #include "historymanager/historymanager.h"
 #include "gui/gui_context.h"
 #include "signals.h"
@@ -26,6 +27,7 @@ class MainWindow : public Gtk::ApplicationWindow
         GUIContext* gui_context;
 
         ResourcesController* resources_controller;
+        MachinesController* machines_controller;
 
         // UI state variables
         bool project_open;
