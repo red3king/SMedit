@@ -1,6 +1,7 @@
 #pragma once
 
 #include "list_view_controller.h"
+#include "selected_item/selected_resourcelock.h"
 #include "historymanager/historymanager.h"
 #include "models/machine.h"
 #include "gui/draw_context.h"
@@ -14,6 +15,8 @@ class MachinesController
 
     private:
         ListViewController* list_view_controller;
+        SelectedResourceLock* selected_resourcelock_ctrl;
+
         HistoryManager* history_manager;
         DrawContext* draw_context;
         GUIContext* gui_context;
@@ -31,8 +34,10 @@ class MachinesController
         Gtk::Label *name_label, *launch_on_start_label;
         Gtk::Entry* name_entry;
         Gtk::Switch* launch_on_start_switch;
+        Gtk::Stack* selected_item_stack;
         Gtk::GLArea* gl_area;
 
+        void on_model_selected(Machine* machine, EntityType entity_type, Entity* entity);
         void on_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id);
         void on_selection_changed(unsigned int machine_id);
         void on_project_open();

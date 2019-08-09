@@ -5,6 +5,7 @@
 
 enum EntityType
 {
+    NONE_ENTITY,
     MACHINE,
     RESOURCE,
     STATE,

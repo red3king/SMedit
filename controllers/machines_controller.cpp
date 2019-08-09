@@ -24,6 +24,7 @@ MachinesController::MachinesController(HistoryManager* history_manager, Glib::Re
     builder->get_widget("machine_launch_on_start_label", launch_on_start_label);
     builder->get_widget("machine_name_entry", name_entry);
     builder->get_widget("machine_launch_on_start_switch", launch_on_start_switch);
+    builder->get_widget("selected_item_stack", selected_item_stack);
     builder->get_widget("machine_edit_gl_area", gl_area);
 
     gui_context = new GUIContext(gl_area, history_manager);
@@ -32,9 +33,12 @@ MachinesController::MachinesController(HistoryManager* history_manager, Glib::Re
     list_view_controller = new ListViewController(tree_view);
     list_view_controller->selection_changed_signal.connect(sigc::mem_fun(this, &MachinesController::on_selection_changed));
 
+    selected_resourcelock_ctrl = new SelectedResourceLock(history_manager, builder);
+
     signals.project_open.connect(sigc::mem_fun(this, &MachinesController::on_project_open));
     signals.project_close.connect(sigc::mem_fun(this, &MachinesController::on_project_close));
     signals.model_changed.connect(sigc::mem_fun(this, &MachinesController::on_model_changed));
+    signals.model_selected.connect(sigc::mem_fun(this, &MachinesController::on_model_selected));
 
     create_button->signal_clicked().connect(sigc::mem_fun(this, &MachinesController::on_create_clicked));
     delete_button->signal_clicked().connect(sigc::mem_fun(this, &MachinesController::on_delete_clicked));
@@ -224,4 +228,25 @@ void MachinesController::on_model_changed(EntityType entity_type, SignalType sig
     // otherwise, rebuild list
     unsigned int to_delete_id = signal_type == PRE_DELETE ? entity_id : 0;
     _rebuild_list(to_delete_id);
+}
+
+
+void MachinesController::on_model_selected(Machine* machine, EntityType entity_type, Entity* entity)
+{
+    if(machine != selected_machine)
+        return;
+
+    if(entity_type == NONE_ENTITY)
+        selected_item_stack->set_visible_child("none_selected");
+
+    else if(entity_type == STATE)
+        selected_item_stack->set_visible_child("state_selected");
+
+    else if(entity_type == TRANSITION)
+        selected_item_stack->set_visible_child("transition_selected");
+
+    else if(entity_type == RESOURCELOCK)
+        selected_item_stack->set_visible_child("resourcelock_selected");
+
+    selected_resourcelock_ctrl->set_selected(machine, entity);
 }

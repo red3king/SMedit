@@ -28,4 +28,4 @@ else
 fi
 
 
-g++ -std=c++14 -iquote ./ -g $OPTS -o $OFILE $MAIN cursor.cpp utils.cpp signals.cpp log.cpp lib/nanovg/nanovg.c models/*.cpp historymanager/*.cpp historymanager/operations/*.cpp gui/*.cpp gui/models/*.cpp gui/operations/*.cpp controllers/*.cpp `pkg-config --cflags --libs gtkmm-3.0 epoxy` 
+g++ -std=c++14 -iquote ./ -g $OPTS -o $OFILE $MAIN cursor.cpp utils.cpp signals.cpp log.cpp lib/nanovg/nanovg.c models/*.cpp historymanager/*.cpp historymanager/operations/*.cpp gui/*.cpp gui/models/*.cpp gui/operations/*.cpp controllers/*.cpp controllers/selected_item/*.cpp `pkg-config --cflags --libs gtkmm-3.0 epoxy` 

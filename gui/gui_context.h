@@ -51,6 +51,7 @@ class GUIContext
         CurrentEvents current_events;
         GUIState gui_state;
         GUIOperation* current_operation;
+        Machine* current_machine;
 
         CursorType current_cursor_type;
 

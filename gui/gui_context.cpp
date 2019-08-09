@@ -25,12 +25,14 @@ GUIContext::GUIContext(Gtk::GLArea* gl_area, HistoryManager* history_manager)
 
 void GUIContext::set_machine(Machine* current_machine)
 {
+    this->current_machine = current_machine;
     gui_state.set_machine(current_machine);
 }
 
 
 void GUIContext::unset_machine()
 {
+    current_machine = nullptr;
     gui_state.unset_machine();
 }
 
@@ -180,17 +182,14 @@ void GUIContext::update()
     // Let gui models react to mouse being nearby & possibly get new cursor 
     bool clear_selected;
     GUIModel* just_selected;
-    CursorType new_cursor = gui_state.update_models(current_events, just_selected, clear_selected);
+    CursorType new_cursor = gui_state.update_models(current_events, just_selected, clear_selected);   
     
-    /*
-     * TODO - uncomment when I build the selected item widget factory
     if(just_selected != nullptr)
-        signals.fire_set_selected(just_selected);
+        signals.model_selected.emit(current_machine, just_selected->type, just_selected->get_entity());
 
     if(clear_selected)
-        signals.fire_set_selected(nullptr);
-    */
-
+        signals.model_selected.emit(current_machine, NONE_ENTITY, nullptr);
+    
     if(new_cursor != current_cursor_type)
     {
         current_cursor_type = new_cursor;

@@ -1,9 +1,7 @@
 working on machines controller
-    just finished wiring up all signals on machinescontroller
-        need to:
-            -make the gui update when create state/transition/rl buttons are clicked
-            -make the gui switch between machines on machine list element select
-
+    just got selected item tab switching working
+    need to keep writing the sleected item controllers
+        halfway through the resourcelock one, see selected_reosurclock.cpp for more 
 
 NEXT MAKE A MAKEFILE SO I ONLY RECOMPILE WHATS NEEDED
 
