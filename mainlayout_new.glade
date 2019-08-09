@@ -163,10 +163,10 @@
           </packing>
         </child>
         <child>
-          <object class="GtkStackSwitcher" id="mainswitcher">
+          <object class="GtkStackSwitcher" id="main_switcher">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="stack">mainstack</property>
+            <property name="stack">main_stack</property>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -175,7 +175,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkStack" id="mainstack">
+          <object class="GtkStack" id="main_stack">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
@@ -562,17 +562,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkLabel" id="selected_item_placeholder">
-                            <property name="name">label</property>
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">[selected item widget goes here]</property>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">1</property>
-                          </packing>
+                          <placeholder/>
                         </child>
                       </object>
                       <packing>

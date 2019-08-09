@@ -10,12 +10,13 @@
 class MachinesController
 {
     public:
-        MachinesController(HistoryManager* history_manager, Glib::RefPtr<Gtk::Builder> const& builder, DrawContext* draw_context);
+        MachinesController(HistoryManager* history_manager, Glib::RefPtr<Gtk::Builder> const& builder);
 
     private:
         ListViewController* list_view_controller;
         HistoryManager* history_manager;
         DrawContext* draw_context;
+        GUIContext* gui_context;
 
         // ui state
         bool project_open;
@@ -31,7 +32,6 @@ class MachinesController
         Gtk::Entry* name_entry;
         Gtk::Switch* launch_on_start_switch;
         Gtk::GLArea* gl_area;
-
 
         void on_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id);
         void on_selection_changed(unsigned int machine_id);

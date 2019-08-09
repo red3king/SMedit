@@ -1,14 +1,14 @@
 #include "machines_controller.h"
+#include "gui/gui_context.h"
 #include "historymanager/operations/machine_ops.h"
 #include "historymanager/operations/state_ops.h"
 #include "historymanager/operations/transition_ops.h"
 #include "historymanager/operations/resourcelock_ops.h"
 
 
-MachinesController::MachinesController(HistoryManager* history_manager, Glib::RefPtr<Gtk::Builder> const& builder, DrawContext* draw_context)
+MachinesController::MachinesController(HistoryManager* history_manager, Glib::RefPtr<Gtk::Builder> const& builder)
 {
     this->history_manager = history_manager;
-    this->draw_context = draw_context;
 
     disable_input_signals = false;
     project_open = false;
@@ -25,6 +25,9 @@ MachinesController::MachinesController(HistoryManager* history_manager, Glib::Re
     builder->get_widget("machine_name_entry", name_entry);
     builder->get_widget("machine_launch_on_start_switch", launch_on_start_switch);
     builder->get_widget("machine_edit_gl_area", gl_area);
+
+    gui_context = new GUIContext(gl_area, history_manager);
+    draw_context = &gui_context->gui_state.draw_context;
 
     list_view_controller = new ListViewController(tree_view);
     list_view_controller->selection_changed_signal.connect(sigc::mem_fun(this, &MachinesController::on_selection_changed));
@@ -84,6 +87,7 @@ void MachinesController::new_entity_coords(float& x, float& y, bool offset)
 void MachinesController::on_selection_changed(unsigned int machine_id)
 {
     disable_input_signals = true;
+    gui_context->unset_machine();
 
     if(machine_id == 0)
     {
@@ -97,8 +101,10 @@ void MachinesController::on_selection_changed(unsigned int machine_id)
         selected_machine = history_manager->current_project.get_machine_by_id(machine_id);
         name_entry->set_text(selected_machine->name);
         launch_on_start_switch->set_state(selected_machine->run_on_start);
+        gui_context->set_machine(selected_machine);
     }
-    
+   
+    gui_context->update(); 
     disable_input_signals = false;
     _update_enabled();
 }

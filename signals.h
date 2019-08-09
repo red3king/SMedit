@@ -26,7 +26,6 @@ class Signals
         Signals();
 
         sigc::signal<void> project_open, project_close;
-        sigc::signal<void, Machine*> machine_selected;
         sigc::signal<void, EntityType, SignalType, unsigned int> model_changed;
 
         void register_set_cursor_handler(SetCursorHandler handler);
