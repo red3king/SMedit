@@ -613,15 +613,101 @@
                               <object class="GtkBox" id="transition_selected">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="orientation">vertical</property>
                                 <child>
-                                  <placeholder/>
+                                  <object class="GtkButton" id="transition_selected_delete">
+                                    <property name="label" translatable="yes">Delete</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="receives_default">True</property>
+                                    <property name="halign">start</property>
+                                    <property name="valign">start</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
                                 </child>
                                 <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
+                                  <object class="GtkGrid">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <child>
+                                      <object class="GtkLabel" id="transition_selected_title">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="margin_left">4</property>
+                                        <property name="margin_right">4</property>
+                                        <property name="margin_top">4</property>
+                                        <property name="margin_bottom">4</property>
+                                        <property name="label" translatable="yes">Transition [name goes here]</property>
+                                        <attributes>
+                                          <attribute name="weight" value="bold"/>
+                                        </attributes>
+                                      </object>
+                                      <packing>
+                                        <property name="left_attach">0</property>
+                                        <property name="top_attach">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="label" translatable="yes">Type:</property>
+                                      </object>
+                                      <packing>
+                                        <property name="left_attach">0</property>
+                                        <property name="top_attach">1</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="event_timeout_label">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="label" translatable="yes">[event/timeout]</property>
+                                      </object>
+                                      <packing>
+                                        <property name="left_attach">0</property>
+                                        <property name="top_attach">2</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkEntry" id="event_timeout_entry">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                      </object>
+                                      <packing>
+                                        <property name="left_attach">1</property>
+                                        <property name="top_attach">2</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkComboBoxText" id="transition_type_combobox">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="active">0</property>
+                                        <property name="active_id">0</property>
+                                        <items>
+                                          <item id="0" translatable="yes">Catchall</item>
+                                          <item id="1" translatable="yes">Event</item>
+                                          <item id="2" translatable="yes">Timeout</item>
+                                        </items>
+                                      </object>
+                                      <packing>
+                                        <property name="left_attach">1</property>
+                                        <property name="top_attach">1</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">1</property>
+                                  </packing>
                                 </child>
                               </object>
                               <packing>
@@ -640,7 +726,7 @@
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">True</property>
-                                    <property name="halign">center</property>
+                                    <property name="halign">start</property>
                                     <property name="valign">start</property>
                                   </object>
                                   <packing>
@@ -658,7 +744,14 @@
                                       <object class="GtkLabel" id="resourcelock_selected_name">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
+                                        <property name="margin_left">4</property>
+                                        <property name="margin_right">4</property>
+                                        <property name="margin_top">4</property>
+                                        <property name="margin_bottom">4</property>
                                         <property name="label" translatable="yes">Lock (resourcenamehere)</property>
+                                        <attributes>
+                                          <attribute name="weight" value="bold"/>
+                                        </attributes>
                                       </object>
                                       <packing>
                                         <property name="expand">False</property>

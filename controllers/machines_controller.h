@@ -2,6 +2,7 @@
 
 #include "list_view_controller.h"
 #include "selected_item/selected_resourcelock.h"
+#include "selected_item/selected_transition.h"
 #include "historymanager/historymanager.h"
 #include "models/machine.h"
 #include "gui/draw_context.h"
@@ -16,6 +17,7 @@ class MachinesController
     private:
         ListViewController* list_view_controller;
         SelectedResourceLock* selected_resourcelock_ctrl;
+        SelectedTransition* selected_transition_ctrl;
 
         HistoryManager* history_manager;
         DrawContext* draw_context;

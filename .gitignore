@@ -1,4 +1,8 @@
+smedit
+test
 *.exe
 *.glade~
 *.swp
+*.o
+*.d
 

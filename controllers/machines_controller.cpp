@@ -34,6 +34,7 @@ MachinesController::MachinesController(HistoryManager* history_manager, Glib::Re
     list_view_controller->selection_changed_signal.connect(sigc::mem_fun(this, &MachinesController::on_selection_changed));
 
     selected_resourcelock_ctrl = new SelectedResourceLock(history_manager, builder);
+    selected_transition_ctrl = new SelectedTransition(history_manager, builder);
 
     signals.project_open.connect(sigc::mem_fun(this, &MachinesController::on_project_open));
     signals.project_close.connect(sigc::mem_fun(this, &MachinesController::on_project_close));
@@ -249,4 +250,5 @@ void MachinesController::on_model_selected(Machine* machine, EntityType entity_t
         selected_item_stack->set_visible_child("resourcelock_selected");
 
     selected_resourcelock_ctrl->set_selected(machine, entity);
+    selected_transition_ctrl->set_selected(machine, entity);
 }

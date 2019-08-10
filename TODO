@@ -1,12 +1,18 @@
-working on machines controller
-    just got selected item tab switching working
-    need to keep writing the sleected item controllers
-        halfway through the resourcelock one, see selected_reosurclock.cpp for more 
+LEFT OFF HERE:
+    working on selected transition ctrl
+        stuff mostly works, need to:
+            update the gui whenever I submit an action on user entry input
+            may need to call update() after user changes the transition type (to overwrite contents of text entry)
+    after that, figure out why there is a double free crash when the program exits
 
-NEXT MAKE A MAKEFILE SO I ONLY RECOMPILE WHATS NEEDED
 
-THEN, START ON THE BUTTONS TO CREATE/DELETE ENTITIES,
-    THEN THE SELECTED ENTITY EDITOR! NICE!
+bug
+    make a 2x wider state and a normal size one
+    connect the 2 states
+    zoom out a bunch (may not be necessary)
+    rotate the smamll one around the big one
+        the transition doesnt always stay stuck to both, it disconnects from the small one sometimes.
+
 
 box entity stuff
     then do the double resize operation (corner drag)

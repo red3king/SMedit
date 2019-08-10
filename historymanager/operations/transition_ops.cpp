@@ -234,6 +234,7 @@ unsigned int TransitionChgOperation::execute(Project& project)
     Machine* machine = project.get_machine_by_id(machine_id);
     Transition* transition = machine->get_transition_by_id(transition_id);
     execute_impl(transition);
+    signals.fire_model_changed(TRANSITION, MODIFY, transition_id);
     return transition_id;
 }
 

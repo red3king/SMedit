@@ -15,6 +15,7 @@ class SelectedItemController
         virtual void set_selected_impl(Entity* entity)=0;
         virtual Entity* get_entity()=0;
         virtual void update()=0;
+
         virtual ~SelectedItemController()=0;
 
     protected:

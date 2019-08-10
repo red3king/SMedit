@@ -1,4 +1,4 @@
-CXXFLAGS = -std=c++14 -iquote ./ $(shell pkg-config --cflags --libs gtkmm-3.0 epoxy)
+CXXFLAGS = -std=c++14 -iquote ./ -ggdb $(shell pkg-config --cflags --libs gtkmm-3.0 epoxy)
 LDFLAGS = $(shell pkg-config --libs gtkmm-3.0 epoxy)
 
 
@@ -50,13 +50,13 @@ endif
 	@$(CPP) $(CPPFLAGS) $(CXXFLAGS) $< -MM -MT $(@:.d=.o) >$@
 
 
-
 .PHONY: clean
 clean:
+	# delete stuff
 	rm -f $(obj) smedit
-	rm -f $(testobj) test
-
-.PHONY: cleandep
-cleandep:
 	rm -f $(dep)
+
+	# delete test stuff
+	rm -f $(testobj) test
 	rm -f $(testdep)
+
