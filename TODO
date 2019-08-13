@@ -1,9 +1,8 @@
 LEFT OFF HERE:
-    working on selected transition ctrl
-        stuff mostly works, need to:
-            update the gui whenever I submit an action on user entry input
-            may need to call update() after user changes the transition type (to overwrite contents of text entry)
-    after that, figure out why there is a double free crash when the program exits
+    working on selected state ctrl
+        need to build the widget and then code more of it
+
+   after that, figure out why there is a double free crash when the program exits
 
 
 bug
@@ -23,6 +22,8 @@ box entity stuff
  
 
 === for later === 
+
+CHECK - that all object modifications are done by submitting operations and i didnt accidentally write direct modification that will mess up the history system`:
 
 add minimum size to resize operations
 

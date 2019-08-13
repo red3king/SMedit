@@ -2,15 +2,28 @@
 
 #include <string>
 #include <vector>
+#include <stdexcept>
 
 #include "boxentity.h"
 
+
+#define STS_INITIAL "Initial"
+#define STS_CODE "Code"
+#define STS_RETURN "Return"
+#define STS_SPAWN "Spawn"
+#define STS_JOIN "Join"
+#define STS_RUN "Run"
+
+
 using std::string;
 using std::vector;
+class Transition;
+
 
 enum StateType { INITIAL, CODE, RETURN, SPAWN, JOIN, RUN };
 
-class Transition;
+string state_type_to_string(StateType type);
+StateType string_to_state_type(string input);
 
 
 class State : public BoxEntity
@@ -50,7 +63,6 @@ class State : public BoxEntity
         string name;
         StateType type;
         string code;    // only used in CODE type 
-        bool initial;
 
         vector<Transition*> incoming_transitions, outgoing_transitions;
 

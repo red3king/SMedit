@@ -15,6 +15,7 @@ unsigned int StateChgOperation::execute(Project& project)
     Machine* machine = project.get_machine_by_id(machine_id);
     State* state = machine->get_state_by_id(state_id);
     execute_impl(state);
+    signals.fire_model_changed(STATE, MODIFY, state_id);
     return state_id;
 }
 
@@ -167,26 +168,6 @@ OpStateType* OpStateType::clone()
 void OpStateType::execute_impl(State* state)
 {
     state->type = type;
-}
-
-
-// Initial flag change
-
-OpStateInitial::OpStateInitial(Machine* machine, State* state, bool initial) : StateChgOperation(machine, state)
-{
-    this->initial = initial;
-}
-
-
-OpStateInitial* OpStateInitial::clone()
-{
-    return new OpStateInitial(*this);
-}
-
-
-void OpStateInitial::execute_impl(State* state)
-{
-    state->initial = initial;
 }
 
 

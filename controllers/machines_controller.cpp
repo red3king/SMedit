@@ -35,6 +35,7 @@ MachinesController::MachinesController(HistoryManager* history_manager, Glib::Re
 
     selected_resourcelock_ctrl = new SelectedResourceLock(history_manager, builder);
     selected_transition_ctrl = new SelectedTransition(history_manager, builder);
+    selected_state_ctrl = new SelectedState(history_manager, builder);
 
     signals.project_open.connect(sigc::mem_fun(this, &MachinesController::on_project_open));
     signals.project_close.connect(sigc::mem_fun(this, &MachinesController::on_project_close));
@@ -251,4 +252,5 @@ void MachinesController::on_model_selected(Machine* machine, EntityType entity_t
 
     selected_resourcelock_ctrl->set_selected(machine, entity);
     selected_transition_ctrl->set_selected(machine, entity);
+    selected_state_ctrl->set_selected(machine, entity);
 }

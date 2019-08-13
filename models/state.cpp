@@ -2,6 +2,48 @@
 #include "transition.h"
 
 
+string state_type_to_string(StateType type)
+{
+    switch(type)
+    {
+        case INITIAL:
+            return STS_INITIAL;
+        case CODE:
+            return STS_CODE;
+        case RETURN:
+            return STS_RETURN;
+        case SPAWN:
+            return STS_SPAWN;
+        case JOIN:
+            return STS_JOIN;
+        case RUN:
+            return STS_RUN;
+    }
+
+    throw std::invalid_argument("unknown StateType");
+}
+
+
+StateType string_to_state_type(string input)
+{
+    if(input == STS_INITIAL)
+        return INITIAL;
+    if(input == STS_CODE)
+        return CODE;
+    if(input == STS_RETURN)
+        return RETURN;
+    if(input == STS_SPAWN)
+        return SPAWN;
+    if(input == STS_JOIN)
+        return JOIN;
+    if(input == STS_RUN)
+        return RUN;
+
+    throw std::invalid_argument("unknown StateType string");
+}
+
+
+
 State::State(unsigned int id) : BoxEntity(id) { } 
 
 

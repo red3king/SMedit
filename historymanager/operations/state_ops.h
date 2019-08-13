@@ -69,18 +69,6 @@ class OpStateType : public StateChgOperation
 };
 
 
-class OpStateInitial : public StateChgOperation
-{
-    public:
-        OpStateInitial(Machine* machine, State* state, bool initial);
-        OpStateInitial* clone();
-        void execute_impl(State* state);
-
-    private:
-        bool initial;
-};
-
-
 class OpStateName : public StateChgOperation
 {
     public:
