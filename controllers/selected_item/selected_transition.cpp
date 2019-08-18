@@ -1,7 +1,9 @@
+#include <iostream>
+
 #include "selected_transition.h"
+#include "utils.h"
 #include "historymanager/operations/transition_ops.h"
 
-#include <iostream>
 
 
 SelectedTransition::SelectedTransition(HistoryManager* history_manager, Glib::RefPtr<Gtk::Builder> const& builder) : SelectedItemController(history_manager)
@@ -21,33 +23,6 @@ SelectedTransition::SelectedTransition(HistoryManager* history_manager, Glib::Re
 }
 
 
-bool is_number(Glib::ustring text)
-{
-    // return true if text consists of numbers and periods
-    string allowed = "1234567890.";
-    bool ok;
-
-    for(int i=0; i<text.size(); i++)
-    {
-        ok = false;
-
-        for(int j=0; j<allowed.size(); j++)
-        {
-            if(text.at(i) == allowed.at(j))
-            {
-                ok = true;
-                break;
-            }
-        }
-
-        if(!ok)
-            return false;
-    }    
-
-    return true;
-}
-
-
 void SelectedTransition::on_event_timeout_changed()
 {
     if(is_overwriting_user)
@@ -58,13 +33,9 @@ void SelectedTransition::on_event_timeout_changed()
     if(selected_transition->type == TIMEOUT)
     {
         float value = selected_transition->timeout;
-        bool valid = true;
+        bool valid = string_to_float(value, text);
         
-        try { value = std::stof(text); }
-        catch (...) { valid = false; }
-        
-        // stof doesn't throw exceptions for strings like "3.14goat15" so is_number is also needed
-        if(!is_number(text) || !valid)
+        if(!valid)
         {
             is_overwriting_user = true;
             event_timeout_entry->set_text(std::to_string(selected_transition->timeout));  

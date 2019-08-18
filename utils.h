@@ -3,6 +3,8 @@
 #define _USE_MATH_DEFINES   // for pi
 #include <cmath>
 #include <string>
+#include <gtkmm.h>
+
 
 using std::string;
 
@@ -44,4 +46,10 @@ class IOResult
 };
 
 
+
+// String to number helpers
+// returns true when input is valid
+bool is_number(Glib::ustring text);
+bool string_to_int(int& result, string input);
+bool string_to_float(float& result, string input);
 

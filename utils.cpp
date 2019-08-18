@@ -1,4 +1,3 @@
-
 #include "utils.h"
 
 #include <algorithm>
@@ -72,4 +71,63 @@ bool angle_within(float theta, float a0, float a1, bool counterclockwise)
 void print_angle(float angle)
 {
     std::cout << 360.0 * angle / (2.0 * M_PI);
+}
+
+
+bool is_number(Glib::ustring text)
+{
+    // return true if text consists of numbers and periods
+    string allowed = "1234567890.";
+    bool ok;
+
+    for(int i=0; i<text.size(); i++)
+    {
+        ok = false;
+
+        for(int j=0; j<allowed.size(); j++)
+        {
+            if(text.at(i) == allowed.at(j))
+            {
+                ok = true;
+                break;
+            }
+        }
+
+        if(!ok)
+            return false;
+    }
+
+    return true;
+}
+
+
+bool string_to_int(int& result, string input)
+{
+    int res2;
+    try { res2 = std::stoi(input); }
+    catch(...) { return false; }
+    
+    if(is_number(input))
+    {
+        result = res2;
+        return true;
+    }
+
+    return false;
+}
+
+
+bool string_to_float(float& result, string input)
+{
+    float res2;
+    try { res2 = std::stof(input); }
+    catch(...) { return false; }
+    
+    if(is_number(input))
+    {
+        result = res2;
+        return true;
+    }
+
+    return false;
 }

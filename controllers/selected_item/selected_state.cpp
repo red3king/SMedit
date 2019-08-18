@@ -9,6 +9,10 @@ SelectedState::SelectedState(HistoryManager* history_manager, Glib::RefPtr<Gtk::
     builder->get_widget("state_name_entry", name_entry);
     builder->get_widget("state_type_combobox", type_combobox);    
 
+    Gtk::Box* selected_state_grid;
+    builder->get_widget("test_box", selected_state_grid);
+    // value_input = new ValueInputController(selected_state_grid, "tvi");
+
     name_entry->signal_changed().connect(sigc::mem_fun(this, &SelectedState::on_name_changed));
     type_combobox->signal_changed().connect(sigc::mem_fun(this, &SelectedState::on_type_changed));
     delete_button->signal_clicked().connect(sigc::mem_fun(this, &SelectedState::on_delete_clicked));

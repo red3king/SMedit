@@ -3,6 +3,7 @@
 #include <gtkmm.h>
 
 #include "selected_item.h"
+#include "controllers/value_input_controller.h"
 #include "models/state.h"
 
 
@@ -17,6 +18,8 @@ class SelectedState : public SelectedItemController
 
     private:
         State* selected_state;
+
+        //ValueInputController* value_input;
 
         // widgets
         Gtk::Button* delete_button;
