@@ -5,68 +5,11 @@
 #include <string>
 #include <vector>
 
-#define SVT_ANY "any"
-#define SVT_STR "string"
-#define SVT_INT "int"
-#define SVT_FLOAT "float"
-#define SVT_REF "reference"
+#include "models/datatypes/lvov.h"
 
 
 using std::string;
 using std::vector;
-
-
-enum ValueType { VT_ANY, VT_STR, VT_INT, VT_FLOAT, VT_REF };
-static const ValueType AllValueTypes[] = { VT_ANY, VT_STR, VT_INT, VT_FLOAT, VT_REF };
-
-
-string value_type_to_string(ValueType vt);
-ValueType string_to_value_type(string str);
-
-
-/*
-
-    return - literal or variable
-    spawn - literal or variable, must be string (name of task) | literal or variable ( arg ) | variable  ( pid storage)
-    join - variable (pid) | variable (for result)
-    run - literal or variable, string (name of task) | literal or variable (arg) | variable (result)
-   
-    
-   
-   
-   
-*/
-
-
-class LVOV
-{
-    // Literal Value or Variable name
-    public:
-        LVOV();
-        LVOV(string str_val);
-        LVOV(string str_val, bool is_variable);
-        LVOV(int int_val);
-        LVOV(float float_val);
-
-        void reset();
-
-        bool from_string(Glib::ustring input); // attempt to update value from string
-
-        // Returns string representation of value/varname 
-        string to_string();
-
-        ValueType type;
-
-        string variable_name;
-        string str_val;
-        int int_val;
-        float float_val;
-
-        // These operators return the underlying value or variable name
-        operator int() const;
-        operator string() const;
-        operator float() const;
-};
 
 
 class ValueInputController

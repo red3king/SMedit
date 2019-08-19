@@ -5,14 +5,16 @@
 #include <stdexcept>
 
 #include "boxentity.h"
+#include "models/datatypes/lvov.h"
+#include "models/datatypes/arg.h"
+#include "models/datatypes/argdef.h"
 
-
-#define STS_INITIAL "Initial"
+#define STS_INITIAL "Initial"       // list of argument names
 #define STS_CODE "Code"
-#define STS_RETURN "Return"
-#define STS_SPAWN "Spawn"
-#define STS_JOIN "Join"
-#define STS_RUN "Run"
+#define STS_RETURN "Return"         // return vov
+#define STS_SPAWN "Spawn"           // spawn string name or variable, vovlist arguments, string pid var
+#define STS_JOIN "Join"             // string variable
+#define STS_RUN "Run"               // string name or variable VOV, vovlist arguments, string output var
 
 
 using std::string;
@@ -62,7 +64,23 @@ class State : public BoxEntity
 
         string name;
         StateType type;
-        string code;    // only used in CODE type 
+        
+        // Initial
+        vector<ArgDef> initial_args;
+
+        // Code
+        string code;    
+
+        //Return
+        LVOV return_value;
+
+        // Spawn / Run
+        LVOV launch_task_name;
+        vector<Arg> launch_args;
+        string launch_result_variable;  // stores pid for spawn, result for run
+
+        // Join
+        string join_pid_variable;
 
         vector<Transition*> incoming_transitions, outgoing_transitions;
 

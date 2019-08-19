@@ -11,7 +11,8 @@ presrc = $(filter-out main.cpp, $(filter-out test_main.cpp, $(wildcard *.cpp))) 
 	$(wildcard gui/operations/*.cpp) \
 	$(wildcard historymanager/*.cpp) \
 	$(wildcard historymanager/operations/*.cpp) \
-	$(wildcard models/*.cpp)
+	$(wildcard models/*.cpp) \
+	$(wildcard models/datatypes/*.cpp)
 
 src := $(presrc) main.cpp
 testsrc := $(presrc) test_main.cpp

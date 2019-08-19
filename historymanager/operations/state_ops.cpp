@@ -211,3 +211,44 @@ void OpStateCode::execute_impl(State* state)
 }
 
 
+// Join pid var change
+
+OpStateJoinPidVar::OpStateJoinPidVar(Machine* machine, State* state, string join_pid) : StateChgOperation(machine, state)
+{
+    this->join_pid = join_pid;
+}
+
+
+OpStateJoinPidVar* OpStateJoinPidVar::clone()
+{
+    return new OpStateJoinPidVar(*this);
+}
+
+
+void OpStateJoinPidVar::execute_impl(State* state)
+{
+    state->join_pid_variable = join_pid;
+}
+
+
+// Return value
+
+OpStateRetVal::OpStateRetVal(Machine* machine, State* state, LVOV ret_val) : StateChgOperation(machine, state)
+{
+    this->ret_val = ret_val;
+}
+
+
+OpStateRetVal* OpStateRetVal::clone()
+{
+    return new OpStateRetVal(*this);
+}
+
+
+void OpStateRetVal::execute_impl(State* state)
+{
+    state->return_value = ret_val;
+}
+ 
+
+

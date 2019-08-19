@@ -92,3 +92,26 @@ class OpStateCode : public StateChgOperation
         string code;
 };
 
+
+class OpStateJoinPidVar : public StateChgOperation
+{
+    public:
+        OpStateJoinPidVar(Machine* machine, State* state, string join_pid);
+        OpStateJoinPidVar* clone();
+        void execute_impl(State* state);
+
+    private:
+        string join_pid;
+};
+
+
+class OpStateRetVal : public StateChgOperation
+{
+    public:
+        OpStateRetVal(Machine* machine, State* state, LVOV ret_val);
+        OpStateRetVal* clone();
+        void execute_impl(State* state);
+
+    private:
+        LVOV ret_val;
+};

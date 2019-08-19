@@ -19,15 +19,21 @@ class SelectedState : public SelectedItemController
     private:
         State* selected_state;
 
-        //ValueInputController* value_input;
+        ValueInputController* return_value_input;
 
         // widgets
         Gtk::Button* delete_button;
         Gtk::Label* title_label;
         Gtk::Entry* name_entry;
         Gtk::ComboBoxText* type_combobox;
+        Gtk::Stack* state_types_stack;
+
+        Gtk::Entry* join_pidvar_entry;
 
         void on_name_changed();
         void on_type_changed();
         void on_delete_clicked();
+
+        void on_jpidvar_changed();
+        void on_retval_changed(LVOV lvov);
 };
