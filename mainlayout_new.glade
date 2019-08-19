@@ -691,33 +691,7 @@
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <child>
-                                      <object class="GtkBox" id="state_initial_selected">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">False</property>
-                                        <property name="orientation">vertical</property>
-                                        <child>
-                                          <object class="GtkLabel">
-                                            <property name="visible">True</property>
-                                            <property name="can_focus">False</property>
-                                            <property name="label" translatable="yes">Initial State Configuration</property>
-                                            <attributes>
-                                              <attribute name="weight" value="bold"/>
-                                            </attributes>
-                                          </object>
-                                          <packing>
-                                            <property name="expand">False</property>
-                                            <property name="fill">True</property>
-                                            <property name="position">0</property>
-                                          </packing>
-                                        </child>
-                                        <child>
-                                          <placeholder/>
-                                        </child>
-                                      </object>
-                                      <packing>
-                                        <property name="name">state_initial_selected</property>
-                                        <property name="title" translatable="yes">page0</property>
-                                      </packing>
+                                      <placeholder/>
                                     </child>
                                     <child>
                                       <object class="GtkBox" id="state_code_selected">
@@ -750,6 +724,149 @@
                                       </packing>
                                     </child>
                                     <child>
+                                      <object class="GtkGrid" id="state_initial_selected">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <child>
+                                          <object class="GtkLabel">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="label" translatable="yes">Initial State Configuration</property>
+                                            <attributes>
+                                              <attribute name="weight" value="bold"/>
+                                            </attributes>
+                                          </object>
+                                          <packing>
+                                            <property name="left_attach">0</property>
+                                            <property name="top_attach">0</property>
+                                            <property name="width">4</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkTreeView" id="initial_state_arg_treeview">
+                                            <property name="height_request">100</property>
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">True</property>
+                                            <child internal-child="selection">
+                                              <object class="GtkTreeSelection"/>
+                                            </child>
+                                          </object>
+                                          <packing>
+                                            <property name="left_attach">0</property>
+                                            <property name="top_attach">1</property>
+                                            <property name="width">4</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkLabel">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="halign">center</property>
+                                            <property name="valign">center</property>
+                                            <property name="margin_left">4</property>
+                                            <property name="margin_right">4</property>
+                                            <property name="margin_top">4</property>
+                                            <property name="margin_bottom">4</property>
+                                            <property name="label" translatable="yes">Name:</property>
+                                          </object>
+                                          <packing>
+                                            <property name="left_attach">0</property>
+                                            <property name="top_attach">2</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkEntry" id="initial_state_name_entry">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">True</property>
+                                            <property name="halign">center</property>
+                                            <property name="valign">center</property>
+                                            <property name="margin_left">4</property>
+                                            <property name="margin_right">4</property>
+                                            <property name="margin_top">4</property>
+                                            <property name="margin_bottom">4</property>
+                                          </object>
+                                          <packing>
+                                            <property name="left_attach">1</property>
+                                            <property name="top_attach">2</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkLabel">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="halign">center</property>
+                                            <property name="valign">center</property>
+                                            <property name="margin_left">4</property>
+                                            <property name="margin_right">4</property>
+                                            <property name="margin_top">4</property>
+                                            <property name="margin_bottom">4</property>
+                                            <property name="label" translatable="yes">Type:</property>
+                                          </object>
+                                          <packing>
+                                            <property name="left_attach">2</property>
+                                            <property name="top_attach">2</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkComboBoxText" id="initial_state_type_combobox">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="halign">center</property>
+                                            <property name="valign">center</property>
+                                            <property name="margin_left">4</property>
+                                            <property name="margin_right">4</property>
+                                            <property name="margin_top">4</property>
+                                            <property name="margin_bottom">4</property>
+                                          </object>
+                                          <packing>
+                                            <property name="left_attach">3</property>
+                                            <property name="top_attach">2</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkButton" id="initial_state_create_button">
+                                            <property name="label" translatable="yes">Create</property>
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">True</property>
+                                            <property name="receives_default">True</property>
+                                            <property name="halign">center</property>
+                                            <property name="valign">center</property>
+                                            <property name="margin_left">4</property>
+                                            <property name="margin_right">4</property>
+                                            <property name="margin_top">4</property>
+                                            <property name="margin_bottom">4</property>
+                                          </object>
+                                          <packing>
+                                            <property name="left_attach">0</property>
+                                            <property name="top_attach">3</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkButton" id="initial_state_delete_button">
+                                            <property name="label" translatable="yes">Delete</property>
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">True</property>
+                                            <property name="receives_default">True</property>
+                                          </object>
+                                          <packing>
+                                            <property name="left_attach">1</property>
+                                            <property name="top_attach">3</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <placeholder/>
+                                        </child>
+                                        <child>
+                                          <placeholder/>
+                                        </child>
+                                      </object>
+                                      <packing>
+                                        <property name="name">state_initial_selected</property>
+                                        <property name="title" translatable="yes">page4</property>
+                                        <property name="position">2</property>
+                                      </packing>
+                                    </child>
+                                    <child>
                                       <object class="GtkBox" id="state_return_selected">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
@@ -776,7 +893,7 @@
                                       <packing>
                                         <property name="name">state_return_selected</property>
                                         <property name="title" translatable="yes">page2</property>
-                                        <property name="position">2</property>
+                                        <property name="position">3</property>
                                       </packing>
                                     </child>
                                     <child>
@@ -806,11 +923,8 @@
                                       <packing>
                                         <property name="name">state_spawn_selected</property>
                                         <property name="title" translatable="yes">page3</property>
-                                        <property name="position">3</property>
+                                        <property name="position">4</property>
                                       </packing>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
                                     </child>
                                     <child>
                                       <object class="GtkGrid" id="state_join_selected">

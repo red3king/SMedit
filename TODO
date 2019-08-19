@@ -1,8 +1,6 @@
 LEFT OFF HERE:
-    working on selected state ctrl
-        need to build the widget and then code more of it
-
-   after that, figure out why there is a double free crash when the program exits
+    just implemented the initial state arguments controller
+        theres a crash bug, gotta fix that    
 
 
 bug

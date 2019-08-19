@@ -251,4 +251,21 @@ void OpStateRetVal::execute_impl(State* state)
 }
  
 
+// Initial state config
 
+OpStateInitialCfg::OpStateInitialCfg(Machine* machine, State* state, vector<ArgDef> arguments) : StateChgOperation(machine, state)
+{
+    this->arguments = arguments;
+}
+
+
+OpStateInitialCfg* OpStateInitialCfg::clone()
+{
+    return new OpStateInitialCfg(*this);
+}
+
+
+void OpStateInitialCfg::execute_impl(State* state)
+{
+    state->initial_args = arguments;
+}

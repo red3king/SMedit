@@ -6,6 +6,7 @@ LDFLAGS = $(shell pkg-config --libs gtkmm-3.0 epoxy)
 presrc = $(filter-out main.cpp, $(filter-out test_main.cpp, $(wildcard *.cpp))) \
 	$(wildcard controllers/*.cpp) \
 	$(wildcard controllers/selected_item/*.cpp) \
+	$(wildcard controllers/selected_item/selected_state/*.cpp) \
 	$(wildcard gui/*.cpp) \
 	$(wildcard gui/models/*.cpp) \
 	$(wildcard gui/operations/*.cpp) \

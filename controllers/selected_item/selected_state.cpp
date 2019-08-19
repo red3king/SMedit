@@ -25,10 +25,38 @@ SelectedState::SelectedState(HistoryManager* history_manager, Glib::RefPtr<Gtk::
     return_value_input = new ValueInputController(return_grid, "return value");
     return_value_input->value_changed_signal.connect(sigc::mem_fun(this, &SelectedState::on_retval_changed));
 
+    init_initial_state_ctrl(builder);
+
     name_entry->signal_changed().connect(sigc::mem_fun(this, &SelectedState::on_name_changed));
     type_combobox->signal_changed().connect(sigc::mem_fun(this, &SelectedState::on_type_changed));
     delete_button->signal_clicked().connect(sigc::mem_fun(this, &SelectedState::on_delete_clicked));
     join_pidvar_entry->signal_changed().connect(sigc::mem_fun(this, &SelectedState::on_jpidvar_changed));
+}
+
+
+void SelectedState::init_initial_state_ctrl(Glib::RefPtr<Gtk::Builder> const& builder)
+{
+    Gtk::TreeView* tree_view;
+    Gtk::Button *delete_button, *create_button;
+    Gtk::Entry* arg_name_entry;
+    Gtk::ComboBoxText* arg_type_cb;
+
+    builder->get_widget("initial_state_arg_treeview", tree_view);
+    builder->get_widget("initial_state_delete_button", delete_button);
+    builder->get_widget("initial_state_create_button", create_button);
+    builder->get_widget("initial_state_name_entry", arg_name_entry);
+    builder->get_widget("initial_state_type_combobox", arg_type_cb);
+
+    initial_state_ctrl = new InitialStateController(tree_view, delete_button, create_button, 
+            arg_name_entry, arg_type_cb);
+    initial_state_ctrl->config_changed_signal.connect(sigc::mem_fun(this, &SelectedState::on_initial_state_changed));
+}
+
+
+void SelectedState::on_initial_state_changed(vector<ArgDef> arguments)
+{
+    auto op = OpStateInitialCfg(owning_machine, selected_state, arguments);
+    history_manager->submit_operation(op);
 }
 
 
@@ -91,6 +119,7 @@ void SelectedState::update()
 
     join_pidvar_entry->set_text(selected_state->join_pid_variable);
     return_value_input->set_value(selected_state->return_value);
+    initial_state_ctrl->set_config(selected_state->initial_args);
 
     if(selected_state->type == INITIAL)
         state_types_stack->set_visible_child(STK_INITIAL_ID);

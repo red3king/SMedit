@@ -1,6 +1,7 @@
 #pragma once
 
 #include "historymanager/operation.h"
+#include "models/datatypes/argdef.h"
 #include "models/state.h"
 
 
@@ -114,4 +115,16 @@ class OpStateRetVal : public StateChgOperation
 
     private:
         LVOV ret_val;
+};
+
+
+class OpStateInitialCfg : public StateChgOperation
+{
+    public:
+        OpStateInitialCfg(Machine* machine, State* state, vector<ArgDef> arguments);
+        OpStateInitialCfg* clone();
+        void execute_impl(State* state);
+
+    private:
+        vector<ArgDef> arguments;
 };

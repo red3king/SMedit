@@ -53,3 +53,8 @@ bool is_number(Glib::ustring text);
 bool string_to_int(int& result, string input);
 bool string_to_float(float& result, string input);
 
+
+// UI Helpers
+
+// add value types to combo box
+void prepare_value_type_combobox(Gtk::ComboBoxText* combo_box);

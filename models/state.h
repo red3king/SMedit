@@ -2,7 +2,6 @@
 
 #include <string>
 #include <vector>
-#include <stdexcept>
 
 #include "boxentity.h"
 #include "models/datatypes/lvov.h"
@@ -71,7 +70,7 @@ class State : public BoxEntity
         // Code
         string code;    
 
-        //Return
+        //Return  done
         LVOV return_value;
 
         // Spawn / Run
@@ -79,7 +78,7 @@ class State : public BoxEntity
         vector<Arg> launch_args;
         string launch_result_variable;  // stores pid for spawn, result for run
 
-        // Join
+        // Join  done
         string join_pid_variable;
 
         vector<Transition*> incoming_transitions, outgoing_transitions;

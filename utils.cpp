@@ -1,4 +1,5 @@
 #include "utils.h"
+#include "const.h"
 
 #include <algorithm>
 #include <iostream>
@@ -130,4 +131,15 @@ bool string_to_float(float& result, string input)
     }
 
     return false;
+}
+
+
+void prepare_value_type_combobox(Gtk::ComboBoxText* combo_box)
+{
+    for(int i=0; i<NUM_VALUE_TYPES; i++)
+    {
+        ValueType vt = AllValueTypes[i];
+        string str = value_type_to_string(vt);
+        combo_box->append(str);
+    }
 }
