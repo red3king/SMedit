@@ -1,5 +1,5 @@
-CXXFLAGS = -std=c++14 -iquote ./ -ggdb $(shell pkg-config --cflags --libs gtkmm-3.0 epoxy)
-LDFLAGS = $(shell pkg-config --libs gtkmm-3.0 epoxy)
+CXXFLAGS = -std=c++14 -iquote ./ -ggdb $(shell pkg-config --cflags  gtkmm-3.0 gtksourceviewmm-3.0 epoxy)
+LDFLAGS = $(shell pkg-config --libs gtkmm-3.0 gtksourceviewmm-3.0 epoxy)
 
 
 

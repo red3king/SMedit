@@ -1,7 +1,6 @@
 LEFT OFF HERE:
     just implemented the initial state arguments controller
-        theres a crash bug, gotta fix that    
-
+        next up: finish up all other state types
 
 bug
     make a 2x wider state and a normal size one

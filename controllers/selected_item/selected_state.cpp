@@ -27,6 +27,11 @@ SelectedState::SelectedState(HistoryManager* history_manager, Glib::RefPtr<Gtk::
 
     init_initial_state_ctrl(builder);
 
+    Gtk::ScrolledWindow* code_box;
+    builder->get_widget("state_code_scrolled", code_box);
+    code_state_ctrl = new CodeStateController(code_box);
+    code_state_ctrl->signal_code_changed.connect(sigc::mem_fun(this, &SelectedState::on_code_changed));
+
     name_entry->signal_changed().connect(sigc::mem_fun(this, &SelectedState::on_name_changed));
     type_combobox->signal_changed().connect(sigc::mem_fun(this, &SelectedState::on_type_changed));
     delete_button->signal_clicked().connect(sigc::mem_fun(this, &SelectedState::on_delete_clicked));
@@ -50,6 +55,13 @@ void SelectedState::init_initial_state_ctrl(Glib::RefPtr<Gtk::Builder> const& bu
     initial_state_ctrl = new InitialStateController(tree_view, delete_button, create_button, 
             arg_name_entry, arg_type_cb);
     initial_state_ctrl->config_changed_signal.connect(sigc::mem_fun(this, &SelectedState::on_initial_state_changed));
+}
+
+
+void SelectedState::on_code_changed(string code)
+{
+    auto op = OpStateCode(owning_machine, selected_state, code);
+    history_manager->submit_operation(op);
 }
 
 
@@ -120,6 +132,7 @@ void SelectedState::update()
     join_pidvar_entry->set_text(selected_state->join_pid_variable);
     return_value_input->set_value(selected_state->return_value);
     initial_state_ctrl->set_config(selected_state->initial_args);
+    code_state_ctrl->set_text(selected_state->code);
 
     if(selected_state->type == INITIAL)
         state_types_stack->set_visible_child(STK_INITIAL_ID);

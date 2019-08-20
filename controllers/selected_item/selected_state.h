@@ -5,6 +5,7 @@
 #include "selected_item.h"
 #include "controllers/value_input_controller.h"
 #include "selected_state/initial_state_ctrl.h"
+#include "selected_state/code_state.h"
 #include "models/state.h"
 
 
@@ -22,6 +23,7 @@ class SelectedState : public SelectedItemController
 
         ValueInputController* return_value_input;
         InitialStateController* initial_state_ctrl;
+        CodeStateController* code_state_ctrl;
 
         // widgets
         Gtk::Button* delete_button;
@@ -39,6 +41,7 @@ class SelectedState : public SelectedItemController
         void on_jpidvar_changed();
         void on_retval_changed(LVOV lvov);
         void on_initial_state_changed(vector<ArgDef> arguments);
+        void on_code_changed(string code);
 
         void init_initial_state_ctrl(Glib::RefPtr<Gtk::Builder> const& builder);
 };

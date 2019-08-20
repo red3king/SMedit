@@ -14,7 +14,7 @@ InitialStateController::InitialStateController(Gtk::TreeView* tree_view, Gtk::Bu
 
     prepare_value_type_combobox(arg_type_combobox);
 
-    list_view_controller = new ListViewController(tree_view);
+    list_view_controller = new ListViewController(tree_view, "Machine launch args:");
     list_view_controller->selection_changed_signal.connect(sigc::mem_fun(this, &InitialStateController::on_listview_selection_changed));
 
     arg_name_entry->signal_changed().connect(sigc::mem_fun(this, &InitialStateController::on_arg_name_changed));

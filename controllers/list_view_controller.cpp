@@ -15,11 +15,26 @@ ListViewColumns::ListViewColumns()
 
 ListViewController::ListViewController(Gtk::TreeView* tree_view)
 {
+    _init(tree_view, "", false);
+}
+
+
+ListViewController::ListViewController(Gtk::TreeView* tree_view, string title)
+{
+    _init(tree_view, title, true);
+}
+
+
+void ListViewController::_init(Gtk::TreeView* tree_view, string title, bool has_title)
+{
     this->tree_view = tree_view;
     list_store = Gtk::ListStore::create(columns);
 
     tree_view->set_model(list_store);
-    tree_view->append_column("Name:", columns.name_column);
+    tree_view->append_column(title, columns.name_column);
+
+    if(!has_title)
+        tree_view->set_headers_visible(false);
 
     selection = tree_view->get_selection();
     selection->signal_changed().connect(sigc::mem_fun(this, &ListViewController::on_selection_changed));
