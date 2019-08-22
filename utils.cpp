@@ -143,3 +143,33 @@ void prepare_value_type_combobox(Gtk::ComboBoxText* combo_box)
         combo_box->append(str);
     }
 }
+
+
+void set_margins(Gtk::Widget* widget, int margins)
+{
+    widget->set_margin_left(margins);
+    widget->set_margin_top(margins);
+    widget->set_margin_right(margins);
+    widget->set_margin_bottom(margins);
+}
+
+
+void left_align(Gtk::Widget* widget)
+{
+    widget->set_halign(Gtk::ALIGN_START);
+    widget->set_valign(Gtk::ALIGN_CENTER);
+}
+
+
+void right_align(Gtk::Widget* widget)
+{
+    widget->set_halign(Gtk::ALIGN_END);
+    widget->set_valign(Gtk::ALIGN_CENTER);
+}
+
+
+void center_align(Gtk::Widget* widget)
+{
+    widget->set_halign(Gtk::ALIGN_CENTER);
+    widget->set_valign(Gtk::ALIGN_CENTER);
+}

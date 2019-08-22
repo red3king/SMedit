@@ -411,6 +411,8 @@
                               <object class="GtkLabel" id="machine_name_label">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
+                                <property name="halign">start</property>
+                                <property name="valign">center</property>
                                 <property name="margin_left">4</property>
                                 <property name="margin_right">4</property>
                                 <property name="margin_top">4</property>
@@ -420,26 +422,31 @@
                               <packing>
                                 <property name="left_attach">0</property>
                                 <property name="top_attach">0</property>
+                                <property name="width">2</property>
                               </packing>
                             </child>
                             <child>
                               <object class="GtkEntry" id="machine_name_entry">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
+                                <property name="halign">center</property>
                                 <property name="margin_left">4</property>
                                 <property name="margin_right">4</property>
                                 <property name="margin_top">4</property>
                                 <property name="margin_bottom">4</property>
                               </object>
                               <packing>
-                                <property name="left_attach">1</property>
-                                <property name="top_attach">0</property>
+                                <property name="left_attach">0</property>
+                                <property name="top_attach">1</property>
+                                <property name="width">2</property>
                               </packing>
                             </child>
                             <child>
                               <object class="GtkLabel" id="machine_launch_on_start_label">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
+                                <property name="halign">start</property>
+                                <property name="valign">center</property>
                                 <property name="margin_left">4</property>
                                 <property name="margin_right">4</property>
                                 <property name="margin_top">4</property>
@@ -448,7 +455,7 @@
                               </object>
                               <packing>
                                 <property name="left_attach">0</property>
-                                <property name="top_attach">1</property>
+                                <property name="top_attach">2</property>
                               </packing>
                             </child>
                             <child>
@@ -462,7 +469,7 @@
                               </object>
                               <packing>
                                 <property name="left_attach">1</property>
-                                <property name="top_attach">1</property>
+                                <property name="top_attach">2</property>
                               </packing>
                             </child>
                           </object>
@@ -702,7 +709,6 @@
                                           <item translatable="yes">Code</item>
                                           <item translatable="yes">Spawn</item>
                                           <item translatable="yes">Join</item>
-                                          <item translatable="yes">Run</item>
                                           <item translatable="yes">Return</item>
                                         </items>
                                       </object>
@@ -1025,36 +1031,6 @@
                                         <property name="name">state_join_selected</property>
                                         <property name="title" translatable="yes">page0</property>
                                         <property name="position">4</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <object class="GtkBox" id="state_run_selected">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">False</property>
-                                        <property name="orientation">vertical</property>
-                                        <child>
-                                          <object class="GtkLabel">
-                                            <property name="visible">True</property>
-                                            <property name="can_focus">False</property>
-                                            <property name="label" translatable="yes">Run State Configuration</property>
-                                            <attributes>
-                                              <attribute name="weight" value="bold"/>
-                                            </attributes>
-                                          </object>
-                                          <packing>
-                                            <property name="expand">False</property>
-                                            <property name="fill">True</property>
-                                            <property name="position">0</property>
-                                          </packing>
-                                        </child>
-                                        <child>
-                                          <placeholder/>
-                                        </child>
-                                      </object>
-                                      <packing>
-                                        <property name="name">state_run_selected</property>
-                                        <property name="title" translatable="yes">page5</property>
-                                        <property name="position">5</property>
                                       </packing>
                                     </child>
                                   </object>

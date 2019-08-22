@@ -16,8 +16,6 @@ string state_type_to_string(StateType type)
             return STS_SPAWN;
         case JOIN:
             return STS_JOIN;
-        case RUN:
-            return STS_RUN;
     }
 
     throw std::invalid_argument("unknown StateType");
@@ -36,15 +34,16 @@ StateType string_to_state_type(string input)
         return SPAWN;
     if(input == STS_JOIN)
         return JOIN;
-    if(input == STS_RUN)
-        return RUN;
 
     throw std::invalid_argument("unknown StateType string");
 }
 
 
 
-State::State(unsigned int id) : BoxEntity(id) { } 
+State::State(unsigned int id) : BoxEntity(id) 
+{ 
+    launch_task_name = LVOV("");
+} 
 
 
 void State::add_transition(Transition* transition, bool incoming)

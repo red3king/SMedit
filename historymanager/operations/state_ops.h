@@ -128,3 +128,51 @@ class OpStateInitialCfg : public StateChgOperation
     private:
         vector<ArgDef> arguments;
 };
+
+
+class OpStateLaunchTaskName : public StateChgOperation
+{
+    public:
+        OpStateLaunchTaskName(Machine* machine, State* state, LVOV task_name);
+        OpStateLaunchTaskName* clone();
+        void execute_impl(State* state);
+
+    private:
+        LVOV task_name;
+};
+
+
+class OpStateLaunchArgs : public StateChgOperation
+{
+    public:
+        OpStateLaunchArgs(Machine* machine, State* state, vector<Arg> launch_args);
+        OpStateLaunchArgs* clone();
+        void execute_impl(State* state);
+
+    private:
+        vector<Arg> launch_args;
+};
+
+
+class OpStateLaunchResVar : public StateChgOperation
+{
+    public:
+        OpStateLaunchResVar(Machine* machine, State* state, string result_variable);
+        OpStateLaunchResVar* clone();
+        void execute_impl(State* state);
+
+    private:
+        string result_variable;
+};
+
+
+class OpStateLaunchSynch : public StateChgOperation
+{
+    public:
+        OpStateLaunchSynch(Machine* machine, State* state, bool synchronous);
+        OpStateLaunchSynch* clone();
+        void execute_impl(State* state);
+
+    private:
+        bool synchronous;
+};

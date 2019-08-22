@@ -58,3 +58,7 @@ bool string_to_float(float& result, string input);
 
 // add value types to combo box
 void prepare_value_type_combobox(Gtk::ComboBoxText* combo_box);
+void set_margins(Gtk::Widget* widget, int margins);
+void left_align(Gtk::Widget* widget);
+void right_align(Gtk::Widget* widget);
+void center_align(Gtk::Widget* widget);

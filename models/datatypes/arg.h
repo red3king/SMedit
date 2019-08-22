@@ -10,4 +10,6 @@ class Arg
         
         string variable_name;
         LVOV argument_value;
+
+        string describe();
 };

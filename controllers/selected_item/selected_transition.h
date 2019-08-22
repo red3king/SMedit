@@ -11,7 +11,7 @@ class SelectedTransition : public SelectedItemController
     public:
         SelectedTransition(HistoryManager* history_manager, Glib::RefPtr<Gtk::Builder> const& builder);
 
-        void set_selected_impl(Entity* entity);
+        void set_selected_impl(Machine* owning_machine, Entity* entity);
         Entity* get_entity();
         void update();
 

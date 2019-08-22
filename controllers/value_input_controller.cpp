@@ -1,35 +1,66 @@
 #include <stdexcept>
 
 #include "value_input_controller.h"
+#include "utils.h"
 
 
-ValueInputController::ValueInputController(Gtk::Container *parent_container, string name)
+ValueInputController::ValueInputController()
 {
     vector<ValueType> allowed_types(std::begin(AllValueTypes), std::end(AllValueTypes));
-    _init(parent_container, allowed_types, name);   
+    _init(allowed_types, false, "");
 }
 
 
-ValueInputController::ValueInputController(Gtk::Container *parent_container, vector<ValueType> allowed_types, string name)
-{   
-    _init(parent_container, allowed_types, name);
-}
-
-
-void ValueInputController::_init(Gtk::Container *parent_container, vector<ValueType> allowed_types, string name)
+ValueInputController::ValueInputController(string name)
 {
+    vector<ValueType> allowed_types(std::begin(AllValueTypes), std::end(AllValueTypes));
+    _init(allowed_types, true, name);   
+}
+
+
+ValueInputController::ValueInputController(vector<ValueType> allowed_types, string name)
+{   
+    _init(allowed_types, true, name);
+}
+
+
+void ValueInputController::_init(vector<ValueType> allowed_types, bool has_name, string name)
+{
+    this->has_name = has_name;
     is_updating = false;
 
     // Prepare widgets
-    title_label.set_markup("<b>" + name + "</b>");
-    value_type_label.set_text("value type");
-    value_label.set_text("value");
+    if(has_name)
+    {
+        left_align(&title_label);
+        title_label.set_markup("<b>" + name + "</b>");
+    }
+
+    value_type_label.set_text("Type:");
+    value_label.set_text("Value:");
     
-    container_grid.attach(title_label, 0, 0, 2, 1);
-    container_grid.attach(value_type_label, 0, 1, 1, 1);
-    container_grid.attach(value_type_combobox, 1, 1, 1, 1);
-    container_grid.attach(value_label, 0, 2, 1, 1);
-    container_grid.attach(value_entry, 1, 2, 1, 1);
+    set_margins(&value_type_label, 4);
+    left_align(&value_type_label);
+    set_margins(&value_label, 4);
+    left_align(&value_label);
+
+    set_margins(&title_label, 4);
+
+    set_margins(&value_type_combobox, 4);
+    right_align(&value_type_combobox);
+    
+    set_margins(&value_entry, 4);
+    right_align(&value_entry);
+
+    int noffset = has_name ? 0 : 1;
+
+    if(has_name)
+        container_grid.attach(title_label, 0, 0, 2, 1);
+
+    container_grid.attach(value_type_label, 0, 1 + noffset, 1, 1);
+    container_grid.attach(value_type_combobox, 1, 1 + noffset, 1, 1);
+    container_grid.attach(value_label, 0, 2 + noffset, 1, 1);
+    container_grid.attach(value_entry, 1, 2 + noffset, 1, 1);
 
     int i;
     for(i=0; i<allowed_types.size(); i++)
@@ -45,9 +76,21 @@ void ValueInputController::_init(Gtk::Container *parent_container, vector<ValueT
         value_type_label.set_sensitive(false);
     }
 
-    parent_container->add(container_grid);
+    // Set widgets to default value
+    set_value(value);
     
-    title_label.show();
+    value_type_combobox.signal_changed().connect(sigc::mem_fun(this, &ValueInputController::on_value_type_changed));
+    value_entry.signal_changed().connect(sigc::mem_fun(this, &ValueInputController::on_value_changed));
+}
+
+
+void ValueInputController::attach(Gtk::Container* parent_container)
+{
+    parent_container->add(container_grid);
+
+    if(has_name)
+        title_label.show();
+    
     value_type_label.show();
     value_label.show();
 
@@ -55,13 +98,8 @@ void ValueInputController::_init(Gtk::Container *parent_container, vector<ValueT
     value_entry.show();
 
     container_grid.show();
-
-    // Set widgets to default value
-    set_value(value);
-    
-    value_type_combobox.signal_changed().connect(sigc::mem_fun(this, &ValueInputController::on_value_type_changed));
-    value_entry.signal_changed().connect(sigc::mem_fun(this, &ValueInputController::on_value_changed));
 }
+
 
 
 void ValueInputController::on_value_type_changed()
@@ -104,3 +142,8 @@ void ValueInputController::set_value(LVOV new_value)
 }
 
 
+void ValueInputController::set_enabled(bool enabled)
+{
+    value_entry.set_sensitive(enabled);
+    value_type_combobox.set_sensitive(enabled);
+}

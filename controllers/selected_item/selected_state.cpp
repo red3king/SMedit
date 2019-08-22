@@ -7,11 +7,12 @@
 #define STK_RETURN_ID "state_return_selected"
 #define STK_SPAWN_ID "state_spawn_selected"
 #define STK_JOIN_ID "state_join_selected"
-#define STK_RUN_ID "state_run_selected"
 
 
 SelectedState::SelectedState(HistoryManager* history_manager, Glib::RefPtr<Gtk::Builder> const& builder) : SelectedItemController(history_manager)
 {
+    selected_state = nullptr;
+
     builder->get_widget("delete_state_button", delete_button);
     builder->get_widget("selected_state_title", title_label);
     builder->get_widget("state_name_entry", name_entry);
@@ -22,15 +23,24 @@ SelectedState::SelectedState(HistoryManager* history_manager, Glib::RefPtr<Gtk::
     
     Gtk::Box* return_grid;
     builder->get_widget("state_return_selected", return_grid);
-    return_value_input = new ValueInputController(return_grid, "return value");
+    return_value_input = new ValueInputController("return value");
+    return_value_input->attach(return_grid);
     return_value_input->value_changed_signal.connect(sigc::mem_fun(this, &SelectedState::on_retval_changed));
 
     init_initial_state_ctrl(builder);
 
+    // init code state ctrl
     Gtk::ScrolledWindow* code_box;
     builder->get_widget("state_code_scrolled", code_box);
     code_state_ctrl = new CodeStateController(code_box);
     code_state_ctrl->signal_code_changed.connect(sigc::mem_fun(this, &SelectedState::on_code_changed));
+
+    // init spawn state ctrl
+    Gtk::Box* spawn_box;
+    builder->get_widget("state_spawn_selected", spawn_box);
+    spawn_state_ctrl = new SpawnStateController(history_manager);
+    spawn_state_ctrl->attach(spawn_box);
+
 
     name_entry->signal_changed().connect(sigc::mem_fun(this, &SelectedState::on_name_changed));
     type_combobox->signal_changed().connect(sigc::mem_fun(this, &SelectedState::on_type_changed));
@@ -108,7 +118,7 @@ void SelectedState::on_delete_clicked()
 }
 
 
-void SelectedState::set_selected_impl(Entity* entity)
+void SelectedState::set_selected_impl(Machine* owning_machine, Entity* entity)
 {
     selected_state = dynamic_cast<State*>(entity);
 }
@@ -133,6 +143,7 @@ void SelectedState::update()
     return_value_input->set_value(selected_state->return_value);
     initial_state_ctrl->set_config(selected_state->initial_args);
     code_state_ctrl->set_text(selected_state->code);
+    spawn_state_ctrl->set_state(owning_machine, selected_state);
 
     if(selected_state->type == INITIAL)
         state_types_stack->set_visible_child(STK_INITIAL_ID);
@@ -142,6 +153,6 @@ void SelectedState::update()
         state_types_stack->set_visible_child(STK_RETURN_ID);
     else if(selected_state->type == JOIN)
         state_types_stack->set_visible_child(STK_JOIN_ID);
-    else if(selected_state->type == RUN)
-        state_types_stack->set_visible_child(STK_RUN_ID);
+    else if(selected_state->type == SPAWN)
+        state_types_stack->set_visible_child(STK_SPAWN_ID);
 }

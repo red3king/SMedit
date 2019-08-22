@@ -78,7 +78,7 @@ void SelectedTransition::on_delete_clicked()
 }
 
 
-void SelectedTransition::set_selected_impl(Entity* entity)
+void SelectedTransition::set_selected_impl(Machine* owning_machine, Entity* entity)
 {
     selected_transition = dynamic_cast<Transition*>(entity);
 }

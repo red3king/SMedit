@@ -13,7 +13,6 @@
 #define STS_RETURN "Return"         // return vov
 #define STS_SPAWN "Spawn"           // spawn string name or variable, vovlist arguments, string pid var
 #define STS_JOIN "Join"             // string variable
-#define STS_RUN "Run"               // string name or variable VOV, vovlist arguments, string output var
 
 
 using std::string;
@@ -21,7 +20,7 @@ using std::vector;
 class Transition;
 
 
-enum StateType { INITIAL, CODE, RETURN, SPAWN, JOIN, RUN };
+enum StateType { INITIAL, CODE, RETURN, SPAWN, JOIN };
 
 string state_type_to_string(StateType type);
 StateType string_to_state_type(string input);
@@ -74,6 +73,7 @@ class State : public BoxEntity
         LVOV return_value;
 
         // Spawn / Run
+        bool launch_synchronous;
         LVOV launch_task_name;
         vector<Arg> launch_args;
         string launch_result_variable;  // stores pid for spawn, result for run

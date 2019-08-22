@@ -6,6 +6,7 @@
 #include "controllers/value_input_controller.h"
 #include "selected_state/initial_state_ctrl.h"
 #include "selected_state/code_state.h"
+#include "selected_state/spawn_state_ctrl.h"
 #include "models/state.h"
 
 
@@ -14,7 +15,7 @@ class SelectedState : public SelectedItemController
     public:
         SelectedState(HistoryManager* history_manager, Glib::RefPtr<Gtk::Builder> const& builder);
 
-        void set_selected_impl(Entity* entity);
+        void set_selected_impl(Machine* owning_machine, Entity* entity);
         Entity* get_entity();
         void update();
 
@@ -24,6 +25,7 @@ class SelectedState : public SelectedItemController
         ValueInputController* return_value_input;
         InitialStateController* initial_state_ctrl;
         CodeStateController* code_state_ctrl;
+        SpawnStateController* spawn_state_ctrl;
 
         // widgets
         Gtk::Button* delete_button;

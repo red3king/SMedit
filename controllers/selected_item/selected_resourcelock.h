@@ -11,7 +11,7 @@ class SelectedResourceLock : public SelectedItemController
     public:
         SelectedResourceLock(HistoryManager* history_manager, Glib::RefPtr<Gtk::Builder> const& builder);
 
-        void set_selected_impl(Entity* entity);
+        void set_selected_impl(Machine* owning_machine, Entity* entity);
         Entity* get_entity();
         void update();
         void on_delete_clicked();

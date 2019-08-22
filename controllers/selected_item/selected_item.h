@@ -12,7 +12,7 @@ class SelectedItemController
 
         void set_selected(Machine* machine, Entity* entity);
 
-        virtual void set_selected_impl(Entity* entity)=0;
+        virtual void set_selected_impl(Machine* owning_machine, Entity* entity)=0;
         virtual Entity* get_entity()=0;
         virtual void update()=0;
 

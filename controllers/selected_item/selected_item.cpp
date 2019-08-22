@@ -18,7 +18,7 @@ SelectedItemController::~SelectedItemController()
 void SelectedItemController::set_selected(Machine* owning_machine, Entity* entity)
 {
     this->owning_machine = owning_machine;
-    set_selected_impl(entity);
+    set_selected_impl(owning_machine, entity);
     update();
 }
 

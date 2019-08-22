@@ -269,3 +269,83 @@ void OpStateInitialCfg::execute_impl(State* state)
 {
     state->initial_args = arguments;
 }
+
+
+// Task name set (launch/spawn state)
+
+OpStateLaunchTaskName::OpStateLaunchTaskName(Machine* machine, State* state, LVOV task_name) : StateChgOperation(machine, state)
+{
+    this->task_name = task_name;
+}
+
+
+OpStateLaunchTaskName* OpStateLaunchTaskName::clone()
+{
+    return new OpStateLaunchTaskName(*this);
+}
+
+
+void OpStateLaunchTaskName::execute_impl(State* state)
+{
+    state->launch_task_name = task_name;
+}
+
+
+// Task launch args 
+
+OpStateLaunchArgs::OpStateLaunchArgs(Machine* machine, State* state, vector<Arg> launch_args) : StateChgOperation(machine, state)
+{
+    this->launch_args = launch_args;
+}
+
+
+OpStateLaunchArgs* OpStateLaunchArgs::clone()
+{
+    return new OpStateLaunchArgs(*this);
+}
+
+
+void OpStateLaunchArgs::execute_impl(State* state)
+{
+    state->launch_args = launch_args;
+}
+
+
+// Task result / pid variable name
+
+OpStateLaunchResVar::OpStateLaunchResVar(Machine* machine, State* state, string result_variable) : StateChgOperation(machine, state)
+{
+    this->result_variable = result_variable;
+}
+
+
+OpStateLaunchResVar* OpStateLaunchResVar::clone()
+{
+    return new OpStateLaunchResVar(*this);
+}
+
+
+void OpStateLaunchResVar::execute_impl(State* state)
+{
+    state->launch_result_variable = result_variable;
+}
+
+
+// task launch synchronous setting
+
+OpStateLaunchSynch::OpStateLaunchSynch(Machine* machine, State* state, bool synchronous) : StateChgOperation(machine, state)
+{
+    this->synchronous = synchronous;
+}
+
+
+OpStateLaunchSynch* OpStateLaunchSynch::clone()
+{
+    return new OpStateLaunchSynch(*this);
+}
+
+
+void OpStateLaunchSynch::execute_impl(State* state)
+{
+    state->launch_synchronous = synchronous;
+}

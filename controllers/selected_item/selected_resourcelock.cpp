@@ -14,7 +14,7 @@ SelectedResourceLock::SelectedResourceLock(HistoryManager* history_manager, Glib
 }
 
 
-void SelectedResourceLock::set_selected_impl(Entity* entity)
+void SelectedResourceLock::set_selected_impl(Machine* owning_machine, Entity* entity)
 {
     selected_resourcelock = dynamic_cast<ResourceLock*>(entity);
 }
