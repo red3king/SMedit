@@ -26,6 +26,8 @@ class GMBox : public GUIModel
         bool mouse_within(float mouse_x, float mouse_y);
         BorderType mouse_on_border(float mouse_x, float mouse_y);
 
+        bool new_border_valid(BorderType border, float world_mouse_position);
+
     protected:
         int text_line_no;
         float text_line_pos;

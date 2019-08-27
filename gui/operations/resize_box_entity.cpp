@@ -37,11 +37,15 @@ bool ResizeBoxEntity::on_continue(GUIState& gui_state, CurrentEvents& current_ev
 {
     float new_position, mouse_wx, mouse_wy;
     gui_state.draw_context.screen_to_world(mouse_wx, mouse_wy, current_events.mouse_x, current_events.mouse_y);
-    
+
     if(resize_border == BT_TOP || resize_border == BT_BOTTOM)
         new_position = mouse_wy;
     else
         new_position = mouse_wx;
+
+    // don't submit operation if new height/width is too small
+    if(!gm_box->new_border_valid(resize_border, new_position))
+        return false;
 
     BoxEntity* entity = dynamic_cast<BoxEntity*>(gm_box->get_entity());
     op = new OpBoxEntityResize(gui_state.current_machine, entity, resize_border, new_position);

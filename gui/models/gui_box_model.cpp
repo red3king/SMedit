@@ -8,8 +8,17 @@
 
 #define ICON_SIZE 30
 #define ICON_MARGIN 4
+#define ICON_PADDED_SIZE (ICON_SIZE + 2*ICON_MARGIN)
+
 #define BORDER_W 4
-#define TEXT_LINE_HEIGHT 18
+
+#define TITLE_FONT_SIZE 16
+#define TITLE_HEIGHT (TITLE_FONT_SIZE + 5)
+
+#define TEXT_FONT_SIZE 16
+#define TEXT_LINE_HEIGHT (TEXT_FONT_SIZE + 2)
+
+#define CORNER_RADIUS 5.0
 
 
 GMBox::GMBox(DrawContext* ctx, EntityType type) : GUIModel(ctx, type) 
@@ -39,16 +48,19 @@ void GMBox::set_coords(float x, float y, float w, float h)
 }
 
 
+bool GMBox::new_border_valid(BorderType border, float world_mouse_position)
+{
+    auto entity = (BoxEntity*) get_entity();
+    return entity->new_border_valid(border, world_mouse_position);
+}
+
+
 void GMBox::draw()
 {
     text_line_no = 0;
 
     float x, y, w, h, screen_x, screen_y, screen_w, screen_h;
     get_coords(x, y, w, h);
-    float title_height = ICON_SIZE + 2*ICON_MARGIN;
-    float old_title_height = 21;
-
-    float corner_radius = 5.0;
 
     ctx->world_to_screen(screen_x, screen_y, x, y);
     screen_w = ctx->world_dist_to_screen(w);
@@ -57,49 +69,55 @@ void GMBox::draw()
     NVGcontext* vg = ctx->vg;
     nvgReset(vg);
 
-    // interior 
-    draw_interior(screen_x + BORDER_W, screen_y + old_title_height, screen_w - 2*BORDER_W, 
-            screen_h - BORDER_W - old_title_height);
+    bool too_small = screen_w < ICON_PADDED_SIZE || screen_h < ICON_PADDED_SIZE;
 
+    // interior 
+    if(!too_small)
+        draw_interior(screen_x + BORDER_W, screen_y + TITLE_HEIGHT, screen_w - 2*BORDER_W, 
+                screen_h - BORDER_W - TITLE_HEIGHT);
 
     // Draw border and title bar
     nvgBeginPath(vg);
-    nvgRoundedRect(vg, screen_x, screen_y, screen_w, screen_h, 5.0);
+    nvgRoundedRect(vg, screen_x, screen_y, screen_w, screen_h, CORNER_RADIUS);
 
-    float xs[] = {
-        screen_x + BORDER_W,
-        screen_x + ICON_SIZE + 2*ICON_MARGIN,
-        screen_x + ICON_SIZE + 2*ICON_MARGIN + 3,
-        screen_x + screen_w - BORDER_W,
-        screen_x + screen_w - BORDER_W,
-        screen_x + BORDER_W,
-        screen_x + BORDER_W
-    };
 
-    float ys[] = {
-        screen_y + title_height,
-        screen_y + title_height,
-        screen_y + old_title_height,
-        screen_y + old_title_height,
-        screen_y + screen_h - BORDER_W,
-        screen_y + screen_h - BORDER_W,
-        screen_y + title_height
-    };
+    if(!too_small)
+    {
+        float xs[] = {
+            screen_x + BORDER_W,
+            screen_x + ICON_SIZE + 2*ICON_MARGIN,
+            screen_x + ICON_SIZE + 2*ICON_MARGIN + 3,
+            screen_x + screen_w - BORDER_W,
+            screen_x + screen_w - BORDER_W,
+            screen_x + BORDER_W,
+            screen_x + BORDER_W
+        };
 
-    nvgMoveTo(vg, xs[0], ys[0]);
+        float ys[] = {
+            screen_y + ICON_PADDED_SIZE,
+            screen_y + ICON_PADDED_SIZE,
+            screen_y + TITLE_HEIGHT,
+            screen_y + TITLE_HEIGHT,
+            screen_y + screen_h - BORDER_W,
+            screen_y + screen_h - BORDER_W,
+            screen_y + ICON_PADDED_SIZE
+        };
+        
+        nvgMoveTo(vg, xs[0], ys[0]);
 
-    for(int i=1; i<7; i++)
-        nvgLineTo(vg, xs[i], ys[i]);
+        for(int i=1; i<7; i++)
+            nvgLineTo(vg, xs[i], ys[i]);
 
-    nvgClosePath(vg);    
-    nvgPathWinding(vg, NVG_HOLE);    
-    
+        nvgClosePath(vg);    
+        nvgPathWinding(vg, NVG_HOLE);    
+    }
+
     nvgFillColor(vg, selected ? ORANGERED : GRAY);
     nvgFill(vg); 
 
     // Icon 
     int icon_image;
-    if(get_icon(icon_image))
+    if(!too_small && get_icon(icon_image))
     {
         int ix = screen_x + ICON_MARGIN;
         int iy = screen_y + ICON_MARGIN;
@@ -119,19 +137,21 @@ void GMBox::draw()
         NVGcolor in_color = nvgRGBA(159, 159, 159, 222);
         NVGcolor out_color = nvgRGBA(0, 0, 0, 0);
         pt = nvgBoxGradient(vg, screen_x-xtra, screen_y-xtra, screen_w+2*xtra, screen_h+2*xtra, 
-                n*corner_radius, 10, in_color, out_color);
+                n*CORNER_RADIUS, 10, in_color, out_color);
 
         nvgBeginPath(vg);
-        nvgRoundedRect(vg, screen_x-xtra, screen_y-xtra, screen_w+2*xtra, screen_h+2*xtra, n*corner_radius);
-        nvgRoundedRect(vg, screen_x, screen_y, screen_w, screen_h, corner_radius);
+        nvgRoundedRect(vg, screen_x-xtra, screen_y-xtra, screen_w+2*xtra, screen_h+2*xtra, n*CORNER_RADIUS);
+        nvgRoundedRect(vg, screen_x, screen_y, screen_w, screen_h, CORNER_RADIUS);
         nvgPathWinding(vg, NVG_HOLE);
         nvgFillPaint(vg, pt);
         nvgFill(vg);
     }
 
     // title
-    ctx->draw_text_one_line(get_title(), ctx->font_hack_bold, 16, WHITE, 
-            screen_x + 2*ICON_MARGIN + BORDER_W + ICON_SIZE, screen_y + BORDER_W, screen_w - ICON_SIZE - ICON_MARGIN);
+    if(!too_small)
+        ctx->draw_text_one_line(get_title(), ctx->font_hack_bold, TITLE_FONT_SIZE, WHITE, 
+                screen_x + 2*ICON_MARGIN + BORDER_W + ICON_SIZE, screen_y + BORDER_W, 
+                screen_w - ICON_SIZE - ICON_MARGIN);
 }
 
 
@@ -210,7 +230,7 @@ bool GMBox::text(string text, NVGcolor color, bool stay)
     if(ty + TEXT_LINE_HEIGHT > screen_y + screen_h)
         return false;
 
-    ctx->draw_text_one_line(text, ctx->font_hack_bold, 16, color, tx, ty, tw); 
+    ctx->draw_text_one_line(text, ctx->font_hack_bold, TEXT_FONT_SIZE, color, tx, ty, tw); 
 
     if(!stay)
     {
@@ -219,7 +239,7 @@ bool GMBox::text(string text, NVGcolor color, bool stay)
     }
 
     else
-        text_line_pos += ctx->measure_text(text, ctx->font_hack_bold, 16);
+        text_line_pos += ctx->measure_text(text, ctx->font_hack_bold, TEXT_FONT_SIZE);
 
     return true;
 }

@@ -2,9 +2,7 @@
 
 #include "historymanager/operation.h"
 #include "models/boxentity.h"
-
-
-enum BorderType { BT_NONE, BT_TOP, BT_RIGHT, BT_BOTTOM, BT_LEFT };
+#include "const.h"
 
 
 class OpBoxEntityResize : public Operation

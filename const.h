@@ -20,3 +20,6 @@ string value_type_to_string(ValueType vt);
 ValueType string_to_value_type(string str);
 
 
+enum BorderType { BT_NONE, BT_TOP, BT_RIGHT, BT_BOTTOM, BT_LEFT };
+
+
