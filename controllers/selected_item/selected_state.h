@@ -7,6 +7,7 @@
 #include "selected_state/initial_state_ctrl.h"
 #include "selected_state/code_state.h"
 #include "selected_state/spawn_state_ctrl.h"
+#include "selected_state/return_state_ctrl.h"
 #include "models/state.h"
 
 
@@ -22,10 +23,10 @@ class SelectedState : public SelectedItemController
     private:
         State* selected_state;
 
-        ValueInputController* return_value_input;
         InitialStateController* initial_state_ctrl;
         CodeStateController* code_state_ctrl;
         SpawnStateController* spawn_state_ctrl;
+        ReturnStateController* return_state_ctrl;
 
         // widgets
         Gtk::Button* delete_button;
@@ -41,7 +42,6 @@ class SelectedState : public SelectedItemController
         void on_delete_clicked();
 
         void on_jpidvar_changed();
-        void on_retval_changed(LVOV lvov);
         void on_initial_state_changed(vector<ArgDef> arguments);
         void on_code_changed(string code);
 

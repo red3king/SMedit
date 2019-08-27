@@ -1,6 +1,7 @@
 #include "main.h"
 
 #include "log.h"
+#include "utils.h"
 #include "historymanager/operations/machine_ops.h"
 #include "historymanager/operations/state_ops.h"
 #include "historymanager/operations/resource_ops.h"
@@ -46,6 +47,8 @@ void MainWindow::get_widgets()
     builder->get_widget("edit_copy", edit_copy);
     builder->get_widget("edit_paste", edit_paste);
     builder->get_widget("edit_delete", edit_delete);
+
+    builder->get_widget("about_licenses", about_licenses);
 }
 
 
@@ -58,6 +61,8 @@ void MainWindow::prepare_signals()
     // click signals
     file_quit->signal_activate().connect(sigc::mem_fun(this, &MainWindow::on_close_click));
     file_new->signal_activate().connect(sigc::mem_fun(this, &MainWindow::on_new_click));
+
+    about_licenses->signal_activate().connect(sigc::mem_fun(this, &MainWindow::on_about_click));
 }
 
 
@@ -102,6 +107,58 @@ void MainWindow::on_new_click()
 
     history_manager->new_project();
     signals.project_open();
+}
+
+
+void MainWindow::on_about_click()
+{
+    Gtk::MessageDialog dialog(*this, "About", false, Gtk::MESSAGE_OTHER, Gtk::BUTTONS_CLOSE);
+    Gtk::Box* dialog_box = dialog.get_message_area();
+    Gtk::Box version_box(Gtk::ORIENTATION_HORIZONTAL);
+    Gtk::Label version_version_label, version_title_label, licenses_label;
+    Gtk::ScrolledWindow scrolled_area;
+    Gtk::TextView licenses_area;
+
+    version_title_label.set_markup("<b>Version:</b>");
+    version_version_label.set_text("0.0.1");
+    version_box.pack_start(version_title_label, false, false, 0);
+    version_box.pack_start(version_version_label, false, false, 0);
+    
+    set_margins(&version_title_label, 4);
+    set_margins(&version_version_label, 4);
+    left_align(&version_title_label);
+    right_align(&version_version_label);
+
+    dialog_box->pack_start(version_box, false, false, 0);
+
+    licenses_label.set_markup("<b>Licenses:</b>");
+    left_align(&licenses_label);
+    set_margins(&licenses_label, 4);
+    
+    dialog_box->pack_start(licenses_label, false, false, 0);
+
+    scrolled_area.add(licenses_area);
+    auto buf = Gtk::TextBuffer::create();
+    licenses_area.set_buffer(buf);
+    licenses_area.set_editable(false);
+
+    string license_txt = "failed to read licenses.txt";
+    file_to_string("licenses.txt", license_txt);
+
+    buf->set_text(license_txt);
+    scrolled_area.property_height_request() = 200;
+
+    dialog_box->pack_start(scrolled_area, false, false, 0);
+    dialog_box->property_width_request() = 400;
+
+    version_version_label.show();
+    version_title_label.show();
+    licenses_label.show();
+    version_box.show();
+    scrolled_area.show();
+    licenses_area.show();
+
+    dialog.run();
 }
 
 

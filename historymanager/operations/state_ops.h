@@ -176,3 +176,15 @@ class OpStateLaunchSynch : public StateChgOperation
     private:
         bool synchronous;
 };
+
+
+class OpStateHasReturnValue : public StateChgOperation
+{
+    public:
+        OpStateHasReturnValue(Machine* machine, State* state, bool has_return_value);
+        OpStateHasReturnValue* clone();
+        void execute_impl(State* state);
+
+    private:
+        bool has_return_value;
+};

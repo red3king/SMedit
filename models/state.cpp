@@ -43,6 +43,7 @@ StateType string_to_state_type(string input)
 State::State(unsigned int id) : BoxEntity(id) 
 { 
     launch_task_name = LVOV("");
+    has_return_value = false;
 } 
 
 

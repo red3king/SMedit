@@ -2671,15 +2671,18 @@ int nvgTextBreakLines(NVGcontext* ctx, const char* string, const char* end, floa
 			breakEnd = rowStart;
 			breakWidth = 0.0;
 			breakMaxX = 0.0;
+
 			// Indicate to skip the white space at the beginning of the row.
-			rowStart = NULL;
-			rowEnd = NULL;
+            rowStart = NULL;
+            rowEnd = NULL;
 			rowWidth = 0;
 			rowMinX = rowMaxX = 0;
-		} else {
+            
+        } else {
 			if (rowStart == NULL) {
-				// Skip white space until the beginning of the line
-				if (type == NVG_CHAR || type == NVG_CJK_CHAR) {
+				// Modified to not skip white space until the beginning of the line:
+                // rory was here
+                if (1 == 1 || type == NVG_CHAR || type == NVG_CJK_CHAR) {
 					// The current char is the row so far
 					rowStartX = iter.x;
 					rowStart = iter.str;
@@ -2720,7 +2723,10 @@ int nvgTextBreakLines(NVGcontext* ctx, const char* string, const char* end, floa
 				// Break to new line when a character is beyond break width.
 				if ((type == NVG_CHAR || type == NVG_CJK_CHAR) && nextWidth > breakRowWidth) {
 					// The run length is too long, need to break to new line.
-					if (breakEnd == rowStart) {
+					if (1 == 1 || breakEnd == rowStart) {
+                        // rory was here
+                        // always chop off the rest of a word instead of sending the whole word to the next line
+                        // TODO - if i modify nanovg enough, fork it and add flags to enable / disable these individual tweaks
 						// The current word is longer than the row length, just break it from here.
 						rows[nrows].start = rowStart;
 						rows[nrows].end = iter.str;

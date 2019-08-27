@@ -8,6 +8,7 @@
 
 using std::string;
 
+bool file_to_string(string filename, string& output);
 
 // Return true if point within box
 bool point_in_box(float pt_x, float pt_y, float box_x, float box_y, float box_w, float box_h);

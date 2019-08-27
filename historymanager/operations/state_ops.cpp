@@ -37,8 +37,8 @@ unsigned int OpStateCreate::execute(Project& project)
     state->type = CODE;
     state->x = x;
     state->y = y;
-    state->w = 100;
-    state->h = 100;
+    state->w = 150;
+    state->h = 125;
 
     Machine* machine = project.get_machine_by_id(machine_id);
     machine->states.push_back(state);
@@ -349,3 +349,26 @@ void OpStateLaunchSynch::execute_impl(State* state)
 {
     state->launch_synchronous = synchronous;
 }
+
+
+
+// Has Return value
+
+OpStateHasReturnValue::OpStateHasReturnValue(Machine* machine, State* state, bool has_return_value) : StateChgOperation(machine, state)
+{
+    this->has_return_value = has_return_value;
+}
+
+
+OpStateHasReturnValue* OpStateHasReturnValue::clone()
+{
+    return new OpStateHasReturnValue(*this);
+}
+
+
+void OpStateHasReturnValue::execute_impl(State* state)
+{
+    state->has_return_value = has_return_value;
+}
+
+

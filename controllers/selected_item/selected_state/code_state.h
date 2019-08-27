@@ -4,7 +4,6 @@
 #include <gtkmm.h>
 #include <gtksourceviewmm.h>
 
-//#include <gtksourceviewmm-3.0/gtksourceviewmm.h>
 
 using std::string;
 

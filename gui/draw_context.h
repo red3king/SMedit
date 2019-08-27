@@ -24,14 +24,19 @@ class DrawContext
 
         NVGcontext* vg;
 
+        NVGtextRow one_line_row;
+
+        float measure_text(std::string text, int font, float size);
         void draw_text_noclip(std::string text, int font, float size, NVGcolor color, float x, float y);
         void draw_text_one_line(std::string text, int font, float size, NVGcolor color, float x, float y,
                 float max_width);
         void draw_text_many_lines(std::string text, int font, float size, NVGcolor color, float x, float y,
                 float max_width, float max_height);
 
-
+        // resources
         int font_hack, font_hack_bold;
+        int icon_coding, icon_flow, icon_fork, icon_join, icon_lock,
+            icon_uturn;
 
     private:
         float zoom_factor, woffset_x, woffset_y;

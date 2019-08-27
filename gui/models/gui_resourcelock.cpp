@@ -7,24 +7,6 @@ GMResourceLock::GMResourceLock(DrawContext* ctx, ResourceLock* resourcelock) : G
 }
 
 
-void GMResourceLock::get_coords(float& x, float& y, float& w, float& h)
-{
-    x = resourcelock->x;
-    y = resourcelock->y;
-    w = resourcelock->w;
-    h = resourcelock->h;
-}
-
-
-void GMResourceLock::set_coords(float x, float y, float w, float h)
-{
-    resourcelock->x = x;
-    resourcelock->y = y;
-    resourcelock->w = w;
-    resourcelock->h = h;
-}
-
-
 Entity* GMResourceLock::get_entity()
 {
     return resourcelock;
@@ -52,4 +34,11 @@ NVGcolor GMResourceLock::get_title_text_color()
 std::string GMResourceLock::get_title()
 {
     return "Lock [" + resourcelock->resource->name + "]";
+}
+
+
+bool GMResourceLock::get_icon(int& icon_image)
+{
+    icon_image = ctx->icon_lock;
+    return true;
 }

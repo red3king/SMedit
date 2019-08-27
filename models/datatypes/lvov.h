@@ -26,6 +26,9 @@ class LVOV
         // Returns string representation of value/varname 
         string to_string();
 
+        // string representation + data type string
+        string describe();
+
         ValueType type;
 
         string variable_name;

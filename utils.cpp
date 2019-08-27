@@ -2,7 +2,26 @@
 #include "const.h"
 
 #include <algorithm>
+#include <fstream>
+#include <string>
 #include <iostream>
+
+
+bool file_to_string(string filename, string& output)
+{   
+    try 
+    {
+        std::ifstream input_stream(filename);
+        output = std::string( (std::istreambuf_iterator<char>(input_stream) ),
+                           (std::istreambuf_iterator<char>()    ) );
+    }
+    catch(...)
+    {
+        return false;
+    }
+
+    return true;
+}
 
 
 bool point_in_box(float pt_x, float pt_y, float box_x, float box_y, float box_w, float box_h)

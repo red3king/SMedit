@@ -155,6 +155,28 @@
                 </child>
               </object>
             </child>
+            <child>
+              <object class="GtkMenuItem">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">About</property>
+                <child type="submenu">
+                  <object class="GtkMenu">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkImageMenuItem" id="about_licenses">
+                        <property name="label">gtk-about</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_underline">True</property>
+                        <property name="use_stock">True</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -557,10 +579,14 @@
                         <child>
                           <object class="GtkGLArea" id="machine_edit_gl_area">
                             <property name="width_request">640</property>
-                            <property name="height_request">480</property>
+                            <property name="height_request">580</property>
                             <property name="visible">True</property>
                             <property name="app_paintable">True</property>
                             <property name="can_focus">False</property>
+                            <property name="margin_left">4</property>
+                            <property name="margin_right">4</property>
+                            <property name="margin_top">4</property>
+                            <property name="margin_bottom">4</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>

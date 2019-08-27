@@ -1,0 +1,18 @@
+Nanovg - Mikko Mononen
+https://github.com/memononen/nanovg
+
+
+Icons:
+    lock   -  Iconnic
+    coding -  Ralf Schmitzer
+    uturn  -  Dmitry Baranovskiy
+    flow   -  Dmitry Baranovskiy
+    join   -  Dmitry Baranovskiy
+    fork   -  Dmitry Baranovskiy
+
+Icons found on Noun Project:
+http:://thenounproject.com
+
+
+Hack Font  -  https://sourcefoundry.org/hack/
+

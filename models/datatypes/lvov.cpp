@@ -64,7 +64,7 @@ void LVOV::reset()
 string LVOV::to_string()
 {
     if(type == VT_ANY)
-        return "";
+        return str_val;
 
     if(type == VT_STR)
         return str_val;
@@ -79,6 +79,31 @@ string LVOV::to_string()
         return variable_name;
 
     throw std::invalid_argument("unknown ValueType");
+}
+
+
+string LVOV::describe()
+{
+    string prefix;
+
+    if(type == VT_ANY)
+        prefix = str_val;
+
+    else if(type == VT_STR)
+        prefix = "\"" + str_val + "\"";
+
+    else if(type == VT_INT)
+        prefix = std::to_string(int_val);
+
+    else if(type == VT_FLOAT)
+        prefix = std::to_string(float_val);
+
+    else if(type == VT_REF)
+        prefix = "`" + variable_name + "`";
+    else
+        throw std::invalid_argument("unknown ValueType");
+
+    return prefix + " (" + value_type_to_string(type) + ")";
 }
 
 

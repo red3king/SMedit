@@ -36,7 +36,8 @@ class MainWindow : public Gtk::ApplicationWindow
         Gtk::GLArea* machine_edit_gl_area;
         
         Gtk::ImageMenuItem *file_new, *file_open, *file_save, *file_save_as, *file_quit, 
-            *edit_undo, *edit_redo, *edit_cut, *edit_copy, *edit_paste, *edit_delete;
+            *edit_undo, *edit_redo, *edit_cut, *edit_copy, *edit_paste, *edit_delete,
+            *about_licenses;
 
         Gtk::Stack* main_stack;
         Gtk::StackSwitcher* main_switcher;
@@ -53,6 +54,7 @@ class MainWindow : public Gtk::ApplicationWindow
         void on_project_close();
         void on_close_click();
         void on_new_click();
+        void on_about_click();
 
         void _update_enabled();
 

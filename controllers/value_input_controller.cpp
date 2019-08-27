@@ -20,6 +20,7 @@ ValueInputController::ValueInputController(string name)
 
 ValueInputController::ValueInputController(vector<ValueType> allowed_types, string name)
 {   
+    // note - this ignores VT_ANY even if in allowed_types
     _init(allowed_types, true, name);
 }
 
@@ -66,6 +67,11 @@ void ValueInputController::_init(vector<ValueType> allowed_types, bool has_name,
     for(i=0; i<allowed_types.size(); i++)
     {
         ValueType vt = allowed_types[i];
+        
+        // ignore VT_ANY
+        if(vt == VT_ANY)
+            continue;
+
         string str = value_type_to_string(vt);
         value_type_combobox.append(str);
     }

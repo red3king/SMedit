@@ -70,7 +70,8 @@ class State : public BoxEntity
         string code;    
 
         //Return  done
-        LVOV return_value;
+        bool has_return_value;
+        LVOV return_value;  // ignore if has_return_value = false
 
         // Spawn / Run
         bool launch_synchronous;

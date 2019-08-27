@@ -1,13 +1,7 @@
 LEFT OFF HERE:
-    working on spawn state controller
-        just did the constructro and the attach functions, all child widgets are defined and signals linked
+    just added about window and icons
+    need to remake the gui box model class render the image icons in the title bar (make title bar bigger, v-center text within..)
 
-        now i need to do the set state / set machine functions, 
-        and write the on stuff changed handlers so they submit history ops
-
-
-! there is a rare crash on launch
-    time to valgrind or do the cpp analyzer again
 
 bug
     make a 2x wider state and a normal size one

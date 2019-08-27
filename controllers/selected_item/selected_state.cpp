@@ -20,13 +20,14 @@ SelectedState::SelectedState(HistoryManager* history_manager, Glib::RefPtr<Gtk::
     builder->get_widget("selected_state_stack", state_types_stack);
 
     builder->get_widget("join_pidvar_entry", join_pidvar_entry);
-    
+   
+    // init return value ctrl 
     Gtk::Box* return_grid;
     builder->get_widget("state_return_selected", return_grid);
-    return_value_input = new ValueInputController("return value");
-    return_value_input->attach(return_grid);
-    return_value_input->value_changed_signal.connect(sigc::mem_fun(this, &SelectedState::on_retval_changed));
+    return_state_ctrl = new ReturnStateController(history_manager);
+    return_state_ctrl->attach(return_grid);
 
+    // initial state ctrl
     init_initial_state_ctrl(builder);
 
     // init code state ctrl
@@ -82,13 +83,6 @@ void SelectedState::on_initial_state_changed(vector<ArgDef> arguments)
 }
 
 
-void SelectedState::on_retval_changed(LVOV lvov)
-{
-    auto op = OpStateRetVal(owning_machine, selected_state, lvov);
-    history_manager->submit_operation(op);
-}
-
-
 void SelectedState::on_jpidvar_changed()
 {
     auto op = OpStateJoinPidVar(owning_machine, selected_state, join_pidvar_entry->get_text());
@@ -140,10 +134,10 @@ void SelectedState::update()
     type_combobox->set_active_text(state_type_to_string(selected_state->type));
 
     join_pidvar_entry->set_text(selected_state->join_pid_variable);
-    return_value_input->set_value(selected_state->return_value);
     initial_state_ctrl->set_config(selected_state->initial_args);
     code_state_ctrl->set_text(selected_state->code);
     spawn_state_ctrl->set_state(owning_machine, selected_state);
+    return_state_ctrl->set_state(owning_machine, selected_state);
 
     if(selected_state->type == INITIAL)
         state_types_stack->set_visible_child(STK_INITIAL_ID);
