@@ -14,15 +14,17 @@ MainWindow::MainWindow(BaseObjectType* obj, Glib::RefPtr<Gtk::Builder> const& bu
     set_title("state machine editor");
 
     project_open = false;
+    may_undo = false;
+    may_redo = false;
 
     get_widgets();
-    prepare_signals();
 
     history_manager = new HistoryManager(50, 20, 15);
-    
+
     resources_controller = new ResourcesController(history_manager, builder);
     machines_controller = new MachinesController(history_manager, builder);
 
+    prepare_signals();
     machine_edit_gl_area->signal_realize().connect(sigc::mem_fun(this, &MainWindow::connect_cursor_signals));
 }
 
@@ -58,11 +60,23 @@ void MainWindow::prepare_signals()
     signals.project_close.connect(sigc::mem_fun(this, &MainWindow::on_project_close));
     signals.project_open.connect(sigc::mem_fun(this, &MainWindow::on_project_open));
 
+    history_manager->signal_changed.connect(sigc::mem_fun(this, &MainWindow::on_history_changed));
+    
+
     // click signals
     file_quit->signal_activate().connect(sigc::mem_fun(this, &MainWindow::on_close_click));
     file_new->signal_activate().connect(sigc::mem_fun(this, &MainWindow::on_new_click));
-
+    edit_undo->signal_activate().connect(sigc::mem_fun(this, &MainWindow::on_undo_click));
+    edit_redo->signal_activate().connect(sigc::mem_fun(this, &MainWindow::on_redo_click));    
     about_licenses->signal_activate().connect(sigc::mem_fun(this, &MainWindow::on_about_click));
+}
+
+
+void MainWindow::on_history_changed(bool may_undo, bool may_redo)
+{
+    this->may_undo = may_undo;
+    this->may_redo = may_redo;
+    _update_enabled();    
 }
 
 
@@ -84,6 +98,18 @@ void MainWindow::on_close_click()
 {
     log("closing.");
     hide();
+}
+
+
+void MainWindow::on_undo_click()
+{
+    history_manager->undo();
+}
+
+
+void MainWindow::on_redo_click()
+{
+    history_manager->redo();
 }
 
 
@@ -175,8 +201,9 @@ void MainWindow::_update_enabled()
     file_save->set_sensitive(save_enabled);
     file_save_as->set_sensitive(save_enabled);
     
-    edit_undo->set_sensitive(false);
-    edit_redo->set_sensitive(false);
+    edit_undo->set_sensitive(project_open && may_undo);
+    edit_redo->set_sensitive(project_open && may_redo);
+
     edit_cut->set_sensitive(false);
     edit_copy->set_sensitive(false);
     edit_paste->set_sensitive(false);

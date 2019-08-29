@@ -25,6 +25,7 @@ class ListViewController
         ListViewController(Gtk::TreeView* tree_view, string title);
 
         sigc::signal<void, unsigned int> selection_changed_signal;  // value is object id
+        sigc::signal<void, unsigned int, bool> selection_changed_details;   //same but bool true if signal from user click (false when emitted after somebody calls clear() or select_item()
 
         void _init(Gtk::TreeView* tree_view, string title, bool has_title);
 
@@ -38,6 +39,8 @@ class ListViewController
         Glib::RefPtr<Gtk::ListStore> list_store;
         Glib::RefPtr<Gtk::TreeSelection> selection;
         ListViewColumns columns;
+
+        bool is_setting;
 
         void on_selection_changed();
 };

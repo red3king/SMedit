@@ -16,6 +16,7 @@ GUIContext::GUIContext(Gtk::GLArea* gl_area, HistoryManager* history_manager)
     this->gl_area = gl_area;
     this->history_manager = history_manager;
     current_operation = nullptr;
+    current_machine_id = 0;
     current_cursor_type = CT_DEFAULT;
 
     register_sm_signal_handlers();
@@ -26,6 +27,7 @@ GUIContext::GUIContext(Gtk::GLArea* gl_area, HistoryManager* history_manager)
 void GUIContext::set_machine(Machine* current_machine)
 {
     this->current_machine = current_machine;
+    current_machine_id = current_machine->id;
     gui_state.set_machine(current_machine);
 }
 
@@ -33,19 +35,20 @@ void GUIContext::set_machine(Machine* current_machine)
 void GUIContext::unset_machine()
 {
     current_machine = nullptr;
+    current_machine_id = 0;
     gui_state.unset_machine();
 }
 
 
 void GUIContext::register_sm_signal_handlers()
 {
-    signals.register_gui_context(this);
+    signals.model_changed.connect(sigc::mem_fun(this, &GUIContext::handle_model_changed));
 }
 
 
 void GUIContext::unregister_sm_signal_handlers()
 {
-    signals.unregister_gui_context(this);
+
 }
 
 
@@ -66,33 +69,43 @@ void GUIContext::register_gtk_signal_handlers()
 }
 
 
-void GUIContext::handle_create(EntityType entity_type, SignalType signal_type, unsigned int entity_id)
+void GUIContext::handle_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id)
 {
-    if(signal_type != CREATE)
+    if(signal_type == PRE_DELETE && entity_type == MACHINE && entity_id == current_machine_id)
+        current_machine_id = 0;
+    
+    if(entity_type != STATE && entity_type != TRANSITION && entity_type != RESOURCELOCK)
         return;
 
-    gui_state.add_gui_model(entity_type, entity_id);
+    if(signal_type == CREATE)
+        gui_state.add_gui_model(entity_type, entity_id);
+
+
+    if(signal_type == PRE_DELETE)
+        gui_state.remove_gui_model(entity_id);
+
+    gl_area->queue_draw();
 }
 
 
-void GUIContext::handle_delete(EntityType entity_type, SignalType signal_type, unsigned int entity_id)
+void GUIContext::reset(bool reload)
 {
-    if(signal_type != PRE_DELETE)
-        return;
+    if(!reload)
+        current_machine_id = 0;
 
-    gui_state.remove_gui_model(entity_id);
+    gui_state.unset_machine();
 }
 
 
-void GUIContext::handle_gui_rebuild()
+void GUIContext::load_from(Project& current_project, bool reload)
 {
-    gui_state.rebuild_models();
-}
+    if(reload)
+    {
+        Machine* current_machine = current_project.get_machine_by_id(current_machine_id);
 
-
-void GUIContext::handle_pre_gui_rebuild()
-{
-    gui_state.pre_rebuild_models();
+        if(current_machine != nullptr)
+            gui_state.set_machine(current_machine);
+    }
 }
 
 
@@ -120,6 +133,7 @@ bool GUIContext::on_gl_render(const Glib::RefPtr<Gdk::GLContext>& context)
     return true;
 }
 
+
 void GUIContext::_render()
 {
     gl_area->throw_if_error();
@@ -136,6 +150,12 @@ void GUIContext::_render()
 
     nvgEndFrame(vg);
     glFlush();
+}
+
+
+void GUIContext::restore_selected_entity(Entity* entity)
+{
+    gui_state.restore_selected_entity(entity);
 }
 
 

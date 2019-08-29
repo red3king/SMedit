@@ -99,3 +99,19 @@ int Project::get_rindex_by_id(unsigned int id)
 
     return -1;
 }
+
+
+Entity* Project::get_entity_by_id(unsigned int id)
+{
+    Entity* result = get_machine_by_id(id);
+
+    if(result == nullptr)
+        result = get_resource_by_id(id);
+
+    int i=0;
+
+    while(result == nullptr && i < machines.size())
+        result = machines[i++]->get_entity_by_id(id);
+    
+    return result;
+}

@@ -1,6 +1,15 @@
 LEFT OFF HERE:
-    just added about window and icons
-    need to remake the gui box model class render the image icons in the title bar (make title bar bigger, v-center text within..)
+    was working on the great controller refactor (to connect to proj open/close &  gui rebuild signals)
+    when i had to stop to refactor operations
+    now im back to refactoring the controllers. i have fixed GUIContext (not really controller but similar logic)
+        and the resouurces controller. next up is machines controller
+    just finished machines controller
+        the last 2 have felt pretty hacky, i wonder if there is a better way to organize my thinking/approach here
+
+
+
+undoing and then redoing the same thing seems buggy, after a while there's no more undo/redo at all
+ 
 
 
 bug
@@ -22,10 +31,6 @@ box entity stuff
 === for later === 
 
 CHECK - that all object modifications are done by submitting operations and i didnt accidentally write direct modification that will mess up the history system`:
-
-add minimum size to resize operations
-
-text clipping for boxentity titles
 
 add error checks to everything that could fail:
     opengl init

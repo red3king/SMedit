@@ -1,12 +1,13 @@
 #pragma once
 
+#include "top_controller.h"
 #include "list_view_controller.h"
 #include "models/entity.h"
 #include "signals.h"
 #include "historymanager/historymanager.h"
 
 
-class ResourcesController
+class ResourcesController : public TopController
 {
     // Handles the resources tab
     public:
@@ -20,17 +21,17 @@ class ResourcesController
         Gtk::FileChooserButton* path_file_chooser;
 
         ListViewController* list_view_controller;
-        HistoryManager* history_manager;
 
         // ui state vars
-        bool project_open;
         int num_items;
         Resource* selected_resource;
+        unsigned int selected_resource_id;
 
-        bool disable_input_signals;
+        bool is_setting;
 
-        void on_project_open();
-        void on_project_close();
+        void reset(bool reload);
+        void load_from(Project& current_project, bool reload);
+
         void on_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id);
         void on_selection_changed(unsigned int entity_id);
 

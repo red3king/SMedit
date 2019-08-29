@@ -30,7 +30,7 @@ class MainWindow : public Gtk::ApplicationWindow
         MachinesController* machines_controller;
 
         // UI state variables
-        bool project_open;
+        bool project_open, may_undo, may_redo;
 
         // Widgets
         Gtk::GLArea* machine_edit_gl_area;
@@ -55,10 +55,13 @@ class MainWindow : public Gtk::ApplicationWindow
         void on_close_click();
         void on_new_click();
         void on_about_click();
+        void on_undo_click();
+        void on_redo_click();
 
         void _update_enabled();
 
     private:
         Glib::RefPtr<Gtk::Builder> builder;
+        void on_history_changed(bool may_undo, bool may_redo);
 };
 

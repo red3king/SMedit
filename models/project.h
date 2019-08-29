@@ -27,6 +27,8 @@ class Project
         Resource* get_resource_by_id(unsigned int id);
         int get_rindex_by_id(unsigned int id);
 
+        Entity* get_entity_by_id(unsigned int id);  //inefficient
+
     private:
         unsigned int id_ctr;
         void _copy_from(const Project& other);

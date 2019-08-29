@@ -94,3 +94,15 @@ ResourceLock* Machine::get_resourcelock_by_id(unsigned int id)
 }
 
 
+Entity* Machine::get_entity_by_id(unsigned int id)
+{
+    Entity* result = get_state_by_id(id);
+    
+    if(result == nullptr)
+        result = get_transition_by_id(id);
+    
+    if(result == nullptr)
+        result = get_resourcelock_by_id(id);
+
+    return result;
+}

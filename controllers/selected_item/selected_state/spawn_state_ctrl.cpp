@@ -75,7 +75,7 @@ void SpawnStateController::on_synch_changed()
         return;
 
     is_emitting = true;
-    auto op = OpStateLaunchSynch(owning_machine, selected_state, synchronous_switch.get_state());
+    auto op = OpStateLaunchSynchronous(owning_machine, selected_state, synchronous_switch.get_state());
     history_manager->submit_operation(op);
     is_emitting = false;
 }
@@ -102,7 +102,7 @@ void SpawnStateController::on_output_name_changed()
 
     is_emitting = true;
     auto varname = output_name_entry.get_text();
-    auto op = OpStateLaunchResVar(owning_machine, selected_state, varname);
+    auto op = OpStateLaunchResultVariable(owning_machine, selected_state, varname);
     history_manager->submit_operation(op);
     is_emitting = false;
 }

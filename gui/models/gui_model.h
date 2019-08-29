@@ -22,7 +22,7 @@ class GUIModel
         CursorType update(CurrentEvents& current_events, GUIModel*& just_selected);
         unsigned int get_id();
 
-        void set_deselected();
+        void set_selected(bool selected);
 
         EntityType type;
 

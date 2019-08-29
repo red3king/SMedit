@@ -20,9 +20,9 @@ unsigned int GUIModel::get_id()
 GUIModel::~GUIModel(){ }
 
 
-void GUIModel::set_deselected()
+void GUIModel::set_selected(bool selected)
 {
-    selected = false;
+    this->selected = selected;
 }
 
 

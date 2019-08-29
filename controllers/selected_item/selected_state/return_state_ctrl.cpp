@@ -66,7 +66,7 @@ void ReturnStateController::on_retval_changed(LVOV retval)
         return;
 
     is_emitting = true;
-    auto op = OpStateRetVal(owning_machine, selected_state, retval);
+    auto op = OpStateReturnValue(owning_machine, selected_state, retval);
     history_manager->submit_operation(op);
     is_emitting = false;
 }

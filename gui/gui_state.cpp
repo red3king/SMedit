@@ -27,11 +27,11 @@ void GUIState::set_machine(Machine* current_machine)
 {
     this->current_machine = current_machine;
     draw_context.reset();
-    _create_models();
+    create_models();
 }
 
 
-void GUIState::_create_models()
+void GUIState::create_models()
 {
     for(int i=0; i<current_machine->states.size(); i++)
     {
@@ -56,28 +56,16 @@ void GUIState::_create_models()
 void GUIState::unset_machine()
 {
     this->current_machine = nullptr;
-    _delete_models();
+    delete_models();
 }
 
 
-void GUIState::_delete_models()
+void GUIState::delete_models()
 {
     for(int i=0; i<gui_models.size(); i++)
         delete gui_models[i];
 
     gui_models.clear();
-}
-
-
-void GUIState::pre_rebuild_models()
-{
-    _delete_models();
-}
-
-
-void GUIState::rebuild_models()
-{
-    _create_models();
 }
 
 
@@ -134,10 +122,20 @@ CursorType GUIState::update_models(CurrentEvents& current_events, GUIModel*& jus
     {
         GUIModel* model = gui_models[i];
         if(clear_selected || (just_selected != nullptr && just_selected != model))
-            model->set_deselected();
+            model->set_selected(false);
     }
 
    return result; 
+}
+
+
+void GUIState::restore_selected_entity(Entity* entity)
+{
+    for(int i=0; i<gui_models.size(); i++)
+    {
+        if(gui_models[i]->get_entity() == entity)
+            gui_models[i]->set_selected(true);
+    }
 }
 
 

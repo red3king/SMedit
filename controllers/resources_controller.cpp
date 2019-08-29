@@ -6,12 +6,9 @@
 using std::string;
 
 
-ResourcesController::ResourcesController(HistoryManager* history_manager, Glib::RefPtr<Gtk::Builder> const& builder)
+ResourcesController::ResourcesController(HistoryManager* history_manager, Glib::RefPtr<Gtk::Builder> const& builder) : TopController(history_manager)
 {
-    project_open = false;
-    disable_input_signals = false;
-    selected_resource = nullptr;
-    this->history_manager = history_manager;
+    is_setting = false;
 
     builder->get_widget("resource_tree_view", resource_tree_view);
     builder->get_widget("create_resource_button", create_button);
@@ -30,15 +27,13 @@ ResourcesController::ResourcesController(HistoryManager* history_manager, Glib::
     create_button->signal_clicked().connect(sigc::mem_fun(this, &ResourcesController::on_create_clicked));
     delete_button->signal_clicked().connect(sigc::mem_fun(this, &ResourcesController::on_delete_clicked));
 
-    signals.project_open.connect(sigc::mem_fun(this, &ResourcesController::on_project_open));
-    signals.project_close.connect(sigc::mem_fun(this, &ResourcesController::on_project_close));
     signals.model_changed.connect(sigc::mem_fun(this, &ResourcesController::on_model_changed));
 }
 
 
 void ResourcesController::on_path_changed()
 {
-    if(disable_input_signals)
+    if(is_setting)
         return;
 
     string path = string(path_file_chooser->get_filename());
@@ -49,7 +44,7 @@ void ResourcesController::on_path_changed()
 
 void ResourcesController::on_name_changed()
 {
-    if(disable_input_signals)
+    if(is_setting)
         return;
 
     string name = string(name_entry->get_text());
@@ -75,42 +70,59 @@ void ResourcesController::on_delete_clicked()
 
 void ResourcesController::on_selection_changed(unsigned int entity_id)
 {
-    disable_input_signals = true;
+    if(is_setting)
+        return;
 
-    if(entity_id == 0)
+    is_setting = true;
+
+    selected_resource = history_manager->current_project.get_resource_by_id(entity_id);
+    selected_resource_id = selected_resource == nullptr ? 0 : entity_id;
+
+    if(selected_resource == nullptr)
     {
-        selected_resource = nullptr;
         name_entry->set_text("");
         path_file_chooser->set_filename("");
     }
     
     else
     {
-        selected_resource = history_manager->current_project.get_resource_by_id(entity_id);
         name_entry->set_text(selected_resource->name);
         path_file_chooser->set_filename(selected_resource->path);
     }
 
-    disable_input_signals = false;
+    is_setting = false;
     _update_enabled();
 }
 
 
-void ResourcesController::on_project_open()
+void ResourcesController::reset(bool reload)
 {
-    project_open = true;
-    _rebuild_treeview(0);
-    _update_enabled();
-}
-
-
-void ResourcesController::on_project_close()
-{
-    project_open = false;
     num_items = 0;
     selected_resource = nullptr;
+
+    if(!reload)
+        selected_resource_id = 0;
+
+    is_setting = true;
     list_view_controller->clear();
+    name_entry->set_text("");
+    path_file_chooser->set_filename("");
+    is_setting = false;
+
     _update_enabled();
+}
+
+
+void ResourcesController::load_from(Project& current_project, bool reload)
+{
+    _rebuild_treeview(0);
+    _update_enabled();
+
+    if(selected_resource_id != 0)
+    {
+        list_view_controller->select_item(selected_resource_id);
+        //on_selection_changed(selected_resource_id); 
+    }
 }
 
 
@@ -133,11 +145,20 @@ void ResourcesController::on_model_changed(EntityType entity_type, SignalType si
     // if it's a create/delete, just rebuild the tree view
     unsigned int deleted_id = signal_type == PRE_DELETE ? entity_id : 0;
     _rebuild_treeview(deleted_id);
+
+    if(signal_type == CREATE || selected_resource_id != entity_id)
+        return;
+
+    selected_resource_id = 0;
+    selected_resource = nullptr;
+    on_selection_changed(0);
+    _update_enabled();
 }
 
 
 void ResourcesController::_rebuild_treeview(unsigned int deleted_id)
 {
+    is_setting = true;
     list_view_controller->clear();
     
     auto resources = history_manager->current_project.resources;
@@ -148,7 +169,8 @@ void ResourcesController::_rebuild_treeview(unsigned int deleted_id)
         if(resources[i]->id != deleted_id)
             list_view_controller->add_item(resources[i]->name, resources[i]->id);
     }
-
+    
+    is_setting = false;
     _update_enabled();
 }
 

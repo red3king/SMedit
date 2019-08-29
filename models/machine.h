@@ -29,6 +29,7 @@ class Machine : public Entity
         vector<Transition*> transitions;
         vector<ResourceLock*> resourcelocks;
 
+        Entity* get_entity_by_id(unsigned int id);
         State* get_state_by_id(unsigned int id);
         Transition* get_transition_by_id(unsigned int id);
         ResourceLock* get_resourcelock_by_id(unsigned int id);

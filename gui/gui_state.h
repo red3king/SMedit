@@ -10,32 +10,28 @@
 class GUIState
 {
     // Describes the state of the opengl box containing states, transitions, and resourcelocks
-    //
 
     public:
-
-        Machine* current_machine;
         DrawContext draw_context;
+        Machine* current_machine;
         vector<GUIModel*> gui_models;
         
-        GUIModel* get_model_by_id(unsigned int id);
-
         void set_nvg_context(NVGcontext* vg);
+        void restore_selected_entity(Entity* entity);
+
         void set_machine(Machine* current_machine);
         void unset_machine();
 
-        void pre_rebuild_models();
-        void rebuild_models();
-
         void add_gui_model(EntityType entity_type, unsigned int entity_id);
         void remove_gui_model(unsigned int entity_id);
-
-        CursorType update_models(CurrentEvents& current_events, GUIModel*& just_selected, bool& clear_selected);
         
+        CursorType update_models(CurrentEvents& current_events, GUIModel*& just_selected, bool& clear_selected);
         void draw();
 
     private:
-        void _delete_models();
-        void _create_models();
+        void delete_models();
+        void create_models();
+
+        GUIModel* get_model_by_id(unsigned int id);
 };
 

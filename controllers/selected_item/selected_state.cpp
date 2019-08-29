@@ -78,14 +78,14 @@ void SelectedState::on_code_changed(string code)
 
 void SelectedState::on_initial_state_changed(vector<ArgDef> arguments)
 {
-    auto op = OpStateInitialCfg(owning_machine, selected_state, arguments);
+    auto op = OpStateInitialArgs(owning_machine, selected_state, arguments);
     history_manager->submit_operation(op);
 }
 
 
 void SelectedState::on_jpidvar_changed()
 {
-    auto op = OpStateJoinPidVar(owning_machine, selected_state, join_pidvar_entry->get_text());
+    auto op = OpStateJoinPidVariable(owning_machine, selected_state, join_pidvar_entry->get_text());
     history_manager->submit_operation(op);
 }
 

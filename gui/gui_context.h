@@ -13,19 +13,17 @@ class GUIContext
 {
     // Contains all the state and stuff relating to a GLArea
 
-    // TODO - plan is to:
-    //      make this class have onee of everything: gui_state, draw_context, etc
-    //      this class takes in a glarea, and connects its signals and stuff
-    //      this class will have the signal handlers i was putting into glarea_signal_handlers
-    //      
-    //      delete the single instance of gui_state i made, and replace it with a single instance of this.
-    //
-
     public:
         GUIContext(Gtk::GLArea* gl_area, HistoryManager* history_manager);
 
+        unsigned int current_machine_id;
         void set_machine(Machine* current_machine);
         void unset_machine();
+        
+        void reset(bool reload);
+        void load_from(Project& current_project, bool reload);
+
+        void restore_selected_entity(Entity* entity);
 
         // Gdk event handlers
         void on_gl_realize();
@@ -38,10 +36,7 @@ class GUIContext
         bool handle_motion_notify_event(GdkEventMotion* motion_event);
 
         // smedit signal handlers
-        void handle_create(EntityType entity_type, SignalType signal_type, unsigned int entity_id);
-        void handle_delete(EntityType entity_type, SignalType signal_type, unsigned int entity_id);
-        void handle_gui_rebuild();
-        void handle_pre_gui_rebuild();
+        void handle_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id);
 
         void update();
 

@@ -1,8 +1,11 @@
 CXXFLAGS = -std=c++14 -iquote ./ -ggdb $(shell pkg-config --cflags  gtkmm-3.0 gtksourceviewmm-3.0 epoxy)
 LDFLAGS = $(shell pkg-config --libs gtkmm-3.0 gtksourceviewmm-3.0 epoxy)
 
+# generated source files (generated in place by cog)
+autogens = $(wildcard historymanager/operations/*.cpp) \
+		   $(wildcard historymanager/operations/*.h)
 
-
+# source files used by test and smedit
 presrc = $(filter-out main.cpp, $(filter-out test_main.cpp, $(wildcard *.cpp))) \
 	$(wildcard controllers/*.cpp) \
 	$(wildcard controllers/selected_item/*.cpp) \
@@ -18,6 +21,7 @@ presrc = $(filter-out main.cpp, $(filter-out test_main.cpp, $(wildcard *.cpp))) 
 src := $(presrc) main.cpp
 testsrc := $(presrc) test_main.cpp
 
+# c language files
 csrc = $(wildcard lib/nanovg/*.c)
 
 
@@ -26,11 +30,21 @@ testobj = $(testsrc:.cpp=.o) $(csrc:.c=.o)
 dep = $(obj:.o=.d)  # one dependency file for each source
 testdep = $(testobj:.o=.d)
 
-smedit: $(obj)
-	$(CXX) -o $@ $^ $(LDFLAGS)
 
-test: $(testobj)
-	$(CXX) -o $@ $^ $(LDFLAGS)
+all: smedit
+
+code-gen: $(autogens)
+	cog -r $^
+
+smedit: code-gen smedit-compile
+
+smedit-compile: $(obj)
+	$(CXX) -o smedit $^ $(LDFLAGS)
+
+test: code-gen test-compile
+
+test-compile: $(testobj)
+	$(CXX) -o test $^ $(LDFLAGS)
 
 
 ifeq ($(MAKECMDGOALS),smedit)
@@ -40,7 +54,6 @@ endif
 ifeq ($(MAKECMDGOALS),test)
 -include $(testdep)   # include all dep files in the makefile
 endif
-
 
 
 # rule to generate a dep file by using the C preprocessor

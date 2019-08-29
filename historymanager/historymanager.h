@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <sigc++/sigc++.h>
 
 #include "utils.h"
 #include "operation.h"
@@ -13,6 +14,8 @@ class HistoryManager
     public:
         HistoryManager(int max_operations, int op_ex_thresh, int min_undos);
         
+        sigc::signal<void, bool, bool> signal_changed;  // may undo, may redo
+
         unsigned int submit_operation(Operation& operation);
         void undo();
         void redo();
@@ -28,6 +31,7 @@ class HistoryManager
     private:
         int max_operations, op_ex_thresh, min_undos;
 
+        bool last_may_undo, last_may_redo;
         bool project_created;
         Project initial_project;        
         vector<Operation*> operations;    
@@ -36,6 +40,8 @@ class HistoryManager
         void reset();
         void condense_if_needed();
         void condense_history();
+
+        void _update_last();
 };
 
 

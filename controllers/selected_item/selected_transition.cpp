@@ -49,7 +49,7 @@ void SelectedTransition::on_event_timeout_changed()
 
     else if(selected_transition->type == EVENT)
     {
-        auto op = OpTransitionEvName(owning_machine, selected_transition, text);
+        auto op = OpTransitionEventName(owning_machine, selected_transition, text);
         history_manager->submit_operation(op);
     }
 }

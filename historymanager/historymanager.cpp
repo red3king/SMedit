@@ -10,6 +10,8 @@ HistoryManager::HistoryManager(int max_operations, int op_ex_thresh, int min_und
 
     project_created = false;
     undo_position = 0;
+    last_may_undo = false;
+    last_may_redo = false;
 }
 
 
@@ -31,6 +33,8 @@ unsigned int HistoryManager::submit_operation(Operation& operation)
 
     operations.push_back(operation.clone());
     condense_if_needed();
+
+    _update_last();
     return result;
 }
 
@@ -49,6 +53,7 @@ void HistoryManager::undo()
     
     signals.enable_gui_signals();
     signals.fire_gui_rebuild_signal();
+    _update_last();
 }
 
 
@@ -57,12 +62,13 @@ void HistoryManager::redo()
     int i = operations.size() - undo_position;
     operations[i]->execute(current_project);
     undo_position--;
+    _update_last();
 }
 
 
 bool HistoryManager::may_undo()
 {
-    return operations.size() > 0 && undo_position > operations.size() - 1;
+    return operations.size() > 0 && undo_position < operations.size();// - 1;
 }
 
 
@@ -97,12 +103,27 @@ void HistoryManager::condense_history()
 }
 
 
+void HistoryManager::_update_last()
+{
+    bool can_undo = may_undo();
+    bool can_redo = may_redo();
+
+    if(last_may_undo != can_undo || last_may_redo != can_redo)
+        signal_changed.emit(can_undo, can_redo);
+    
+    last_may_undo = can_undo;
+    last_may_redo = can_redo;
+}
+
+
 void HistoryManager::reset()
 {
     current_project = Project();
     initial_project = Project();
     operations.clear();
     project_created = false;
+    last_may_undo = false;
+    last_may_redo = false;
 }
 
 
@@ -114,6 +135,8 @@ void HistoryManager::new_project()
     initial_project = Project();
     current_project = Project();
     project_created = true;
+    last_may_undo = false;
+    last_may_redo = false;
 }
 
 

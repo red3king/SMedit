@@ -6,13 +6,17 @@
 #include "historymanager/operations/resourcelock_ops.h"
 
 
-MachinesController::MachinesController(HistoryManager* history_manager, Glib::RefPtr<Gtk::Builder> const& builder)
+MachinesController::MachinesController(HistoryManager* history_manager, Glib::RefPtr<Gtk::Builder> const& builder) : TopController(history_manager)
 {
-    this->history_manager = history_manager;
-
     disable_input_signals = false;
     project_open = false;
     selected_machine = nullptr;
+    selected_machine_id = 0;
+    create_clicked = false;
+
+    last_entity_id = 0;
+    last_machine_id = 0;
+    last_entity_type = NONE_ENTITY;
 
     builder->get_widget("machine_tree_view", tree_view);
     builder->get_widget("create_machine_button", create_button);
@@ -31,14 +35,12 @@ MachinesController::MachinesController(HistoryManager* history_manager, Glib::Re
     draw_context = &gui_context->gui_state.draw_context;
 
     list_view_controller = new ListViewController(tree_view, "Name:");
-    list_view_controller->selection_changed_signal.connect(sigc::mem_fun(this, &MachinesController::on_selection_changed));
+    list_view_controller->selection_changed_details.connect(sigc::mem_fun(this, &MachinesController::on_selection_changed));
 
     selected_resourcelock_ctrl = new SelectedResourceLock(history_manager, builder);
     selected_transition_ctrl = new SelectedTransition(history_manager, builder);
     selected_state_ctrl = new SelectedState(history_manager, builder);
 
-    signals.project_open.connect(sigc::mem_fun(this, &MachinesController::on_project_open));
-    signals.project_close.connect(sigc::mem_fun(this, &MachinesController::on_project_close));
     signals.model_changed.connect(sigc::mem_fun(this, &MachinesController::on_model_changed));
     signals.model_selected.connect(sigc::mem_fun(this, &MachinesController::on_model_selected));
 
@@ -90,10 +92,12 @@ void MachinesController::new_entity_coords(float& x, float& y, bool offset)
 }
 
 
-void MachinesController::on_selection_changed(unsigned int machine_id)
+void MachinesController::on_selection_changed(unsigned int machine_id, bool user_generated)
 {
     disable_input_signals = true;
-    gui_context->unset_machine();
+    
+    if(user_generated)
+        gui_context->unset_machine();
 
     if(machine_id == 0)
     {
@@ -105,14 +109,25 @@ void MachinesController::on_selection_changed(unsigned int machine_id)
     else
     {
         selected_machine = history_manager->current_project.get_machine_by_id(machine_id);
-        name_entry->set_text(selected_machine->name);
-        launch_on_start_switch->set_state(selected_machine->run_on_start);
-        gui_context->set_machine(selected_machine);
+        _populate_ui_from_selected();
+
+        if(user_generated)
+            gui_context->set_machine(selected_machine);
     }
-   
+
+    if(user_generated)
+        selected_machine_id = selected_machine == nullptr ? 0 : selected_machine->id;
+
     gui_context->update(); 
     disable_input_signals = false;
     _update_enabled();
+}
+
+
+void MachinesController::_populate_ui_from_selected()
+{
+    name_entry->set_text(selected_machine->name);
+    launch_on_start_switch->set_state(selected_machine->run_on_start);
 }
 
 
@@ -146,17 +161,41 @@ void MachinesController::_rebuild_list(unsigned deleted_id)
 }
 
 
-void MachinesController::on_project_open()
+void MachinesController::load_from(Project& current_project, bool reload)
 {
-    project_open = true;
     _rebuild_list(0);
     _update_enabled();
+
+    if(selected_machine_id != 0)
+        list_view_controller->select_item(selected_machine_id);
+
+    gui_context->load_from(current_project, reload);
+
+    if(!reload)
+        return;
+
+    Machine* last_machine = current_project.get_machine_by_id(last_machine_id);
+    Entity* last_entity = last_machine == nullptr ? nullptr : last_machine->get_entity_by_id(last_entity_id);
+    last_entity_type = last_entity == nullptr ? NONE_ENTITY : last_entity_type; 
+
+    _do_select(last_machine, last_entity_type, last_entity);
+
+    if(reload && last_entity != nullptr)
+        gui_context->restore_selected_entity(last_entity);
 }
 
 
-void MachinesController::on_project_close()
+void MachinesController::reset(bool reload)
 {
-    project_open = false;
+    gui_context->reset(reload);
+
+    if(!reload)
+    {
+        last_entity_id = 0;
+        last_machine_id = 0;
+        last_entity_type = NONE_ENTITY;
+    }
+
     list_view_controller->clear();
     _update_enabled();
 }
@@ -166,7 +205,10 @@ void MachinesController::on_create_clicked()
 {
     auto op = OpMachineCreate("new machine");
     unsigned int new_id = history_manager->submit_operation(op);
+    selected_machine_id = new_id;
     list_view_controller->select_item(new_id);
+    Machine* machine = history_manager->current_project.get_machine_by_id(selected_machine_id);
+    gui_context->set_machine(machine);
 }
 
 
@@ -203,9 +245,10 @@ void MachinesController::on_create_resourcelock_clicked()
     Resource* resource = history_manager->current_project.resources[0];
     float wx, wy;
     new_entity_coords(wx, wy, false);
-
+    create_clicked = true;
     auto op = OpResourceLockCreate(selected_machine, resource, wx, wy);
     history_manager->submit_operation(op);
+    create_clicked = false;
 }
 
 
@@ -221,15 +264,26 @@ void MachinesController::on_model_changed(EntityType entity_type, SignalType sig
 
     if(signal_type == MODIFY)
     {
-        // if a machine was changed, just update it in the list
+        // if a machine was changed, update in list and re-populate ui inputs if changed was selected.
         Machine* machine = history_manager->current_project.get_machine_by_id(entity_id);
         list_view_controller->change_item(machine->name, entity_id);
+    
+        if(entity_id == selected_machine_id)
+            _populate_ui_from_selected();
+
         return;
     }
 
     // otherwise, rebuild list
     unsigned int to_delete_id = signal_type == PRE_DELETE ? entity_id : 0;
+    unsigned int to_select_id = selected_machine == nullptr ? 0 : selected_machine->id;
     _rebuild_list(to_delete_id);
+
+    // kinda hacky, TODO maybe figure out how to make less hacky?
+    // if machine is created when user clicks "redo", this will select it
+    // after the list view was re-built 
+    if(!create_clicked && to_select_id != 0)
+        list_view_controller->select_item(to_select_id);
 }
 
 
@@ -237,7 +291,17 @@ void MachinesController::on_model_selected(Machine* machine, EntityType entity_t
 {
     if(machine != selected_machine)
         return;
+    
+    last_entity_id = entity == nullptr ? 0 : entity->id;
+    last_machine_id = machine->id;
+    last_entity_type = entity_type;
 
+    _do_select(machine, entity_type, entity);
+}
+
+
+void MachinesController::_do_select(Machine* machine, EntityType entity_type, Entity* entity)
+{
     if(entity_type == NONE_ENTITY)
         selected_item_stack->set_visible_child("none_selected");
 

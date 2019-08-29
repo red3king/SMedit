@@ -29,6 +29,7 @@ void ListViewController::_init(Gtk::TreeView* tree_view, string title, bool has_
 {
     this->tree_view = tree_view;
     list_store = Gtk::ListStore::create(columns);
+    is_setting = false;
 
     tree_view->set_model(list_store);
     tree_view->append_column(title, columns.name_column);
@@ -44,6 +45,7 @@ void ListViewController::_init(Gtk::TreeView* tree_view, string title, bool has_
 void ListViewController::select_item(unsigned int id)
 {
     auto children = list_store->children();
+    is_setting = true;
 
     for(auto iter = children.begin(); iter != children.end(); iter++)
     {
@@ -51,6 +53,8 @@ void ListViewController::select_item(unsigned int id)
         if(row[columns.id_column] == id)
             selection->select(row);
     }
+
+    is_setting = false;
 }
 
 
@@ -61,31 +65,38 @@ void ListViewController::on_selection_changed()
     if(!iter)
     {
         selection_changed_signal.emit(0);
+        selection_changed_details.emit(0, !is_setting);
         return;
     }
 
     auto row = *iter;
     unsigned int id = row[columns.id_column];
     selection_changed_signal.emit(id);
+    selection_changed_details.emit(id, !is_setting);
 }
 
 
 void ListViewController::clear()
 {
+    is_setting = true;
     list_store->clear();
+    is_setting = false;
 }
 
 
 void ListViewController::add_item(string item_name, unsigned int id)
 {
+    is_setting = true;
     auto row = *(list_store->append());
     row[columns.name_column] = item_name;
     row[columns.id_column] = id;
+    is_setting = false;
 }
 
 
 void ListViewController::change_item(string item_name, unsigned int id)
 {
+    is_setting = true;
     auto children = list_store->children();
 
     for(auto iter = children.begin(); iter != children.end(); iter++)
@@ -97,4 +108,6 @@ void ListViewController::change_item(string item_name, unsigned int id)
             break;
         }
     }
+
+    is_setting = false;
 }
