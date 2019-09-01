@@ -24,7 +24,7 @@ MainWindow::MainWindow(BaseObjectType* obj, Glib::RefPtr<Gtk::Builder> const& bu
     history_manager = new HistoryManager(50, 20, 15);
 
     resources_controller = new ResourcesController(history_manager, builder, this);
-    machines_controller = new MachinesController(history_manager, builder);
+    machines_controller = new MachinesController(history_manager, builder, this);
 
     prepare_signals();
     machine_edit_gl_area->signal_realize().connect(sigc::mem_fun(this, &MainWindow::connect_cursor_signals));

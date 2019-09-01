@@ -6,8 +6,9 @@
 #include "historymanager/operations/resourcelock_ops.h"
 
 
-MachinesController::MachinesController(HistoryManager* history_manager, Glib::RefPtr<Gtk::Builder> const& builder) : TopController(history_manager)
+MachinesController::MachinesController(HistoryManager* history_manager, Glib::RefPtr<Gtk::Builder> const& builder, Gtk::Window* main_window) : TopController(history_manager)
 {
+    this->main_window = main_window;
     disable_input_signals = false;
     project_open = false;
     selected_machine = nullptr;
@@ -242,7 +243,52 @@ void MachinesController::on_create_transition_clicked()
 
 void MachinesController::on_create_resourcelock_clicked()
 {
-    Resource* resource = history_manager->current_project.resources[0];
+    Gtk::MessageDialog dialog(*main_window, "Pick Resource", false, Gtk::MESSAGE_OTHER, Gtk::BUTTONS_OK_CANCEL);
+    Gtk::Box* box = dialog.get_message_area();
+    Gtk::Box hbox(Gtk::ORIENTATION_HORIZONTAL);
+    
+    Gtk::Label resource_label;
+    resource_label.set_markup("<b>resource:</b>");
+    set_margins(&resource_label, 4);
+    resource_label.set_margin_bottom(0);
+    left_align(&resource_label);
+
+    Gtk::ComboBoxText combobox;
+    string first_resource;
+    for(int i=0; i<history_manager->current_project.resources.size(); i++)
+    {
+        Resource* res = history_manager->current_project.resources[i];
+        combobox.append(res->name);
+        if(i == 0)
+            first_resource = res->name;
+    }
+    combobox.set_active_text(first_resource); 
+    set_margins(&combobox, 4);
+    combobox.set_margin_bottom(0);
+    right_align(&combobox);
+    
+    hbox.pack_start(resource_label, false, false, 0);
+    hbox.pack_start(combobox, false, false, 0);
+    box->pack_start(hbox, false, false, 0);
+
+    hbox.show();
+    combobox.show();
+    resource_label.show();
+
+    if(dialog.run() != Gtk::RESPONSE_OK)
+        return;
+
+    string chosen = combobox.get_active_text();
+    
+
+    Resource* resource; 
+    for(int i=0; i<history_manager->current_project.resources.size(); i++)
+    {
+        resource = history_manager->current_project.resources[i];
+        if(resource->name == chosen)
+            break;
+    }
+
     float wx, wy;
     new_entity_coords(wx, wy, false);
     create_clicked = true;

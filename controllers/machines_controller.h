@@ -14,7 +14,7 @@
 class MachinesController : public TopController
 {
     public:
-        MachinesController(HistoryManager* history_manager, Glib::RefPtr<Gtk::Builder> const& builder);
+        MachinesController(HistoryManager* history_manager, Glib::RefPtr<Gtk::Builder> const& builder, Gtk::Window* main_window);
 
     private:
         ListViewController* list_view_controller;
@@ -22,6 +22,7 @@ class MachinesController : public TopController
         SelectedTransition* selected_transition_ctrl;
         SelectedState* selected_state_ctrl;
 
+        Gtk::Window* main_window;
         DrawContext* draw_context;
         GUIContext* gui_context;
 
