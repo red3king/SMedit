@@ -38,6 +38,7 @@ class IOResult
 {
     public:
         IOResult(bool success, string fail_msg);
+        IOResult(bool success);
 
         bool success;
         string fail_msg;
@@ -50,12 +51,13 @@ class IOResult
 
 // String to number helpers
 // returns true when input is valid
-bool is_number(Glib::ustring text);
+bool is_number(Glib::ustring text, bool allow_float=true);
 bool string_to_int(int& result, string input);
 bool string_to_float(float& result, string input);
 
 
 // UI Helpers
+void display_error(Gtk::Window& parent, string message);
 
 // add value types to combo box
 void prepare_value_type_combobox(Gtk::ComboBoxText* combo_box);

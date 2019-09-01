@@ -4,7 +4,30 @@
 
 BoxEntity::BoxEntity(unsigned int id) : Entity(id) 
 {
+    x = 0;
+    y = 0;
+    w = 0;
+    h = 0;
+}
 
+
+BoxEntity::BoxEntity(json jdata) : Entity(jdata)
+{
+    x = jdata["x"];
+    y = jdata["y"];
+    w = jdata["w"]; 
+    h = jdata["h"];
+}
+
+
+json BoxEntity::to_json()
+{
+    json jdata = Entity::to_json();
+    jdata["x"] = x;
+    jdata["y"] = y;
+    jdata["w"] = w;
+    jdata["h"] = h;
+    return jdata;
 }
 
 

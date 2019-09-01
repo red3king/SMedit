@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include "lib/json.hpp"
 
 #include "entity.h"
 #include "resourcelock.h"
@@ -11,14 +12,17 @@
 
 using std::string;
 using std::vector;
+using nlohmann::json;
 
+
+class Project;
 
 class Machine : public Entity
 {
     public:
         Machine(unsigned int id=0);
         Machine(const Machine& other);
-        Machine& operator=(const Machine& other);
+        Machine(json jdata);
         Machine* clone() const;
         ~Machine();
 
@@ -34,7 +38,8 @@ class Machine : public Entity
         Transition* get_transition_by_id(unsigned int id);
         ResourceLock* get_resourcelock_by_id(unsigned int id);
 
+        json to_json();
+
     private:
-        void _copy_from(const Machine& other);
 };
 

@@ -51,6 +51,23 @@ LVOV::LVOV(float float_val)
 }
 
 
+LVOV::LVOV(json jdata)
+{
+    type = (ValueType) jdata["type"];
+    string val = jdata["value"];
+    from_string(val);
+}
+
+
+json LVOV::to_json()
+{
+    return {
+        { "type", (int)(type) },
+        { "value", to_string() }    
+    };
+}
+
+
 void LVOV::reset()
 {
     type = VT_ANY;
@@ -109,7 +126,7 @@ string LVOV::describe()
 
 bool LVOV::from_string(Glib::ustring input)
 {
-    if(type == VT_STR)
+    if(type == VT_STR || type == VT_ANY)
     {
         str_val = input;
         return true;

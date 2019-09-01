@@ -114,7 +114,8 @@ void ArgumentListController::_update_selected()
 
     if(selected_index == -1)
     {
-        value_input_controller->set_value(LVOV(""));
+        string empty = "";
+        value_input_controller->set_value(LVOV(empty));
         arg_name_entry.set_text("");
     }
 
@@ -131,7 +132,8 @@ void ArgumentListController::_update_selected()
 
 void ArgumentListController::on_create_clicked()
 {
-    Arg new_arg("argument", LVOV(""));
+    string empty = "";
+    Arg new_arg("argument", LVOV(empty));
     
     unsigned int i = arg_list.size();
     arg_list.push_back(new_arg);

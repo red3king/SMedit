@@ -8,16 +8,19 @@ HistoryManager::HistoryManager(int max_operations, int op_ex_thresh, int min_und
     this->op_ex_thresh = op_ex_thresh;
     this->min_undos = min_undos;
 
+    unsaved_changes = false;
     project_created = false;
     undo_position = 0;
     last_may_undo = false;
     last_may_redo = false;
+    last_unsaved_changes = false;
 }
 
 
 unsigned int HistoryManager::submit_operation(Operation& operation)
 {
     unsigned int result = operation.execute(current_project);
+    unsaved_changes = true;
 
     if(undo_position > 0)
     {        
@@ -28,6 +31,7 @@ unsigned int HistoryManager::submit_operation(Operation& operation)
     if(operations.size() > 0 && operations.back()->may_collapse(operation))
     {
         operations.back()->collapse(operation);
+        _update_last();
         return result;
     }
 
@@ -44,6 +48,7 @@ void HistoryManager::undo()
     signals.fire_pre_gui_rebuild_signal();
     signals.disable_gui_signals();
 
+    unsaved_changes = true;
     current_project = initial_project; 
 
     for(int i=0; i < operations.size() - undo_position - 1; i++)
@@ -62,6 +67,7 @@ void HistoryManager::redo()
     int i = operations.size() - undo_position;
     operations[i]->execute(current_project);
     undo_position--;
+    unsaved_changes = true;
     _update_last();
 }
 
@@ -110,9 +116,13 @@ void HistoryManager::_update_last()
 
     if(last_may_undo != can_undo || last_may_redo != can_redo)
         signal_changed.emit(can_undo, can_redo);
+
+    if(last_unsaved_changes != unsaved_changes)
+        signal_unsaved_changes.emit(unsaved_changes);
     
     last_may_undo = can_undo;
     last_may_redo = can_redo;
+    last_unsaved_changes = unsaved_changes;
 }
 
 
@@ -124,40 +134,52 @@ void HistoryManager::reset()
     project_created = false;
     last_may_undo = false;
     last_may_redo = false;
+    unsaved_changes = false;
 }
 
 
 void HistoryManager::new_project()
 {
     if(project_created)
+    {
         reset();
+        signals.project_close.emit();
+    }
 
     initial_project = Project();
     current_project = Project();
     project_created = true;
     last_may_undo = false;
     last_may_redo = false;
+    unsaved_changes = true;
+
+    signals.project_open.emit();
+    _update_last();
 }
 
 
-IOResult HistoryManager::load_from(string load_path)
+void HistoryManager::load_project(Project& loaded_project)
 {
     if(project_created)
+    {
         reset();
+        signals.project_close.emit();
+    }
 
-    //if(something == bad)
-    //    return IOResult(false, "File not found");
-
-    //TODO
+    current_project = loaded_project;
+    initial_project = loaded_project;
     project_created = true;
+    last_may_undo = false;
+    last_may_redo = false;
+    unsaved_changes = false;
 
-
-    return IOResult(true, "");
+    signals.project_open.emit();
+    _update_last();
 }
 
 
-IOResult HistoryManager::save_to(string save_path)
+void HistoryManager::set_saved()
 {
-    //TODO
-    return IOResult(true, "");
+   unsaved_changes = false;
+  _update_last(); 
 }

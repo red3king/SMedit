@@ -26,12 +26,13 @@ TEST_CASE("HistoryManager.submit_operation, and undo", "[historymanager]")
 
     // submit second operation, should work
     auto name = OpMachineName(m1, "bob");
+    REQUIRE("asdf" == hm.current_project.machines[0]->name);
     hm.submit_operation(name);
     REQUIRE("bob" == hm.current_project.machines[0]->name);
 
-    // undo rename -> machine name should be blank 
+    // undo rename -> machine name should be the original name 
     hm.undo();
-    REQUIRE("" == hm.current_project.machines[0]->name);
+    REQUIRE("asdf" == hm.current_project.machines[0]->name);
 
     // redo -> name should be bob again
     hm.redo();

@@ -35,6 +35,10 @@ class ResourceLock : public BoxEntity
 
     public:
         ResourceLock(unsigned int id=0);
+        ResourceLock(json jdata);
+
+        json to_json();
+
         Resource* resource;
 
     private:  

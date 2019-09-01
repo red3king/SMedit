@@ -42,9 +42,54 @@ StateType string_to_state_type(string input)
 
 State::State(unsigned int id) : BoxEntity(id) 
 { 
-    launch_task_name = LVOV("");
+    string empty = "";
+    launch_task_name = LVOV(empty);
     has_return_value = false;
 } 
+
+
+State::State(json jdata) : BoxEntity(jdata), return_value(jdata["return_value"]), launch_task_name(jdata["launch_task_name"])
+{
+    name = jdata["name"];
+    type = (StateType) jdata["type"];
+    
+    for(int i=0; i<jdata["initial_args"].size(); i++)
+        initial_args.push_back(ArgDef(jdata["initial_args"][i]));
+
+    has_return_value = jdata["has_return_value"];
+    launch_synchronous = jdata["launch_synchronous"];
+    
+    for(int i=0; i<jdata["launch_args"].size(); i++)
+        launch_args.push_back(Arg(jdata["launch_args"][i]));
+
+    launch_result_variable = jdata["launch_result_variable"];
+    join_pid_variable = jdata["join_pid_variable"];    
+}
+
+
+json State::to_json()
+{
+    json jdata = BoxEntity::to_json();
+    jdata["name"] = name;
+    jdata["type"] = (int)(type);
+    jdata["initial_args"] = json::array();
+    // code ignored, gets saved to file
+    jdata["has_return_value"] = has_return_value;
+    jdata["return_value"] = return_value.to_json();
+    jdata["launch_synchronous"] = launch_synchronous;
+    jdata["launch_task_name"] = launch_task_name.to_json();
+    jdata["launch_args"] = json::array();
+    jdata["launch_result_variable"] = launch_result_variable;
+    jdata["join_pid_variable"] = join_pid_variable;
+    
+    for(int i=0; i<initial_args.size(); i++)
+        jdata["initial_args"].push_back(initial_args[i].to_json());
+
+    for(int i=0; i<launch_args.size(); i++)
+        jdata["launch_args"].push_back(launch_args[i].to_json());
+    
+    return jdata;
+}
 
 
 void State::add_transition(Transition* transition, bool incoming)

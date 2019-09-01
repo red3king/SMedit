@@ -1,5 +1,6 @@
 #include "main.h"
 
+#include "saveload.h"
 #include "log.h"
 #include "utils.h"
 #include "historymanager/operations/machine_ops.h"
@@ -11,11 +12,12 @@
 
 MainWindow::MainWindow(BaseObjectType* obj, Glib::RefPtr<Gtk::Builder> const& builder) : Gtk::ApplicationWindow(obj) , builder{builder}
 {
-    set_title("state machine editor");
 
+    current_filename = "";
     project_open = false;
     may_undo = false;
     may_redo = false;
+    unsaved_changes = false;
 
     get_widgets();
 
@@ -26,6 +28,17 @@ MainWindow::MainWindow(BaseObjectType* obj, Glib::RefPtr<Gtk::Builder> const& bu
 
     prepare_signals();
     machine_edit_gl_area->signal_realize().connect(sigc::mem_fun(this, &MainWindow::connect_cursor_signals));
+    _regen_title();
+}
+
+
+void MainWindow::_regen_title()
+{
+    string project_title = current_filename == "" ? "unsaved" : current_filename;
+    if(unsaved_changes)
+        project_title += "*";
+
+    set_title("smedit - " + project_title);
 }
 
 
@@ -60,12 +73,15 @@ void MainWindow::prepare_signals()
     signals.project_close.connect(sigc::mem_fun(this, &MainWindow::on_project_close));
     signals.project_open.connect(sigc::mem_fun(this, &MainWindow::on_project_open));
 
-    history_manager->signal_changed.connect(sigc::mem_fun(this, &MainWindow::on_history_changed));
-    
+    history_manager->signal_changed.connect(sigc::mem_fun(this, &MainWindow::on_history_changed)); 
+    history_manager->signal_unsaved_changes.connect(sigc::mem_fun(this, &MainWindow::on_unsaved_changes_changed));
 
     // click signals
     file_quit->signal_activate().connect(sigc::mem_fun(this, &MainWindow::on_close_click));
     file_new->signal_activate().connect(sigc::mem_fun(this, &MainWindow::on_new_click));
+    file_save->signal_activate().connect(sigc::mem_fun(this, &MainWindow::on_save_click));
+    file_save_as->signal_activate().connect(sigc::mem_fun(this, &MainWindow::on_save_as_click));
+    file_open->signal_activate().connect(sigc::mem_fun(this, &MainWindow::on_open_click));
     edit_undo->signal_activate().connect(sigc::mem_fun(this, &MainWindow::on_undo_click));
     edit_redo->signal_activate().connect(sigc::mem_fun(this, &MainWindow::on_redo_click));    
     about_licenses->signal_activate().connect(sigc::mem_fun(this, &MainWindow::on_about_click));
@@ -77,6 +93,13 @@ void MainWindow::on_history_changed(bool may_undo, bool may_redo)
     this->may_undo = may_undo;
     this->may_redo = may_redo;
     _update_enabled();    
+}
+
+
+void MainWindow::on_unsaved_changes_changed(bool unsaved_changes)
+{
+    this->unsaved_changes = unsaved_changes;
+    _regen_title();
 }
 
 
@@ -96,6 +119,15 @@ void MainWindow::on_project_close()
 
 void MainWindow::on_close_click()
 {
+    if(unsaved_changes)
+    {
+        Gtk::MessageDialog dialog(*this, "Hey", false, Gtk::MESSAGE_QUESTION, Gtk::BUTTONS_OK_CANCEL);
+        dialog.set_secondary_text("You have unsaved changes, do you still want to quit?");
+
+        if(dialog.run() != Gtk::RESPONSE_OK)
+            return;
+    }
+
     log("closing.");
     hide();
 }
@@ -115,24 +147,93 @@ void MainWindow::on_redo_click()
 
 void MainWindow::on_new_click()
 {
-    bool unsaved_changes = true; // TODO
     if(unsaved_changes)
     {
         Gtk::MessageDialog dialog(*this, "Hey", false, Gtk::MESSAGE_QUESTION, Gtk::BUTTONS_OK_CANCEL);
-        dialog.set_secondary_text("You have unsaved changes, do you want to create a new file?");
+        dialog.set_secondary_text("You have unsaved changes, do you still want to create a new project?");
 
-        int result = dialog.run();
-        switch(result)
-        {
-            case Gtk::RESPONSE_OK:
-                break;
-            default:
-                return;
-        }
+        if(dialog.run() != Gtk::RESPONSE_OK)
+            return;
     }
 
+    current_filename = "";
     history_manager->new_project();
-    signals.project_open();
+    _regen_title();
+}
+
+
+void MainWindow::on_save_click()
+{
+   _do_save(); 
+}
+
+
+void MainWindow::on_open_click()
+{
+    if(unsaved_changes)
+    {
+        Gtk::MessageDialog dialog(*this, "Hey", false, Gtk::MESSAGE_QUESTION, Gtk::BUTTONS_OK_CANCEL);
+        dialog.set_secondary_text("You have unsaved changes, do you still want to open a project?");
+
+        if(dialog.run() != Gtk::RESPONSE_OK)
+            return;
+    }
+
+    Gtk::FileChooserDialog chooser(
+            "Choose a folder to open.", 
+            Gtk::FileChooserAction::FILE_CHOOSER_ACTION_SELECT_FOLDER);
+    chooser.set_transient_for(*this);
+    chooser.add_button("Cancel", Gtk::RESPONSE_CANCEL);
+    chooser.add_button("Open", Gtk::RESPONSE_OK);
+
+    if(chooser.run() != Gtk::RESPONSE_OK)
+        return;
+
+    Project proj;
+    string filename = chooser.get_filename();
+    IOResult result = load_project(proj, filename);
+
+    if(!result.success)
+    {
+        display_error(*this, result.fail_msg);
+        return;
+    }
+    
+    current_filename = filename;
+    history_manager->load_project(proj);
+    _regen_title();
+}
+
+
+void MainWindow::on_save_as_click()
+{
+    Gtk::FileChooserDialog chooser(
+            "Choose a folder to save to.", 
+            Gtk::FileChooserAction::FILE_CHOOSER_ACTION_SELECT_FOLDER);
+    chooser.set_transient_for(*this);
+    chooser.add_button("Cancel", Gtk::RESPONSE_CANCEL);
+    chooser.add_button("Save", Gtk::RESPONSE_OK);
+
+    if(chooser.run() != Gtk::RESPONSE_OK)
+        return;
+    
+    current_filename = chooser.get_filename();
+    _do_save();
+    _regen_title();
+}
+
+
+void MainWindow::_do_save()
+{
+    IOResult result = save_project(history_manager->current_project, current_filename);
+
+    if(!result.success)
+    {
+        display_error(*this, result.fail_msg);
+        return;
+    }
+
+    history_manager->set_saved();
 }
 
 
@@ -197,9 +298,10 @@ void MainWindow::connect_cursor_signals()
 
 void MainWindow::_update_enabled()
 {
-    bool save_enabled = project_open;
+    bool save_as_enabled = project_open;
+    bool save_enabled = project_open && current_filename != "";
     file_save->set_sensitive(save_enabled);
-    file_save_as->set_sensitive(save_enabled);
+    file_save_as->set_sensitive(save_as_enabled);
     
     edit_undo->set_sensitive(project_open && may_undo);
     edit_redo->set_sensitive(project_open && may_redo);

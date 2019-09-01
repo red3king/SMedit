@@ -17,6 +17,7 @@
 
 using std::string;
 using std::vector;
+
 class Transition;
 
 
@@ -59,6 +60,10 @@ class State : public BoxEntity
 
     public:
         State(unsigned int id=0);
+        State(json jdata);
+
+        json to_json();
+
 
         string name;
         StateType type;

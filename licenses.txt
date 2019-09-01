@@ -16,3 +16,8 @@ http:://thenounproject.com
 
 Hack Font  -  https://sourcefoundry.org/hack/
 
+
+nlohmann::json  -  Niels Lohmann
+https://github.com/nlohmann/json
+
+

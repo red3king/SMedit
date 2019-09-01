@@ -64,6 +64,13 @@ IOResult::IOResult(bool success, string fail_msg)
 }
 
 
+IOResult::IOResult(bool success)
+{
+    this->success = success;
+    fail_msg = "";
+}
+
+
 void clip_angle(float& theta)
 {
     while(theta < 0)
@@ -94,10 +101,10 @@ void print_angle(float angle)
 }
 
 
-bool is_number(Glib::ustring text)
+bool is_number(Glib::ustring text, bool allow_float)
 {
     // return true if text consists of numbers and periods
-    string allowed = "1234567890.";
+    string allowed = allow_float ? "1234567890." : "1234567890";
     bool ok;
 
     for(int i=0; i<text.size(); i++)
@@ -150,6 +157,14 @@ bool string_to_float(float& result, string input)
     }
 
     return false;
+}
+
+
+void display_error(Gtk::Window& parent, string message)
+{
+    Gtk::MessageDialog dialog(parent, "Error", false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK);
+    dialog.set_secondary_text(message);
+    dialog.run();
 }
 
 

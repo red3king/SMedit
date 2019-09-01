@@ -11,8 +11,12 @@ class BoxEntity : public Entity
 {
     public:
         BoxEntity(unsigned int id=0);
-        float x, y, w, h;
+        BoxEntity(json jdata);
 
+        json to_json();
+
+        float x, y, w, h;
+        
         bool new_border_valid(BorderType border, float world_mouse_position);
 
     private:  

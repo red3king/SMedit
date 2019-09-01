@@ -1,47 +1,75 @@
 #include "machine.h"
 #include "state.h"
 #include "transition.h"
+#include "project.h"
 
 
 Machine::Machine(unsigned int id) : Entity(id) { }
 
 
-Machine::Machine(const Machine& other)
+Machine::Machine(const Machine& other) : Entity(other)
 {
-    _copy_from(other);
-}
-
-
-Machine& Machine::operator=(const Machine& other)
-{
-    _copy_from(other);
-    return *this;
-}
- 
-
-void Machine::_copy_from(const Machine& other)
-{
+    // copies fields and sub objects but does not assign their pointers
     name = other.name;
     run_on_start = other.run_on_start;
     
-    states = vector<State*>(other.states.size());
-    transitions = vector<Transition*>(other.transitions.size());
-    resourcelocks = vector<ResourceLock*>(other.resourcelocks.size());
+    states = vector<State*>();
+    transitions = vector<Transition*>();
+    resourcelocks = vector<ResourceLock*>();
 
     for(int i=0; i<other.states.size(); i++)
         states.push_back(new State(*other.states[i]));
 
     for(int i=0; i<other.transitions.size(); i++)
     {
-        Transition* copy_from = other.transitions[i];
-        Transition* transition = new Transition(*copy_from);
-        transition->from_state = get_state_by_id(copy_from->from_state->id);
-        transition->to_state = get_state_by_id(copy_from->to_state->id);
+        Transition* transition = new Transition(*other.transitions[i]);
         transitions.push_back(transition); 
     }
 
     for(int i=0; i<other.resourcelocks.size(); i++)
-        resourcelocks.push_back(new ResourceLock(*other.resourcelocks[i]));
+    {
+        auto new_lock = new ResourceLock(*other.resourcelocks[i]);
+        resourcelocks.push_back(new_lock);
+    }
+}
+
+
+Machine::Machine(json jdata) : Entity(jdata)
+{
+    name = jdata["name"];
+    run_on_start = jdata["run_on_start"];
+
+    for(int i=0; i<jdata["states"].size(); i++)
+        states.push_back(new State(jdata["states"][i]));
+
+    for(int i=0; i<jdata["transitions"].size(); i++)
+        transitions.push_back(new Transition(jdata["transitions"][i]));
+
+    for(int i=0; i<jdata["resourcelocks"].size(); i++)
+        resourcelocks.push_back(new ResourceLock(jdata["resourcelocks"][i]));
+}
+
+        
+json Machine::to_json()
+{
+    json jdata = Entity::to_json();
+    jdata["name"] = name;
+    jdata["run_on_start"] = run_on_start;
+
+    jdata["states"] = json::array();
+    jdata["transitions"] = json::array();
+    jdata["resourcelocks"] = json::array();
+
+    for(int i=0; i<states.size(); i++)
+        jdata["states"].push_back(states[i]->to_json());
+
+    for(int i=0; i<transitions.size(); i++)
+        jdata["transitions"].push_back(transitions[i]->to_json());
+
+    for(int i=0; i<resourcelocks.size(); i++)
+        jdata["resourcelocks"].push_back(resourcelocks[i]->to_json());
+
+    return jdata;
 }
 
 

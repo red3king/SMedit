@@ -1,11 +1,7 @@
 LEFT OFF HERE:
-    was working on the great controller refactor (to connect to proj open/close &  gui rebuild signals)
-    when i had to stop to refactor operations
-    now im back to refactoring the controllers. i have fixed GUIContext (not really controller but similar logic)
-        and the resouurces controller. next up is machines controller
-    just finished machines controller
-        the last 2 have felt pretty hacky, i wonder if there is a better way to organize my thinking/approach here
-
+    working on json
+        working on save code in saveload.cpp
+            need to finish writing the delete old python files code
 
 
 undoing and then redoing the same thing seems buggy, after a while there's no more undo/redo at all

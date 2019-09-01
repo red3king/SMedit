@@ -75,7 +75,10 @@ void ReturnStateController::on_retval_changed(LVOV retval)
 void ReturnStateController::_enable_vic(bool enabled)
 {
     if(!enabled)
-        value_input_ctrl->set_value(LVOV(""));
+    {
+        string empty = "";
+        value_input_ctrl->set_value(LVOV(empty));
+    }
 
     value_input_ctrl->set_enabled(enabled);
 }

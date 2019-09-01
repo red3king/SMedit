@@ -1,12 +1,13 @@
 #pragma once
 
 #include <string>
+#include "lib/json.hpp"
 
 #include "entity.h"
 #include "state.h"
 
 using std::string;
-
+using nlohmann::json;
 
 enum TransitionType { EVENT, TIMEOUT, CATCHALL };
 enum CornerPosition { CP_NONE=-1, CP_TL=0, CP_TR=1, CP_BL=2, CP_BR=3 };
@@ -51,6 +52,7 @@ class Transition : public Entity
 
     public:
         Transition(unsigned int id=0);
+        Transition(json jdata);
 
         TransitionType type;
         string event_name;  // only used for EVENT type
@@ -62,6 +64,7 @@ class Transition : public Entity
         float x0, y0, x1, y1;
 
         string describe();
+        json to_json();
 
         bool from_connected();
         bool to_connected();

@@ -30,7 +30,8 @@ class MainWindow : public Gtk::ApplicationWindow
         MachinesController* machines_controller;
 
         // UI state variables
-        bool project_open, may_undo, may_redo;
+        bool project_open, may_undo, may_redo, unsaved_changes;
+        string current_filename;
 
         // Widgets
         Gtk::GLArea* machine_edit_gl_area;
@@ -54,14 +55,20 @@ class MainWindow : public Gtk::ApplicationWindow
         void on_project_close();
         void on_close_click();
         void on_new_click();
+        void on_save_click();
+        void on_save_as_click();
+        void on_open_click();
         void on_about_click();
         void on_undo_click();
         void on_redo_click();
 
         void _update_enabled();
+        void _do_save();
 
     private:
         Glib::RefPtr<Gtk::Builder> builder;
         void on_history_changed(bool may_undo, bool may_redo);
+        void on_unsaved_changes_changed(bool unsaved_changes);
+        void _regen_title();
 };
 

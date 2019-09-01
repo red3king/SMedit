@@ -2,10 +2,13 @@
 
 #include <vector>
 
+#include "lib/json.hpp"
+
 #include "machine.h"
 #include "resource.h"
 
 using std::vector;
+using nlohmann::json;
 
 
 class Project
@@ -13,8 +16,12 @@ class Project
     public:
         Project(unsigned int id_ctr=0);
         Project(const Project& other);
+        Project(json jdata);
+
         Project& operator=(const Project& other);
         ~Project();
+
+        json to_json();
 
         vector<Resource*> resources;
         vector<Machine*> machines;  
@@ -32,6 +39,9 @@ class Project
     private:
         unsigned int id_ctr;
         void _copy_from(const Project& other);
+        void fix_machine_pointers(Machine* other_machine, Machine* new_machine);
+        void fix_machine_pointers(json other_json, Machine* new_machine);
+        void fix_transition_pointers(Machine* new_machine);
 };
 
 

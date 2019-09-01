@@ -1,5 +1,5 @@
-CXXFLAGS = -std=c++14 -iquote ./ -ggdb $(shell pkg-config --cflags  gtkmm-3.0 gtksourceviewmm-3.0 epoxy)
-LDFLAGS = $(shell pkg-config --libs gtkmm-3.0 gtksourceviewmm-3.0 epoxy)
+CXXFLAGS = -std=c++17 -iquote ./ -ggdb $(shell pkg-config --cflags  gtkmm-3.0 gtksourceviewmm-3.0 epoxy)
+LDFLAGS = -lstdc++fs $(shell pkg-config --libs gtkmm-3.0 gtksourceviewmm-3.0 epoxy)
 
 # generated source files (generated in place by cog)
 autogens = $(wildcard historymanager/operations/*.cpp) \
@@ -44,7 +44,7 @@ smedit-compile: $(obj)
 test: code-gen test-compile
 
 test-compile: $(testobj)
-	$(CXX) -o test $^ $(LDFLAGS)
+	$(CXX) -o smtest $^ $(LDFLAGS)
 
 
 ifeq ($(MAKECMDGOALS),smedit)
@@ -72,6 +72,6 @@ clean:
 	rm -f $(dep)
 
 	# delete test stuff
-	rm -f $(testobj) test
+	rm -f $(testobj) smtest
 	rm -f $(testdep)
 

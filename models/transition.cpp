@@ -20,6 +20,38 @@ Transition::Transition(unsigned int id) : Entity(id)
 }
 
 
+Transition::Transition(json jdata) : Entity(jdata)
+{
+    from_state = nullptr;
+    to_state = nullptr;
+    loopback_position = CP_NONE;
+
+    type = (TransitionType) jdata["type"];
+    event_name = jdata["event_name"];
+    timeout = jdata["timeout"];
+    x0 = jdata["x0"];
+    x1 = jdata["x1"];
+    y0 = jdata["y0"];
+    y1 = jdata["y1"];
+}
+
+
+json Transition::to_json()
+{
+    json jdata = Entity::to_json();
+    jdata["type"] = (int)type;
+    jdata["event_name"] = event_name;
+    jdata["timeout"] = timeout;
+    jdata["x0"] = x0;
+    jdata["x1"] = x1;
+    jdata["y0"] = y0;
+    jdata["y1"] = y1;
+    jdata["from_state"] = from_state == nullptr ? 0 : from_state->id;
+    jdata["to_state"] = to_state == nullptr ? 0 : to_state->id;
+    return jdata;
+}
+
+
 string Transition::describe()
 {
     if(type == EVENT)
