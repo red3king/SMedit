@@ -54,9 +54,33 @@ OpResourceDelete::OpResourceDelete(Resource* to_delete)
 }
 
 
+bool delete_next_resourcelock(vector<ResourceLock*>& resourcelocks, unsigned int resource_id)
+{
+    for(int i=0; i<resourcelocks.size(); i++)
+    {
+        ResourceLock* lock = resourcelocks[i];
+        if(lock->resource->id == resource_id)
+        {
+            signals.fire_model_changed(RESOURCELOCK, PRE_DELETE, lock->id);
+            delete lock;
+            resourcelocks.erase(resourcelocks.begin() + i);
+            return true;
+        }
+    }
+    return false;
+}
+
+
 unsigned int OpResourceDelete::execute(Project& project)
 {
     int rindex = project.get_rindex_by_id(to_delete_id);
+
+    // delete all resourcelocks using this first (user has confirmed)
+    for(int i=0; i<project.machines.size(); i++)
+    {
+        Machine* machine = project.machines[i];
+        while(delete_next_resourcelock(machine->resourcelocks, to_delete_id));
+    }
 
     signals.fire_model_changed(RESOURCE, PRE_DELETE, to_delete_id);
 

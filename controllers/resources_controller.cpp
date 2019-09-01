@@ -6,9 +6,10 @@
 using std::string;
 
 
-ResourcesController::ResourcesController(HistoryManager* history_manager, Glib::RefPtr<Gtk::Builder> const& builder) : TopController(history_manager)
+ResourcesController::ResourcesController(HistoryManager* history_manager, Glib::RefPtr<Gtk::Builder> const& builder, Gtk::Window* main_window) : TopController(history_manager)
 {
     is_setting = false;
+    this->main_window = main_window;
 
     builder->get_widget("resource_tree_view", resource_tree_view);
     builder->get_widget("create_resource_button", create_button);
@@ -63,6 +64,30 @@ void ResourcesController::on_create_clicked()
 
 void ResourcesController::on_delete_clicked()
 {
+    int resource_count = 0;
+
+    auto machines = &history_manager->current_project.machines;
+    for(int i=0; i<machines->size(); i++)
+    {
+        auto locks = &((*machines)[i]->resourcelocks);
+        for(int j=0; j<locks->size(); j++)
+        {
+            auto lock = (*locks)[j];
+            if(lock->resource == selected_resource)
+                resource_count++;
+        }
+    }
+
+    if(resource_count > 0)
+    {
+        Gtk::MessageDialog dialog(*main_window, "Hey", false, Gtk::MESSAGE_QUESTION, Gtk::BUTTONS_OK_CANCEL);
+        dialog.set_secondary_text("This resource is currently used by " + std::to_string(resource_count) + " resource locks. Deleting the resource will delete the locks. Do you want to continue?");
+
+        if(dialog.run() != Gtk::RESPONSE_OK)
+            return;
+
+    }
+
     auto op = OpResourceDelete(selected_resource);
     history_manager->submit_operation(op);
 }
@@ -119,10 +144,7 @@ void ResourcesController::load_from(Project& current_project, bool reload)
     _update_enabled();
 
     if(selected_resource_id != 0)
-    {
         list_view_controller->select_item(selected_resource_id);
-        //on_selection_changed(selected_resource_id); 
-    }
 }
 
 

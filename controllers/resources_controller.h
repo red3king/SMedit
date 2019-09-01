@@ -11,7 +11,7 @@ class ResourcesController : public TopController
 {
     // Handles the resources tab
     public:
-        ResourcesController(HistoryManager* history_manager, Glib::RefPtr<Gtk::Builder> const& builder);
+        ResourcesController(HistoryManager* history_manager, Glib::RefPtr<Gtk::Builder> const& builder, Gtk::Window* main_window);
         
     private:
         Gtk::TreeView* resource_tree_view;
@@ -19,6 +19,8 @@ class ResourcesController : public TopController
         Gtk::Label *name_label, *path_label;
         Gtk::Entry* name_entry;
         Gtk::FileChooserButton* path_file_chooser;
+
+        Gtk::Window* main_window;
 
         ListViewController* list_view_controller;
 

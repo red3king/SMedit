@@ -23,7 +23,7 @@ MainWindow::MainWindow(BaseObjectType* obj, Glib::RefPtr<Gtk::Builder> const& bu
 
     history_manager = new HistoryManager(50, 20, 15);
 
-    resources_controller = new ResourcesController(history_manager, builder);
+    resources_controller = new ResourcesController(history_manager, builder, this);
     machines_controller = new MachinesController(history_manager, builder);
 
     prepare_signals();
