@@ -21,3 +21,9 @@ nlohmann::json  -  Niels Lohmann
 https://github.com/nlohmann/json
 
 
+Base64 - Rene Nyffenegger 
+https://github.com/ReneNyffenegger/cpp-base64
+
+
+Boost::asio, crc, thread, lockfree - Boost project
+https://www.boost.org

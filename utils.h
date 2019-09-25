@@ -48,6 +48,8 @@ class IOResult
 };
 
 
+string int_to_hex_string(int input);
+
 
 // String to number helpers
 // returns true when input is valid

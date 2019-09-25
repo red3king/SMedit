@@ -10,6 +10,7 @@
 
 #include "controllers/resources_controller.h"
 #include "controllers/machines_controller.h"
+#include "controllers/run/run_controller.h"
 #include "historymanager/historymanager.h"
 #include "gui/gui_context.h"
 #include "signals.h"
@@ -28,6 +29,7 @@ class MainWindow : public Gtk::ApplicationWindow
 
         ResourcesController* resources_controller;
         MachinesController* machines_controller;
+        RunController* run_controller;
 
         // UI state variables
         bool project_open, may_undo, may_redo, unsaved_changes;

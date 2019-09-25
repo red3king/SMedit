@@ -54,4 +54,16 @@ void Signals::fire_pre_gui_rebuild_signal()
 }
 
 
+void Signals::fire_project_saved(uint16_t hash)
+{
+    project_save.emit(hash);
+}
+
+
+void Signals::fire_project_loaded(uint16_t hash)
+{
+    project_load.emit(hash);
+}
+
+
 Signals signals;

@@ -101,6 +101,14 @@ void print_angle(float angle)
 }
 
 
+string int_to_hex_string(int input)
+{
+    std::stringstream stream;
+    stream << std::hex << input;
+    return string(stream.str());
+}
+
+
 bool is_number(Glib::ustring text, bool allow_float)
 {
     // return true if text consists of numbers and periods

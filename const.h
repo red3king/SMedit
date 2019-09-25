@@ -23,3 +23,7 @@ ValueType string_to_value_type(string str);
 enum BorderType { BT_NONE, BT_TOP, BT_RIGHT, BT_BOTTOM, BT_LEFT };
 
 
+
+#define SERV_RESP_SUCCESS 1
+#define SERV_RESP_FAILURE 0
+

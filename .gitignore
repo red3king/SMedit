@@ -7,4 +7,5 @@ test
 *.d
 *.pyc
 __pycache__
+venv
 

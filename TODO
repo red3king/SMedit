@@ -1,8 +1,4 @@
-LEFT OFF HERE:
-    working on json
-        working on save code in saveload.cpp
-            need to finish writing the delete old python files code
-
+next: work on adding actions and building the deploy/run process
 
 undoing and then redoing the same thing seems buggy, after a while there's no more undo/redo at all
  

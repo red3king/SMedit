@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <experimental/filesystem>
+#include <boost/crc.hpp>
 
 #include "saveload.h"
 
@@ -51,13 +52,17 @@ bool get_code_py_id(string file, unsigned int& id)
 }
 
 
-IOResult save_project(Project& project, string save_path)
+IOResult save_project(Project& project, string save_path, uint16_t& crc_out)
 {
+    
+    boost::crc_ccitt_type crc_thingy;
+
     try 
     {
         // save project
         json jdata = project.to_json();
         string jstr = jdata.dump(4);
+        crc_thingy.process_bytes(jstr.c_str(), jstr.length());
         string json_filename = save_path + "/project.json";
         std::ofstream jfile(json_filename);
         jfile << jstr;
@@ -74,6 +79,7 @@ IOResult save_project(Project& project, string save_path)
                     continue;
 
                 string save_file = save_code(project.machines[i]->states[j], save_path);
+                crc_thingy.process_bytes(save_file.c_str(), save_file.length());
                 saved_code_files.push_back(save_file);
             }
 
@@ -104,23 +110,39 @@ IOResult save_project(Project& project, string save_path)
         return IOResult(false, "Damn, " + what);
     }
 
+    crc_out = crc_thingy.checksum();
     return IOResult(true);
 }
 
 
-IOResult load_project(Project& project, string load_path)
+IOResult load_project(Project& project, string load_path, uint16_t& crc_out)
 {
+    boost::crc_ccitt_type crc_thingy;
     string json_filename = load_path + "/project.json";
     std::ifstream jfile(json_filename);
     
     if(!jfile.is_open())
         return IOResult(false, "could not open " + json_filename);
+    
+    string file_str;
+
+    try
+    {
+        file_str = string(std::istreambuf_iterator<char>(jfile),
+                        std::istreambuf_iterator<char>());
+        crc_thingy.process_bytes(file_str.c_str(), file_str.length());
+    }
+    
+    catch(...)
+    {
+        return IOResult(false, "could not read " + json_filename);
+    }
 
     json jdata;
     
     try
     {
-        jfile >> jdata;
+        jdata = json::parse(file_str);
     }
     
     catch(...)
@@ -150,8 +172,10 @@ IOResult load_project(Project& project, string load_path)
             return IOResult(false, "could not read " + file);
 
         string code((std::istreambuf_iterator<char>(codefile)), std::istreambuf_iterator<char>());
+        crc_thingy.process_bytes(code.c_str(), code.length());
         state->code = code;
     }   
     
+    crc_out = crc_thingy.checksum();
     return IOResult(true);
 }

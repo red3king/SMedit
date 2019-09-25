@@ -24,9 +24,13 @@ class Signals
         Signals();
 
         sigc::signal<void> project_open, project_close;
+        sigc::signal<void, uint16_t> project_save, project_load;
+        
         sigc::signal<void, EntityType, SignalType, unsigned int> model_changed;
         sigc::signal<void, Machine*, EntityType, Entity*> model_selected;
+        
         sigc::signal<void> pre_gui_rebuild, gui_rebuild;
+
 
         void register_set_cursor_handler(SetCursorHandler handler);
         void fire_set_cursor(CursorType cursor_type);
@@ -38,6 +42,9 @@ class Signals
 
         void fire_gui_rebuild_signal();
         void fire_pre_gui_rebuild_signal();
+
+        void fire_project_saved(uint16_t hash);
+        void fire_project_loaded(uint16_t hash);
 
     private:
         bool gui_signals_enabled;
