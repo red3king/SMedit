@@ -14,6 +14,8 @@ class Actionator
         Actionator(LineClient* line_client);
         
         void submit_action(Action* action);
+        void cancel_action(Action* action);
+        void cancel_all();
 
     private:
         int action_id_ctr;
@@ -21,6 +23,8 @@ class Actionator
         LineClient* line_client;
 
         void on_line_received(string line);
+        void on_disconnect(bool intentional);
+
         void _purge_timed_out();
 };
 

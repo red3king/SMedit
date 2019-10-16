@@ -1,12 +1,13 @@
-#!/usr/bin/python3.6
-
+#!./venv/bin/python
 from twisted.protocols.basic import LineReceiver
 from twisted.internet.protocol import Factory
 from twisted.internet import reactor, protocol
 from twisted.internet.endpoints import TCP4ServerEndpoint
 
+
 from command_handler import CommandHandler
 from project_runner import ProjectRunner
+from utils import clear
 
 
 
@@ -30,7 +31,7 @@ class LJProtocol(LineReceiver):
         self.client = ConnectedClient(self)
         self.command_handler.add_client(self.client)
 
-    def connectionLost(self):
+    def connectionLost(self, reason):
         self.command_handler.remove_client(self.client)
 
     def lineReceived(self, line):
@@ -47,10 +48,16 @@ class LJFactory(Factory):
 
 
 def main():
+    clear()
+    print("\n    ====== smsrv v0.0.1 ======\n")
+    print("loading...")
+
     project_runner = ProjectRunner()
     command_handler = CommandHandler(project_runner)
     factory = LJFactory(command_handler)
 
+    print("running reactor\n")
+    
     endpoint = TCP4ServerEndpoint(reactor, 24203)
     endpoint.listen(factory)
     reactor.run()

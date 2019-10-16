@@ -15,6 +15,7 @@
 #include "gui/gui_context.h"
 #include "signals.h"
 #include "cursor.h"
+#include "saveload.h"
 
 
 class MainWindow : public Gtk::ApplicationWindow 
@@ -26,6 +27,7 @@ class MainWindow : public Gtk::ApplicationWindow
 
         HistoryManager* history_manager;
         GUIContext* gui_context;
+        ProjectInfo project_info;
 
         ResourcesController* resources_controller;
         MachinesController* machines_controller;

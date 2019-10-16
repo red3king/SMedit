@@ -10,6 +10,7 @@ Actionator::Actionator(LineClient* line_client)
     action_id_ctr = 0;
     this->line_client = line_client;
     line_client->line_received_signal.connect(sigc::mem_fun(this, &Actionator::on_line_received));
+    line_client->disconnection_signal.connect(sigc::mem_fun(this, &Actionator::on_disconnect));
 }
 
 
@@ -21,6 +22,45 @@ void Actionator::submit_action(Action* action)
     string result = base64_encode((unsigned char*)jstr.c_str(), jstr.length()) + "\r\n";
     current_actions.push_back(action);
     line_client->send(result);
+}
+
+
+void Actionator::on_disconnect(bool intentional)
+{
+    cancel_all();
+}
+
+
+void Actionator::cancel_action(Action* action)
+{
+    int i=0;
+    for(; i<current_actions.size(); i++)
+    {
+        auto cur = current_actions[i];
+        if(action == cur)
+        {
+            action->do_timeout();
+            delete action;
+            break;
+        }
+    }
+
+    if(i < current_actions.size())
+        current_actions.erase(current_actions.begin() + i);
+}
+
+
+void Actionator::cancel_all()
+{
+    for(int i=0; i<current_actions.size(); i++)
+    {
+        auto cur = current_actions[i];
+        cur->do_timeout();
+        delete cur;
+    }
+
+    while(current_actions.size())
+        current_actions.erase(current_actions.begin());
 }
 
 
@@ -56,7 +96,7 @@ void Actionator::on_line_received(string line)
 
     if(status == SERV_RESP_SUCCESS)
     {
-        try { result = response["result"]; }
+        try { result = response["resp"]; }
         catch (...) { log("actionator: missing result"); return; }
     }
 
@@ -69,12 +109,13 @@ void Actionator::on_line_received(string line)
     // Find action to handle response
     int i;
     bool found = false;
+    ActionStatus action_status;
     for(i=0; i<current_actions.size(); i++)
     {
         if(current_actions[i]->id == message_id)
         {
             found = true;
-            current_actions[i]->handle_response(status, response, error);
+            action_status = current_actions[i]->handle_response(status, result, error);
             break;
         }
     }
@@ -82,14 +123,27 @@ void Actionator::on_line_received(string line)
     if(!found)
         log("Actionator: couldnt find action matching response!!!!");
 
+    Action* next_action = nullptr;
+
     // Remove finished action
     if(i < current_actions.size())
     {
-        delete current_actions[i];
+        auto action = current_actions[i];
+        next_action = action->get_next_action();
+        delete action;
         current_actions.erase(current_actions.begin() + i);
     }
 
     _purge_timed_out();
+
+    // Handle chained actions
+    if(next_action != nullptr)
+    {
+        if(action_status == AS_SUCCESS)
+            submit_action(next_action);
+        else
+            next_action->fail_chain();  // fails callback, and deletes this and subsequent actions
+    }
 }
 
 

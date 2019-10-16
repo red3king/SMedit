@@ -3,7 +3,9 @@ LDFLAGS = -lstdc++fs $(shell pkg-config --libs gtkmm-3.0 gtksourceviewmm-3.0 epo
 
 # generated source files (generated in place by cog)
 autogens = $(wildcard historymanager/operations/*.cpp) \
-		   $(wildcard historymanager/operations/*.h)
+		   $(wildcard historymanager/operations/*.h) \
+		   $(wildcard net/actions/simple_commands.cpp) \
+		   $(wildcard net/actions/simple_commands.h)
 
 # source files used by test and smedit
 presrc = $(filter-out main.cpp, $(filter-out test_main.cpp, $(wildcard *.cpp))) \

@@ -1,5 +1,8 @@
 import json
 import base64
+import traceback
+
+from common import InadequateUserException
 
 RESP_SUCCESS = 1
 RESP_FAILURE = 0
@@ -12,15 +15,21 @@ class CommandHandler(object):
         project_runner.set_command_handler(self)
         self.project_runner = project_runner
         self.handlers = {
-                "echo": self.echo_handler
-                }
+                "echo": self.echo_handler,
+                "new project": self.new_project_handler,
+                "add file": self.add_file_handler,
+                "start project": self.start_project_handler,
+                "stop project": self.stop_project_handler,
+                "pause project": self.pause_project_handler,
+                "unpause project": self.unpause_project_handler,
+                "project hash": self.project_hash_handler
+            }
 
     def add_client(self, client):
         self.project_runner.add_client(client)
 
     def remove_client(self, client):
         self.project_runner.remove_client(client)
-
 
     def handle_command(self, client, command_str):
         if len(command_str) < 1:
@@ -34,7 +43,7 @@ class CommandHandler(object):
             print('\t' + str(exp) + '\n')
             return
 
-        print("cmd = " + str(command_str) + "\n")
+        print("cmd = " + str(data) + "\n")
 
         try:
             jdata = json.loads(data)
@@ -57,7 +66,13 @@ class CommandHandler(object):
             resp = self.unknown_handler(client, message_id)
 
         else:
-            resp = self.handlers[command_id](client, message_id, command_json)
+            try:
+                resp = self.handlers[command_id](client, message_id, command_json)
+            except InadequateUserException as ex:
+                resp = self.fail_response(message_id, "you messed up - " + repr(ex))
+
+            except Exception as ex:
+                resp = self.fail_response(message_id, "UNHANDLED EXCPETION: " + traceback.format_exc())
 
         if resp is not None:
             print("resp = " + str(resp) + "\n")
@@ -76,15 +91,15 @@ class CommandHandler(object):
             "status": RESP_SUCCESS
         }
 
-        return jdict #return self.resp_to_line(jdict)
+        return jdict
 
     def fail_response(self, message_id, reason=""):
         jdict = {
             "mid": message_id,
-            "status": RESP_FAIL,
+            "status": RESP_FAILURE,
             "err": reason
         }
-        return jdict # self.resp_to_line(jdict)
+        return jdict
 
     def unknown_handler(self, client, message_id):
         return self.fail_response(message_id, "unknown command")
@@ -92,6 +107,47 @@ class CommandHandler(object):
     def echo_handler(self, client, message_id, command_json):
         return self.success_response(message_id)
 
+    def new_project_handler(self, client, message_id, command_json):
+        self.project_runner.new_project()
+        return self.success_response(message_id)
 
+    def add_file_handler(self, client, message_id, command_json):
+        """
+        expects command_json = {
+            "name": "filename.py",
+            "data": "023920b009f039"   #base64
+        }
+        """
+        
+        try:
+            filename = command_json["name"]
+            data = command_json["data"]
+        
+        except KeyError:
+            raise InadequateUserException("missing field!")
 
+        self.project_runner.project_add_file(filename, data)
+        return self.success_response(message_id)
+
+    def start_project_handler(self, client, message_id, command_json):
+        self.project_runner.start_project()
+        return self.success_response(message_id)
+
+    def stop_project_handler(self, client, message_id, command_json):
+        self.project_runner.stop_project()
+        return self.success_response(message_id)
+
+    def pause_project_handler(self, client, message_id, command_json):
+        self.project_runner.pause_project()
+        return self.success_response(message_id)
+
+    def unpause_project_handler(self, client, message_id, command_json):
+        self.project_runner.unpause_project()
+        return self.success_response(message_id)
+    
+    def project_hash_handler(self, client, message_id, command_json):
+        hash_val = self.project_runner.hash_project()
+        return self.success_response(message_id, { "hash": hash_val } )
+
+    
 

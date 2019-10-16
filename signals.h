@@ -24,7 +24,7 @@ class Signals
         Signals();
 
         sigc::signal<void> project_open, project_close;
-        sigc::signal<void, uint16_t> project_save, project_load;
+        sigc::signal<void> project_save, project_load;
         
         sigc::signal<void, EntityType, SignalType, unsigned int> model_changed;
         sigc::signal<void, Machine*, EntityType, Entity*> model_selected;
@@ -43,8 +43,8 @@ class Signals
         void fire_gui_rebuild_signal();
         void fire_pre_gui_rebuild_signal();
 
-        void fire_project_saved(uint16_t hash);
-        void fire_project_loaded(uint16_t hash);
+        void fire_project_saved();
+        void fire_project_loaded();
 
     private:
         bool gui_signals_enabled;

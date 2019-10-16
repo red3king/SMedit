@@ -4,18 +4,21 @@
 #include <boost/crc.hpp>
 
 #include "saveload.h"
+#include "log.h"
+
 
 using std::string;
 using namespace std::experimental;
 
 
-string save_code(State* state, string save_path)
+string save_code(ProjectInfo& project_info, State* state, string save_path)
 {
     if(state->code == "")
         return "";
 
     string filename = state->name + "_" + std::to_string(state->id) + ".py";
     string save_name = save_path + "/" + filename;
+    project_info.add_file(filename, state->code);
     std::ofstream cfile(save_name);
     cfile << state->code;
     cfile.close();
@@ -52,17 +55,15 @@ bool get_code_py_id(string file, unsigned int& id)
 }
 
 
-IOResult save_project(Project& project, string save_path, uint16_t& crc_out)
+IOResult save_project(Project& project, ProjectInfo& project_info, string save_path)
 {
-    
-    boost::crc_ccitt_type crc_thingy;
-
+    project_info.reset();
     try 
     {
         // save project
         json jdata = project.to_json();
         string jstr = jdata.dump(4);
-        crc_thingy.process_bytes(jstr.c_str(), jstr.length());
+        project_info.add_file("project.json", jstr);
         string json_filename = save_path + "/project.json";
         std::ofstream jfile(json_filename);
         jfile << jstr;
@@ -78,8 +79,7 @@ IOResult save_project(Project& project, string save_path, uint16_t& crc_out)
                 if(state->type != CODE)
                     continue;
 
-                string save_file = save_code(project.machines[i]->states[j], save_path);
-                crc_thingy.process_bytes(save_file.c_str(), save_file.length());
+                string save_file = save_code(project_info, project.machines[i]->states[j], save_path);
                 saved_code_files.push_back(save_file);
             }
 
@@ -110,14 +110,13 @@ IOResult save_project(Project& project, string save_path, uint16_t& crc_out)
         return IOResult(false, "Damn, " + what);
     }
 
-    crc_out = crc_thingy.checksum();
     return IOResult(true);
 }
 
 
-IOResult load_project(Project& project, string load_path, uint16_t& crc_out)
+IOResult load_project(Project& project, ProjectInfo& project_info, string load_path)
 {
-    boost::crc_ccitt_type crc_thingy;
+    project_info.reset();
     string json_filename = load_path + "/project.json";
     std::ifstream jfile(json_filename);
     
@@ -130,7 +129,7 @@ IOResult load_project(Project& project, string load_path, uint16_t& crc_out)
     {
         file_str = string(std::istreambuf_iterator<char>(jfile),
                         std::istreambuf_iterator<char>());
-        crc_thingy.process_bytes(file_str.c_str(), file_str.length());
+        project_info.add_file("project.json", file_str);
     }
     
     catch(...)
@@ -156,9 +155,10 @@ IOResult load_project(Project& project, string load_path, uint16_t& crc_out)
     for(const auto& entry : filesystem::directory_iterator(load_path))
     {
         auto path = entry.path();
-        string file = (string) path;
+        string filepath = (string) path;
+        string filename = path.filename();
 
-        if(!get_code_py_id(file, state_id))
+        if(!get_code_py_id(filepath, state_id))
             continue;
         
         State* state = dynamic_cast<State*>(project.get_entity_by_id(state_id));
@@ -166,16 +166,86 @@ IOResult load_project(Project& project, string load_path, uint16_t& crc_out)
         if(state == nullptr)
             continue;
 
-        std::ifstream codefile(file);
+        std::ifstream codefile(filepath);
         
         if(!codefile.is_open())
-            return IOResult(false, "could not read " + file);
+            return IOResult(false, "could not read " + filepath);
 
         string code((std::istreambuf_iterator<char>(codefile)), std::istreambuf_iterator<char>());
-        crc_thingy.process_bytes(code.c_str(), code.length());
+        project_info.add_file(filename, code);
         state->code = code;
     }   
     
-    crc_out = crc_thingy.checksum();
     return IOResult(true);
 }
+
+
+// ProjectInfo
+
+ProjectInfo::ProjectInfo()
+{
+    reset();
+}
+
+
+bool ProjectInfo::has_project()
+{
+    return hash != 0;
+}
+
+
+void ProjectInfo::reset()
+{
+    hash_calculated = false;
+    hash = 0;
+    filename_to_data.clear();
+    saved_project = Project();
+}
+
+
+void ProjectInfo::add_file(string filename, string filedata)
+{
+    filename_to_data[filename] = filedata;
+    hash_calculated = false;
+}
+
+
+uint16_t ProjectInfo::get_hash()
+{
+    if(hash_calculated)
+        return hash;
+    
+    hash = 0;
+    for(auto it = filename_to_data.begin(); it != filename_to_data.end(); it++)
+    {
+        boost::crc_32_type crc_comp;
+        crc_comp.process_bytes(it->second.c_str(), it->second.length());
+        hash ^= crc_comp.checksum();
+    }
+
+    hash_calculated = true;
+    return hash;
+}
+
+
+int ProjectInfo::get_num_files()
+{
+    return filename_to_data.size();
+}
+
+
+string ProjectInfo::get_filename(int i)
+{
+    auto it = filename_to_data.begin();
+    while(i--) it++;
+    return it->first;
+}
+
+
+string ProjectInfo::get_filedata(int i)
+{
+    auto it = filename_to_data.begin();
+    while(i--) it++;
+    return it->second;
+}
+

@@ -1,25 +1,32 @@
 #include "run_controller.h"
 #include "utils.h"
 #include "net/actions/all.h"
+#include <gdkmm/rgba.h>
+
 #include "log.h"
 
 
-RunController::RunController(HistoryManager* history_manager, Glib::RefPtr<Gtk::Builder> const& builder) : actionator(&line_client)
+
+RunController::RunController(HistoryManager* history_manager, ProjectInfo* project_info, Glib::RefPtr<Gtk::Builder> const& builder) : actionator(&line_client) , rgb_same("green") , rgb_unknown("white") , rgb_different("red")
 {
     project_open = false;
     is_connected = false;
     has_deployed_project = false;
     is_connecting = false;
+    hash_state = HS_UNKNOWN;
 
-    local_checksum = CHK_NONE;
+    local_checksum = CHK_UNKNOWN;
     server_checksum = CHK_UNKNOWN;
     this->history_manager = history_manager;
+    this->project_info = project_info;
 
     builder->get_widget("server_name_entry", server_entry);
     builder->get_widget("server_hash_label", server_hash_label);
     builder->get_widget("project_hash_label", project_hash_label);
     builder->get_widget("connect_button", connect_button);
     builder->get_widget("deploy_button", deploy_button);
+    builder->get_widget("start_button", start_button);
+    builder->get_widget("pause_button", pause_button);
 
     signals.project_save.connect(sigc::mem_fun(this, &RunController::on_project_saved));
     signals.project_load.connect(sigc::mem_fun(this, &RunController::on_project_loaded));
@@ -36,16 +43,16 @@ RunController::RunController(HistoryManager* history_manager, Glib::RefPtr<Gtk::
 }
 
 
-void RunController::on_project_loaded(uint16_t hash)
+void RunController::on_project_loaded()
 {
-    local_checksum = hash;
+    local_checksum = project_info->get_hash();
     update_enabled();
 }
 
 
-void RunController::on_project_saved(uint16_t hash)
+void RunController::on_project_saved()
 {
-    local_checksum = hash;
+    local_checksum = project_info->get_hash();
     update_enabled();
 }
 
@@ -63,18 +70,26 @@ void RunController::on_project_close()
     update_enabled();
 }
 
-/*
- * on connect
- *      get server checksum
- *          fail? disconnect
- *      
- *      update_enabled
- */
 
 void RunController::on_connection_attempt_complete(ConnectionResult result)
 {
     is_connected = result == CR_SUCCESS;
     is_connecting = false;
+
+    update_enabled();
+    begin_get_hash();
+}
+
+
+void RunController::on_get_hash_complete(Action* action)
+{
+    GetHash* get_hash = (GetHash*) action;
+
+    if(get_hash->status == AS_SUCCESS)
+        server_checksum = get_hash->project_hash;
+    else
+        server_checksum = CHK_UNKNOWN;
+
     update_enabled();
 }
 
@@ -83,6 +98,7 @@ void RunController::on_disconnection(bool intentional)
 {
     is_connected = false;
     is_connecting = false;
+    server_checksum = CHK_UNKNOWN;
     update_enabled();
 }
 
@@ -100,28 +116,27 @@ void RunController::on_connect_click()
 }
 
 
-void RunController::on_echo_complete(Action* echo)
-{
-    if(echo->status == AS_SUCCESS)
-        log("ECHO SUCCESS!!!!!!");
-    else
-        log("ECHO FAILURE.. ");
-}
-
-
 void RunController::on_deploy_click()
 {
-    ActionCB cb = boost::bind(&RunController::on_echo_complete, this, _1);
-    auto echo = new Echo(cb);
-    actionator.submit_action(echo);
+    auto new_project = new NewProjectAction();
+
+    for(int i=0; i<project_info->get_num_files(); i++)
+    {
+        string filename = project_info->get_filename(i);
+        string data = project_info->get_filedata(i);
+        auto upload = new AddFileAction(filename, data);
+        new_project->add_next_action(upload);
+    }
+
+    auto hash_cb = boost::bind(&RunController::on_get_hash_complete, this, _1);
+    auto get_hash = new GetHash(hash_cb);
+    new_project->add_next_action(get_hash);
+    actionator.submit_action(new_project);
 }
 
 
 string make_hash_label(int hash)
 {
-    if(hash == CHK_NONE)
-        return "no project";
-
     if(hash == CHK_UNKNOWN)
         return "unknown";
 
@@ -129,8 +144,36 @@ string make_hash_label(int hash)
 }
 
 
+void RunController::begin_get_hash()
+{
+    auto cb = boost::bind(boost::mem_fn(&RunController::on_get_hash_complete), this, _1);
+    auto action = new GetHash(cb);
+    actionator.submit_action(action);
+}
+
+
 void RunController::update_enabled()
 {
+    // logic
+    HashState new_hash_state = HS_UNKNOWN;
+    if(is_connected && local_checksum != CHK_UNKNOWN && server_checksum != CHK_UNKNOWN)
+        new_hash_state = local_checksum == server_checksum ? HS_SAME : HS_DIFFERENT;
+
+    if(new_hash_state != hash_state)
+    {
+        if(hash_state == HS_SAME)
+        {
+            //enable stuff
+        }
+        else if(hash_state == HS_DIFFERENT)
+        {
+            //disable stuff
+        }
+    }
+
+    hash_state = new_hash_state;
+
+    // widget updates
     server_entry->set_sensitive(project_open && !is_connected && !is_connecting);
     deploy_button->set_sensitive(project_open && is_connected && !is_connecting);
     
@@ -147,58 +190,28 @@ void RunController::update_enabled()
 
     connect_button->set_label(connect_text);
     connect_button->set_sensitive(connect_enabled);
+
+    auto color = get_color(hash_state);
+    project_hash_label->override_color(color);
+    server_hash_label->override_color(color);
+
+    bool hash_match = hash_state == HS_SAME;
+    start_button->set_sensitive(is_connected && hash_match);
+    pause_button->set_sensitive(is_connected && hash_match);
 }
 
-/*
- *
- * update_enabled      
- *
- *      if !has_deployed_project
- *          if server_checksum == local_checksum and they are not CHK_NONE:
- *              has_deployed_project = true
- *              deployed_project = hm.current_project
- *
- *      connect/disconnect - always enabled
- *      deploy - enabled if connected
- *      command buttons - enabled if connected and has_deployed_project is true
- *      server name entry - enabled if not connected
- *
- *
- *      ============
- *
- *
- *      on deploy
- *          (do deploy)
- *          has_deployed_project = true
- *          deployed_project = hm.current_project
- *          update_enabled
- *
- *      on connect 
- *          get server chksum
- *              fail? disconnect
- *          match?
- *              has_deployed_project = true
- *              deployed_project = hm.current_project
- *          mismatch
- *              has_deployed_project = false
- *
- *          update_enabled
- *      
- *      on disconnect
- *          has_deployed_project = false
- *          deployed_project = Project()
- *          update_enabled
- *
- *      on save
- *          local_checksum = new_crc
- *          update_enabled
- *
- *      on load
- *          local_checksum = new_crc
- *          update_enabled
- *      
- *
- *
- *
- *
- */
+
+Gdk::RGBA RunController::get_color(HashState hash_state)
+{
+    // get color for hash labels
+    switch(hash_state)
+    {
+        case HS_SAME:
+            return rgb_same;
+        case HS_DIFFERENT:
+            return rgb_different;
+        default:
+            return rgb_unknown;
+    }
+}
+

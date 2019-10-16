@@ -1,7 +1,6 @@
-next: work on adding actions and building the deploy/run process
+
 
 undoing and then redoing the same thing seems buggy, after a while there's no more undo/redo at all
- 
 
 
 bug

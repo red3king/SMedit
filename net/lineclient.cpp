@@ -193,6 +193,7 @@ void LineClient::on_send(const boost::system::error_code& error, std::size_t num
 void LineClient::thread_code()
 {
     log("LineClient::thread_code()");
+    io_service.reset();   // called restart() in latest version, TODO get that version
     socket = new tcp::socket(io_service);
     tcp::resolver::query query(connect_hostname, std::to_string(SMPORT)); 
     tcp::resolver::iterator it;

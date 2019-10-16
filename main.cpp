@@ -1,6 +1,5 @@
 #include "main.h"
 
-#include "saveload.h"
 #include "log.h"
 #include "utils.h"
 #include "historymanager/operations/machine_ops.h"
@@ -25,7 +24,7 @@ MainWindow::MainWindow(BaseObjectType* obj, Glib::RefPtr<Gtk::Builder> const& bu
 
     resources_controller = new ResourcesController(history_manager, builder, this);
     machines_controller = new MachinesController(history_manager, builder, this);
-    run_controller = new RunController(history_manager, builder);
+    run_controller = new RunController(history_manager, &project_info, builder);
 
     prepare_signals();
     machine_edit_gl_area->signal_realize().connect(sigc::mem_fun(this, &MainWindow::connect_cursor_signals));
@@ -192,8 +191,7 @@ void MainWindow::on_open_click()
 
     Project proj;
     string filename = chooser.get_filename();
-    uint16_t crc;
-    IOResult result = load_project(proj, filename, crc);
+    IOResult result = load_project(proj, project_info, filename);
 
     if(!result.success)
     {
@@ -203,7 +201,7 @@ void MainWindow::on_open_click()
     
     current_filename = filename;
     history_manager->load_project(proj);
-    signals.fire_project_loaded(crc);
+    signals.fire_project_loaded();
     _regen_title();
 }
 
@@ -228,9 +226,8 @@ void MainWindow::on_save_as_click()
 
 void MainWindow::_do_save()
 {
-    uint16_t crc;
-    IOResult result = save_project(history_manager->current_project, current_filename, crc);
-    signals.fire_project_saved(crc);
+    IOResult result = save_project(history_manager->current_project, project_info, current_filename);
+    signals.fire_project_saved();
 
     if(!result.success)
     {

@@ -1,4 +1,4 @@
-from .generator import *
+from .op_generator import *
 os = OperationSpec
 
 
