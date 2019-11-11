@@ -5,10 +5,11 @@
 #include "log.h"
 
 
-Actionator::Actionator(LineClient* line_client)
+Actionator::Actionator(LineClient* line_client, BroadcastEvents* broadcast_events)
 {
     action_id_ctr = 0;
     this->line_client = line_client;
+    this->broadcast_events = broadcast_events;
     line_client->line_received_signal.connect(sigc::mem_fun(this, &Actionator::on_line_received));
     line_client->disconnection_signal.connect(sigc::mem_fun(this, &Actionator::on_disconnect));
 }
@@ -76,6 +77,33 @@ void Actionator::on_line_received(string line)
     try { response = json::parse(line); }
     catch (...) { log("actionator: line invalid"); return; }
 
+    bool is_broadcast;
+
+    try { is_broadcast = response["broadcast"]; }
+
+    catch(nlohmann::detail::type_error& ex)
+    {
+        log("actionator: missing broadcast field");
+        return;
+    }
+
+    if(is_broadcast)
+        handle_broadcast(response);
+
+    else
+        handle_response(response);
+
+}
+
+
+void Actionator::handle_broadcast(json broadcast)
+{
+    broadcast_events->handle_broadcast(broadcast);
+}
+
+
+void Actionator::handle_response(json response)
+{
     int message_id;
     int status;
     string error;
@@ -142,7 +170,7 @@ void Actionator::on_line_received(string line)
         if(action_status == AS_SUCCESS)
             submit_action(next_action);
         else
-            next_action->fail_chain();  // fails callback, and deletes this and subsequent actions
+            next_action->fail_chain("prev action in chain failed:\r\n" + error);  // fails callback, and deletes this and subsequent actions
     }
 }
 

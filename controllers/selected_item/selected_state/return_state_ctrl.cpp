@@ -4,6 +4,7 @@
 
 ReturnStateController::ReturnStateController(HistoryManager* history_manager) : StateTypeController(history_manager)
 {
+    // TODO - both of these appear to have no effect! is this for real?
     is_emitting = false;
     is_setting = false;
 

@@ -1,3 +1,23 @@
+LOH:
+    just got my demo program running!
+    NEXT UP, COMMIT
+    then fix the bug where clicking on a state causes smedit to crash after opening the demo program #1
+        the transitions have pointers to states, which are incorrect
+        this is despite gdb showing me that the fix_transition_pointers / fix_machine_pointers
+            functions are being properly called.
+        the transition object which crashes is at a differnet address than the one that got fixed when loading,
+            so there's a copying going on (expected, the project copy constructors should fix all machine pointers,             the code shows that to be true, but somehow I missed something.)
+
+
+next, make the client's runcontroller reset the project_running and project_paused variables
+    also, make the start/stop and pause/unpause buttons be "pause" or "unpause" not both.
+
+at some point, find a way to catch errors in the functions sent into the twisted event loop, 
+    and display those on the client.
+
+
+then: Render the execution
+then: add in custom state types & implement http and file io states.
 
 
 undoing and then redoing the same thing seems buggy, after a while there's no more undo/redo at all

@@ -43,7 +43,7 @@ class Action
         void add_next_action(Action* next_action);  // add action to be run if next if this one succeeds
         bool has_next_action();
         Action* get_next_action();
-        void fail_chain();
+        void fail_chain(string failed_action_error);
 
     private:
         void _init();

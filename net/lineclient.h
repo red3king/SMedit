@@ -12,6 +12,7 @@
 
 #define SMPORT 24203
 #define BUFLEN 4096
+#define MAX_SEND_LENGTH BUFLEN-2
 
 using boost::asio::ip::tcp;
 
@@ -45,11 +46,12 @@ class LineClient
         char receive_array[BUFLEN];
         char send_array[BUFLEN];
         string partial_line;
+        bool is_sending;
 
         void thread_code();
         void begin_receive();
         void on_receive(const boost::system::error_code& error, std::size_t num_bytes);
-        void do_send();
+        void do_send(string line);
         void on_send(const boost::system::error_code& error, std::size_t num_bytes);
         void do_disconnect(bool intentional);
         void do_intentional_disconnect();

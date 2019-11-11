@@ -7,6 +7,7 @@ from .action_generator import ActionGenerator
 ACTION_SPECS = [
     #(class name, command id)
         ("NewProjectAction", "new project"),
+        ("LoadProjectAction", "load project"),
         ("StartProjectAction", "start project"),
         ("StopProjectAction", "stop project"),
         ("PauseProjectAction", "pause project"),

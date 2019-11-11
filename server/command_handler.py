@@ -13,11 +13,13 @@ class CommandHandler(object):
 
     def __init__(self, project_runner):
         project_runner.set_command_handler(self)
+        self.connected_clients = []
         self.project_runner = project_runner
         self.handlers = {
                 "echo": self.echo_handler,
                 "new project": self.new_project_handler,
                 "add file": self.add_file_handler,
+                "load project": self.load_project_handler,
                 "start project": self.start_project_handler,
                 "stop project": self.stop_project_handler,
                 "pause project": self.pause_project_handler,
@@ -25,11 +27,14 @@ class CommandHandler(object):
                 "project hash": self.project_hash_handler
             }
 
+    def send_broadcast(self):
+        pass
+
     def add_client(self, client):
-        self.project_runner.add_client(client)
+        self.connected_clients.append(client)
 
     def remove_client(self, client):
-        self.project_runner.remove_client(client)
+        self.connected_clients.remove(client)
 
     def handle_command(self, client, command_str):
         if len(command_str) < 1:
@@ -79,13 +84,28 @@ class CommandHandler(object):
             line = self.resp_to_line(resp)
             client.send_response(line)
 
+    def send_broadcast(self, broadcast_data):
+        message = self.broadcast_message(broadcast_data)
+        line = self.resp_to_line(message)
+        
+        for client in self.connected_clients:
+            client.send_response(line)
 
     def resp_to_line(self, response_dict):
         str_data = json.dumps(response_dict)
         return base64.b64encode(str_data.encode('ascii'))
 
+    def broadcast_message(self, broadcast_data):
+        jdict = {
+            "broadcast": True,
+            "resp": broadcast_data
+        }
+
+        return jdict
+
     def success_response(self, message_id, response_data=None):
         jdict = {
+            "broadcast": False,
             "mid": message_id,
             "resp": {} if response_data is None else response_data,
             "status": RESP_SUCCESS
@@ -95,10 +115,12 @@ class CommandHandler(object):
 
     def fail_response(self, message_id, reason=""):
         jdict = {
+            "broadcast": False,
             "mid": message_id,
             "status": RESP_FAILURE,
             "err": reason
         }
+
         return jdict
 
     def unknown_handler(self, client, message_id):
@@ -147,7 +169,9 @@ class CommandHandler(object):
     
     def project_hash_handler(self, client, message_id, command_json):
         hash_val = self.project_runner.hash_project()
-        return self.success_response(message_id, { "hash": hash_val } )
+        return self.success_response(message_id, { "hash": hash_val })
 
-    
+    def load_project_handler(self, client, message_id, command_json):
+        self.project_runner.load_project()
+        return self.success_response(message_id)
 

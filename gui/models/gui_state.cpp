@@ -155,6 +155,8 @@ void GMState::draw_interior_join(float x, float y, float w, float h)
 {
     text("Pid variable:", ORANGE);
     text("  " + state->join_pid_variable, WHITE);
+    text("Result variable:", ORANGE);
+    text("  " + state->join_result_variable, WHITE);
 }
 
 

@@ -63,10 +63,10 @@ Action* Action::get_next_action()
 }
 
 
-void Action::fail_chain()
+void Action::fail_chain(string failed_action_error)
 {
     status = AS_FAIL;
-    error_message = "";
+    error_message = failed_action_error;
     
     if(callback)
         callback(this);
@@ -74,7 +74,7 @@ void Action::fail_chain()
     if(next_action == nullptr)
         return;
        
-    next_action->fail_chain();
+    next_action->fail_chain(failed_action_error);
     delete next_action;
 }
 

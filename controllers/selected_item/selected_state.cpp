@@ -18,8 +18,6 @@ SelectedState::SelectedState(HistoryManager* history_manager, Glib::RefPtr<Gtk::
     builder->get_widget("state_name_entry", name_entry);
     builder->get_widget("state_type_combobox", type_combobox);    
     builder->get_widget("selected_state_stack", state_types_stack);
-
-    builder->get_widget("join_pidvar_entry", join_pidvar_entry);
    
     // init return value ctrl 
     Gtk::Box* return_grid;
@@ -42,11 +40,18 @@ SelectedState::SelectedState(HistoryManager* history_manager, Glib::RefPtr<Gtk::
     spawn_state_ctrl = new SpawnStateController(history_manager);
     spawn_state_ctrl->attach(spawn_box);
 
+    // init join state ctrl
+    Gtk::Grid* join_grid;
+    Gtk::Entry *pid_var_entry, *result_variable_entry;
+    builder->get_widget("state_join_selected", join_grid);
+    builder->get_widget("join_pidvar_entry", pid_var_entry);
+    builder->get_widget("join_resultvar_entry", result_variable_entry);
+    join_state_ctrl = new JoinStateController(history_manager, pid_var_entry, result_variable_entry);
+
 
     name_entry->signal_changed().connect(sigc::mem_fun(this, &SelectedState::on_name_changed));
     type_combobox->signal_changed().connect(sigc::mem_fun(this, &SelectedState::on_type_changed));
     delete_button->signal_clicked().connect(sigc::mem_fun(this, &SelectedState::on_delete_clicked));
-    join_pidvar_entry->signal_changed().connect(sigc::mem_fun(this, &SelectedState::on_jpidvar_changed));
 }
 
 
@@ -79,13 +84,6 @@ void SelectedState::on_code_changed(string code)
 void SelectedState::on_initial_state_changed(vector<ArgDef> arguments)
 {
     auto op = OpStateInitialArgs(owning_machine, selected_state, arguments);
-    history_manager->submit_operation(op);
-}
-
-
-void SelectedState::on_jpidvar_changed()
-{
-    auto op = OpStateJoinPidVariable(owning_machine, selected_state, join_pidvar_entry->get_text());
     history_manager->submit_operation(op);
 }
 
@@ -133,11 +131,11 @@ void SelectedState::update()
     name_entry->set_text(selected_state->name);
     type_combobox->set_active_text(state_type_to_string(selected_state->type));
 
-    join_pidvar_entry->set_text(selected_state->join_pid_variable);
     initial_state_ctrl->set_config(selected_state->initial_args);
     code_state_ctrl->set_text(selected_state->code);
     spawn_state_ctrl->set_state(owning_machine, selected_state);
     return_state_ctrl->set_state(owning_machine, selected_state);
+    join_state_ctrl->set_state(owning_machine, selected_state);
 
     if(selected_state->type == INITIAL)
         state_types_stack->set_visible_child(STK_INITIAL_ID);

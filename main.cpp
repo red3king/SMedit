@@ -17,6 +17,7 @@ MainWindow::MainWindow(BaseObjectType* obj, Glib::RefPtr<Gtk::Builder> const& bu
     may_undo = false;
     may_redo = false;
     unsaved_changes = false;
+    main_window = this;
 
     get_widgets();
 
@@ -162,12 +163,6 @@ void MainWindow::on_new_click()
 }
 
 
-void MainWindow::on_save_click()
-{
-   _do_save(); 
-}
-
-
 void MainWindow::on_open_click()
 {
     if(unsaved_changes)
@@ -195,7 +190,7 @@ void MainWindow::on_open_click()
 
     if(!result.success)
     {
-        display_error(*this, result.fail_msg);
+        display_error(result.fail_msg);
         return;
     }
     
@@ -203,6 +198,15 @@ void MainWindow::on_open_click()
     history_manager->load_project(proj);
     signals.fire_project_loaded();
     _regen_title();
+}
+
+
+void MainWindow::on_save_click()
+{
+    if(current_filename == "")
+        on_save_as_click();
+    else
+        _do_save(); 
 }
 
 
@@ -231,7 +235,7 @@ void MainWindow::_do_save()
 
     if(!result.success)
     {
-        display_error(*this, result.fail_msg);
+        display_error(result.fail_msg);
         return;
     }
 
@@ -300,11 +304,10 @@ void MainWindow::connect_cursor_signals()
 
 void MainWindow::_update_enabled()
 {
-    bool save_as_enabled = project_open;
-    bool save_enabled = project_open && current_filename != "";
+    bool save_enabled = project_open;
     file_save->set_sensitive(save_enabled);
-    file_save_as->set_sensitive(save_as_enabled);
-    
+    file_save_as->set_sensitive(save_enabled);
+
     edit_undo->set_sensitive(project_open && may_undo);
     edit_redo->set_sensitive(project_open && may_redo);
 

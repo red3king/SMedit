@@ -25,6 +25,14 @@ string NewProjectAction::get_command_id() { return "new project"; }
 
 
 
+LoadProjectAction::LoadProjectAction(ActionCB callback) : Action(callback) { }
+
+LoadProjectAction::LoadProjectAction() : Action() { }
+
+string LoadProjectAction::get_command_id() { return "load project"; }
+
+
+
 StartProjectAction::StartProjectAction(ActionCB callback) : Action(callback) { }
 
 StartProjectAction::StartProjectAction() : Action() { }

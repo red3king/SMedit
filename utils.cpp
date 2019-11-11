@@ -7,6 +7,9 @@
 #include <iostream>
 
 
+Gtk::Window* main_window;
+
+
 bool file_to_string(string filename, string& output)
 {   
     try 
@@ -168,11 +171,21 @@ bool string_to_float(float& result, string input)
 }
 
 
-void display_error(Gtk::Window& parent, string message)
+// UI Helpers
+
+void display_error(/*Gtk::Window& parent,*/ string message)
 {
-    Gtk::MessageDialog dialog(parent, "Error", false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK);
+    Gtk::MessageDialog dialog(/*parent*/ *main_window, "Error", false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK);
     dialog.set_secondary_text(message);
     dialog.run();
+}
+
+
+void display_action_error(/*Gtk::Window& parent,*/ Action* failed_action)
+{
+    string message = "Server action " + std::to_string(failed_action->id) + " failed:\r\n\r\n" + 
+        failed_action->error_message;
+    display_error(/*parent,*/ message);
 }
 
 

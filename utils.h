@@ -5,6 +5,8 @@
 #include <string>
 #include <gtkmm.h>
 
+#include "net/action.h"
+
 
 using std::string;
 
@@ -59,7 +61,9 @@ bool string_to_float(float& result, string input);
 
 
 // UI Helpers
-void display_error(Gtk::Window& parent, string message);
+extern Gtk::Window* main_window;
+void display_error(/*Gtk::Window& parent,*/ string message);
+void display_action_error(/*Gtk::Window& parent,*/ Action* failed_action);
 
 // add value types to combo box
 void prepare_value_type_combobox(Gtk::ComboBoxText* combo_box);

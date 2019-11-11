@@ -45,6 +45,7 @@ State::State(unsigned int id) : BoxEntity(id)
     string empty = "";
     launch_task_name = LVOV(empty);
     has_return_value = false;
+    code = "def code_func(vars_dict, trigger_event=None):\r\n    pass\r\n";
 } 
 
 
@@ -64,6 +65,7 @@ State::State(json jdata) : BoxEntity(jdata), return_value(jdata["return_value"])
 
     launch_result_variable = jdata["launch_result_variable"];
     join_pid_variable = jdata["join_pid_variable"];    
+    join_result_variable = jdata["join_result_variable"];
 }
 
 
@@ -81,7 +83,8 @@ json State::to_json()
     jdata["launch_args"] = json::array();
     jdata["launch_result_variable"] = launch_result_variable;
     jdata["join_pid_variable"] = join_pid_variable;
-    
+    jdata["join_result_variable"] = join_result_variable;
+
     for(int i=0; i<initial_args.size(); i++)
         jdata["initial_args"].push_back(initial_args[i].to_json());
 

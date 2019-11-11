@@ -26,6 +26,15 @@ class NewProjectAction : public Action
 };
 
             
+class LoadProjectAction : public Action
+{
+    public:
+        LoadProjectAction(ActionCB callback);
+        LoadProjectAction();
+        string get_command_id();
+};
+
+            
 class StartProjectAction : public Action
 {
     public:

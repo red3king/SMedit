@@ -7,12 +7,14 @@
 
 
 
-RunController::RunController(HistoryManager* history_manager, ProjectInfo* project_info, Glib::RefPtr<Gtk::Builder> const& builder) : actionator(&line_client) , rgb_same("green") , rgb_unknown("white") , rgb_different("red")
+RunController::RunController(HistoryManager* history_manager, ProjectInfo* project_info, Glib::RefPtr<Gtk::Builder> const& builder) : actionator(&line_client, &broadcast_events) , rgb_same("green") , rgb_unknown("white") , rgb_different("red")
 {
     project_open = false;
     is_connected = false;
     has_deployed_project = false;
     is_connecting = false;
+    project_started = false;
+    project_paused = false;
     hash_state = HS_UNKNOWN;
 
     local_checksum = CHK_UNKNOWN;
@@ -38,6 +40,8 @@ RunController::RunController(HistoryManager* history_manager, ProjectInfo* proje
 
     connect_button->signal_clicked().connect(sigc::mem_fun(this, &RunController::on_connect_click));
     deploy_button->signal_clicked().connect(sigc::mem_fun(this, &RunController::on_deploy_click));
+    start_button->signal_clicked().connect(sigc::mem_fun(this, &RunController::on_start_click));
+    pause_button->signal_clicked().connect(sigc::mem_fun(this, &RunController::on_pause_click));
 
     update_enabled();
 }
@@ -88,7 +92,10 @@ void RunController::on_get_hash_complete(Action* action)
     if(get_hash->status == AS_SUCCESS)
         server_checksum = get_hash->project_hash;
     else
+    {
         server_checksum = CHK_UNKNOWN;
+        display_action_error(action);
+    }
 
     update_enabled();
 }
@@ -116,6 +123,8 @@ void RunController::on_connect_click()
 }
 
 
+//////  Deploy Project  //////
+
 void RunController::on_deploy_click()
 {
     auto new_project = new NewProjectAction();
@@ -127,12 +136,59 @@ void RunController::on_deploy_click()
         auto upload = new AddFileAction(filename, data);
         new_project->add_next_action(upload);
     }
+    
+    auto load_project = new LoadProjectAction();
+    new_project->add_next_action(load_project);
 
     auto hash_cb = boost::bind(&RunController::on_get_hash_complete, this, _1);
     auto get_hash = new GetHash(hash_cb);
     new_project->add_next_action(get_hash);
     actionator.submit_action(new_project);
 }
+
+
+//////  Start / Stop project behavior  //////
+
+void RunController::on_start_click()
+{
+    // TODO - learn what the _1 and _2 are for
+    // are these placeholders for when your function takes many arguments which you don't care
+    // about passing in? Or something else? Can I compile this without passing _1 here??
+
+    auto start_stop_cb = boost::bind(&RunController::on_start_stop_complete, this, _1);
+    Action* action;
+    
+    if(project_started)
+        action = new StopProjectAction(start_stop_cb);
+    else
+        action = new StartProjectAction(start_stop_cb);
+
+    actionator.submit_action(action);
+}
+
+
+void RunController::on_start_stop_complete(Action* action)
+{
+    if(action->status != AS_SUCCESS)
+    {
+        display_action_error(action);
+        return;
+    }
+
+    project_started = !project_started;
+    update_enabled();
+}
+
+
+////// Pause / Unpause project behavior  //////
+
+void RunController::on_pause_click()
+{
+
+}
+
+
+
 
 
 string make_hash_label(int hash)

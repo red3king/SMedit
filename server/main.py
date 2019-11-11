@@ -23,6 +23,8 @@ class ConnectedClient(object):
 
 
 class LJProtocol(LineReceiver):
+    # "line json" protocol
+
     def __init__(self, command_handler):
         self.command_handler = command_handler
         self.client = None
@@ -39,7 +41,6 @@ class LJProtocol(LineReceiver):
 
 
 class LJFactory(Factory):
-
     def __init__(self, command_handler):
         self.command_handler = command_handler
 

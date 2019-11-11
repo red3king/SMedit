@@ -7,6 +7,7 @@ LineClient::LineClient() : resolver(io_service), lines_to_send(50), received_lin
     log("LineClient::LineClient()");
     socket = nullptr;
     last_connection_result = CR_SUCCESS;
+    is_sending = false;
 
     line_receive_dispatch.connect(sigc::mem_fun(this, &LineClient::on_line_receive_dispatch));
     connect_dispatch.connect(sigc::mem_fun(this, &LineClient::on_connect_disp));
@@ -81,11 +82,8 @@ void LineClient::on_line_receive_dispatch()
 void LineClient::begin_receive()
 {
     auto receive_buffer = boost::asio::buffer(receive_array, BUFLEN);
-    auto bound = boost::bind(boost::mem_fn(&LineClient::on_receive), this, _1, _2); //boost::ref(finder), _1, _2);
+    auto bound = boost::bind(boost::mem_fn(&LineClient::on_receive), this, _1, _2); 
     socket->async_receive(receive_buffer, bound);
-    
-    //socket->async_receive(receive_buffer, boost::bind(&LineClient::on_receive, this));//
-           // boost::asio::placeholders::error));
 }
 
 
@@ -147,46 +145,52 @@ void LineClient::on_receive(const boost::system::error_code& error, std::size_t 
 
 void LineClient::send(string line)
 {
+    line += "\r\n";
     log("LineClient::send(" + line + ")");
+
+    while(line.length() > MAX_SEND_LENGTH)
+    {
+        lines_to_send.push(line.substr(0, MAX_SEND_LENGTH));
+        line = line.substr(MAX_SEND_LENGTH);
+    }
+
     lines_to_send.push(line);
-    io_service.post(boost::bind(&LineClient::do_send, this));
+    
+    lines_to_send.pop(line);
+    io_service.post(boost::bind(&LineClient::do_send, this, line));
 }
 
 
-void LineClient::do_send()
+void LineClient::do_send(string line)
 {
-    string line;
+    if(is_sending)
+        return;
+
+    is_sending = true;
+
     int len;
+    len = line.length();
 
-    while(lines_to_send.pop(line))
-    {
-        len = line.length();
-
-        if(len > BUFLEN - 2)
-            throw "message too long to send! TODO replace with real exception! or multiple send calls!";
-
-        for(int i=0; i<len; i++)
-            send_array[i] = line[i];
-        
-        send_array[len++] = '\r';
-        send_array[len++] = '\n';
-
-        auto bound = boost::bind(boost::mem_fn(&LineClient::on_send), this, _1, _2);
-        socket->async_send(boost::asio::buffer(send_array, len), bound);
-
-        //socket->async_send(boost::asio::buffer(send_array, len), 
-        //        boost::bind(&LineClient::on_send, this));//, boost::asio::placeholders::error));
-    }
+    for(int i=0; i<len; i++)
+        send_array[i] = line[i];
+    
+    auto bound = boost::bind(boost::mem_fn(&LineClient::on_send), this, _1, _2);
+    socket->async_send(boost::asio::buffer(send_array, len), bound);
 }
 
 
 void LineClient::on_send(const boost::system::error_code& error, std::size_t num_bytes)
 {
+    is_sending = false;
     if(error == boost::asio::error::eof || error == boost::asio::error::connection_reset)
     {
         do_disconnect(false);
         return;
     }
+
+    string next_line;
+    if(lines_to_send.pop(next_line))
+        do_send(next_line);
 }
 
 

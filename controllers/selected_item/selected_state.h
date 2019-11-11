@@ -8,6 +8,7 @@
 #include "selected_state/code_state.h"
 #include "selected_state/spawn_state_ctrl.h"
 #include "selected_state/return_state_ctrl.h"
+#include "selected_state/join_state_ctrl.h"
 #include "models/state.h"
 
 
@@ -27,6 +28,7 @@ class SelectedState : public SelectedItemController
         CodeStateController* code_state_ctrl;
         SpawnStateController* spawn_state_ctrl;
         ReturnStateController* return_state_ctrl;
+        JoinStateController* join_state_ctrl;
 
         // widgets
         Gtk::Button* delete_button;
@@ -35,13 +37,10 @@ class SelectedState : public SelectedItemController
         Gtk::ComboBoxText* type_combobox;
         Gtk::Stack* state_types_stack;
 
-        Gtk::Entry* join_pidvar_entry;
-
         void on_name_changed();
         void on_type_changed();
         void on_delete_clicked();
 
-        void on_jpidvar_changed();
         void on_initial_state_changed(vector<ArgDef> arguments);
         void on_code_changed(string code);
 

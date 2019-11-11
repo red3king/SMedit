@@ -65,7 +65,7 @@ string Transition::describe()
     }
 
     if(type == CATCHALL)
-        return "else";
+        return "*";
 }
 
 

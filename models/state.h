@@ -86,6 +86,7 @@ class State : public BoxEntity
 
         // Join  done
         string join_pid_variable;
+        string join_result_variable; 
 
         vector<Transition*> incoming_transitions, outgoing_transitions;
 
