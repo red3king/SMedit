@@ -69,6 +69,31 @@ State::State(json jdata) : BoxEntity(jdata), return_value(jdata["return_value"])
 }
 
 
+State::State(const State& other) : BoxEntity(other)
+{
+    name = other.name;
+    type = other.type;
+
+    initial_args = other.initial_args;
+
+    code = other.code;
+
+    has_return_value = other.has_return_value;
+    return_value = other.return_value;
+
+    launch_synchronous = other.launch_synchronous;
+    launch_task_name = other.launch_task_name;
+    launch_args = other.launch_args;
+    launch_result_variable = other.launch_result_variable;
+
+    join_pid_variable = other.join_pid_variable;
+    join_result_variable = other.join_result_variable;
+
+    // had to define this because we need the vectors of transition pointers
+    // to start empty instead of referring to old ones
+}
+
+
 json State::to_json()
 {
     json jdata = BoxEntity::to_json();

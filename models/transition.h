@@ -53,6 +53,7 @@ class Transition : public Entity
     public:
         Transition(unsigned int id=0);
         Transition(json jdata);
+        Transition(const Transition &other);
 
         TransitionType type;
         string event_name;  // only used for EVENT type

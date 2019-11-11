@@ -20,6 +20,25 @@ Transition::Transition(unsigned int id) : Entity(id)
 }
 
 
+Transition::Transition(const Transition &other) : Entity(other)
+{
+    // defining to keep pointer null
+    type = other.type;
+    event_name = other.event_name;
+    timeout = other.timeout;
+
+    from_state = nullptr;
+    to_state = nullptr;
+
+    x0 = other.x0;
+    x1 = other.x1;
+    y0 = other.y0;
+    y1 = other.y1;
+
+    loopback_position = other.loopback_position;
+}
+
+
 Transition::Transition(json jdata) : Entity(jdata)
 {
     from_state = nullptr;

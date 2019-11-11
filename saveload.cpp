@@ -149,7 +149,9 @@ IOResult load_project(Project& project, ProjectInfo& project_info, string load_p
         return IOResult(false, "could not parse " + json_filename);        
     }
  
-    project = Project(jdata);
+    project = Project(jdata);   // TODO maybe reconsider the frequent copying (assignment, copy ctor, etc)
+                                // of Project objects, happens 2 unnecessary times on project load now
+                                // This could get slow when projects get big.
 
     unsigned int state_id;
     for(const auto& entry : filesystem::directory_iterator(load_path))

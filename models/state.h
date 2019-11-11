@@ -61,6 +61,7 @@ class State : public BoxEntity
     public:
         State(unsigned int id=0);
         State(json jdata);
+        State(const State &other);
 
         json to_json();
 
