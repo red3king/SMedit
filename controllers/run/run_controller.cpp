@@ -253,7 +253,9 @@ void RunController::update_enabled()
 
     bool hash_match = hash_state == HS_SAME;
     start_button->set_sensitive(is_connected && hash_match);
+    start_button->set_label(project_started ? "stop" : "start");
     pause_button->set_sensitive(is_connected && hash_match);
+    pause_button->set_label(project_paused ? "unpause" : "pause"); 
 }
 
 
