@@ -6,7 +6,7 @@
 #include "gui/animation_timer.h"
 
 
-#define AUTO_PAN_SECONDS 2.0
+#define AUTO_PAN_SECONDS 1.2
 
 
 class AutoPan : public GUIOperation

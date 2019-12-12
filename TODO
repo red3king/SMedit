@@ -1,17 +1,4 @@
-LOH - working on modifying GUIContext & GUIState to add "running project display mode"
-
-    everything is working!
-        except not
-        doing a linear interpolation from x0, y0, zoom0, -> x1, y1, zoom1 does not result in a "linear" looking zoom, or a path
-        that goes in a straight line for that matter
-            
-            what to do:
-                -review and commit current code
-                -then try refactor gui_context.cpp, auto_pan.cpp and current_events.cpp
-                    so that the calculation for target_zooom is used each update of auto_pan,
-                    to get the target zoom for the current x and y coordinates
-                
-
+LOH - done with fixing auto pan, see below bugs:
 
     bug - changing state type to code
         may end up with blank code window, should have function

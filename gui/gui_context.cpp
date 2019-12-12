@@ -54,18 +54,9 @@ void GUIContext::rs_hndl_select_state(int state_def_id)
     calc_to_state_zoom(state_def, target_x, target_y, target_zoom);
 
     float current_x, current_y, current_zoom;
-    //float sch = gl_area->get_height();
-    //float scw = gl_area->get_width();
-    //gui_state.draw_context.screen_to_world(current_x, current_y, scw/2.0, sch/2.0);
     gui_state.draw_context.get_offsets(current_x, current_y);
-    log("gui context rs_hdnl_select_state:");
-    log("\tcurrent_x = " + std::to_string(current_x));
-    log("\tcurrent_y = " + std::to_string(current_y));
     current_zoom = gui_state.draw_context.get_zoom_factor();
     
-    //target_x = current_x;
-    //target_y = current_y;
-    //target_zoom = current_zoom;
     current_events.enable_ap(current_x, current_y, current_zoom, target_x, target_y, target_zoom);
     gui_state.rs_state_select(state_def_id);
     update();
@@ -87,40 +78,20 @@ void GUIContext::calc_to_state_zoom(State* state, float& target_x, float& target
             longest_transition = length;
     }
 
-    // goal:
-    //      in screen coordinates, longest transition should be approrzimately
-    //      the size of the screen
-    //
-    //      1. translate longest_transition into screen coordinates
+    // goal -  in screen coordinates, longest transition should be approrximately 
+    // the size of the screen
     float longest_transition_screen = gui_state.draw_context.world_dist_to_screen(longest_transition);
-    //      2. let r = longest_trans_screen / screen_width
     float half_screen_diagonal = sqrt(pow(scw,2) + pow(sch,2)) / 2.0;
     float ratio = longest_transition_screen / half_screen_diagonal;
-    //      3. target_zoom = current_zoom * r (or diviede by r dependig on how zoom is defined)
-    
-    
-    // TEMPORARY
-    //ratio = 1.0;
     
     target_zoom = gui_state.draw_context.get_zoom_factor() / ratio;
 
-
     // target x,y is center of the state:
-    log("sch = " + std::to_string(sch) + ", scw = " + std::to_string(scw));
-    float half_screen_w = .5 * scw / target_zoom; //gui_state.draw_context.screen_dist_to_world(scw)/2.0;
-    float half_screen_h = .5 * sch / target_zoom; //gui_state.draw_context.screen_dist_to_world(sch)/2.0;
+    float half_screen_w = .5 * scw / target_zoom;
+    float half_screen_h = .5 * sch / target_zoom;
 
     target_x = state->x + state->w/2.0 - half_screen_w;
     target_y = state->y + state->h/2.0 - half_screen_h;
-    
-    log("calc_to_state_zoom state id " + std::to_string(state->id));
-    log("\tstate.x = " + std::to_string(state->x) + ", w = " + std::to_string(state->w));
-    log("\tstate.y = " + std::to_string(state->y) + ", h = " + std::to_string(state->h));
-    //log("\tcurrent zoom = " + std::to_string(gui_state.draw_context.get_zoom_factor()));
-    log("\ttarget x = " + std::to_string(target_x));
-    log("\ttarget y = " + std::to_string(target_y));
-    //log("\ttarget zoom = " + std::to_string(target_zoom));
-    
 }
 
 
@@ -129,7 +100,6 @@ void GUIContext::set_machine(Machine* current_machine)
     this->current_machine = current_machine;
     current_machine_id = current_machine->id;
     gui_state.set_machine(current_machine);
-
 
     // pan to location of initial state
     State* state = nullptr;

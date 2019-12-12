@@ -10,7 +10,7 @@ using std::map;
 typedef boost::function<void()> AnimationCB;
 
 
-#define ANIMATION_TICK_MS 35
+#define ANIMATION_TICK_MS 33    // 30 fps, but event loop probably runs around 15 fps or something
 
 
 class AnimationTimer

@@ -49,29 +49,29 @@ double AutoPan::get_elapsed_seconds(CurrentEvents& current_events)
 
 bool AutoPan::on_continue(GUIState& gui_state, CurrentEvents& current_events, Operation*& op)
 {
-    //log("auto pan on_continue()");
     CurrentEvents& c = current_events;
     float dt = get_elapsed_seconds(current_events);
     float t = dt / AUTO_PAN_SECONDS;   // t is parameter from 0 to 1
 
-    //  f(x) = x0 + t(x1 - x0) linear interp on position
+    //  f(x) = x0 + t(x1 - x0) linear interpolate position
     float new_x = c.ap_initial_x + t * (c.ap_target_x - c.ap_initial_x);
     float new_y = c.ap_initial_y + t * (c.ap_target_y - c.ap_initial_y);
 
+    /*
+     * When we move the world offset linearly in time and move the zoom factor linearly in time,
+     * this turns out not to be a smooth zoom/pan. 
+     *
+     * Instead, math was done to ensure that the path of all screen coordinate pairs remain lines
+     * as the zoom factor changes. That math results in the following calculation:
+    */
 
-    // some exponential stuff so the thing doesnt spiral
-    float new_z = c.ap_initial_zoom + t*t * (c.ap_target_zoom - c.ap_initial_zoom);
+    float z0_inv = 1.0 / c.ap_initial_zoom;
+    float z1_inv = 1.0 / c.ap_target_zoom;
+    float new_z = 1.0 / (z0_inv + t * (z1_inv - z0_inv)); 
     
-    
-    log("\tt=" + std::to_string(t));
     float old_x, old_y;
     gui_state.draw_context.get_offsets(old_x, old_y);
-    log("\told_x=" + std::to_string(old_x));
-    log("\told_y=" + std::to_string(old_y));
-    log("\tnew_x=" + std::to_string(new_x));
-    log("\tnew_y=" + std::to_string(new_y));
-    
-    //log("\tnew_z=" + std::to_string(new_z));
+
     gui_state.draw_context.move_raw(new_x, new_y);
     gui_state.draw_context.zoom_raw(new_z);
     return false;

@@ -54,7 +54,7 @@ void GMState::draw_interior(float x, float y, float w, float h)
 
     // TODO make current selection better ? at the very least, make sure pink has good contrast
     // to all interior colors
-    auto bg_col = is_current_state ? PINK : nvgRGBA(0x00, 0x2b, 0x36, 155); 
+    auto bg_col = is_current_state ? ORANGEREDSEETHROUGH : nvgRGBA(0x00, 0x2b, 0x36, 155); 
     nvgFillColor(vg, bg_col);
     nvgFill(vg);
 
