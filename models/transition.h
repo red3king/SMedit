@@ -72,6 +72,8 @@ class Transition : public Entity
         bool any_connected();
         bool is_loopback();
 
+        float get_length();
+
         void update_positions();    // moves the transtion after connecting to state or movoing state
 
     private:

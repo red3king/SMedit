@@ -155,7 +155,6 @@ unsigned int Project::get_next_id()
 
 Machine* Project::get_machine_by_id(unsigned int id)
 {
-    int i = -1;
     for(int j=0; j<machines.size(); j++)
     {
         if(machines[j]->id == id)

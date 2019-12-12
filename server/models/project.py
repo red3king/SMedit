@@ -27,6 +27,7 @@ class Project(object):
         return self._loaded
 
     def on_broadcast(self, broadcast):
+        print("PROJECT GOT BCAST = " + str(broadcast))
         self.broadcast_signal(broadcast)
 
     def on_machine_finished(self, machine, return_value):

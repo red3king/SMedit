@@ -27,9 +27,6 @@ class CommandHandler(object):
                 "project hash": self.project_hash_handler
             }
 
-    def send_broadcast(self):
-        pass
-
     def add_client(self, client):
         self.connected_clients.append(client)
 
@@ -48,7 +45,7 @@ class CommandHandler(object):
             print('\t' + str(exp) + '\n')
             return
 
-        print("cmd = " + str(data) + "\n")
+        print("RECV:\t" + str(data) + "\n")
 
         try:
             jdata = json.loads(data)
@@ -80,11 +77,12 @@ class CommandHandler(object):
                 resp = self.fail_response(message_id, "UNHANDLED EXCPETION: " + traceback.format_exc())
 
         if resp is not None:
-            print("resp = " + str(resp) + "\n")
+            print("SEND: " + str(resp) + "\n")
             line = self.resp_to_line(resp)
             client.send_response(line)
 
     def send_broadcast(self, broadcast_data):
+        print("SEND BCAST:\t" + str(broadcast_data))
         message = self.broadcast_message(broadcast_data)
         line = self.resp_to_line(message)
         

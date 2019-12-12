@@ -2,13 +2,14 @@
 
 #include <string>
 
+#include <gtkmm.h>
 #include "lib/nanovg/nanovg.h"
 
 
 class DrawContext
 {
     public:
-        DrawContext();
+        DrawContext(Gtk::GLArea* gl_area);
         void set_nvg_context(NVGcontext* vg);
         
         // transforms between screen coordinates in pixels and the world
@@ -19,6 +20,9 @@ class DrawContext
 
         void move(float world_dx, float world_dy);  // move viewport, in world coords
         void zoom(float zoom_amount, float fp_screen_x, float fp_screen_y);  // zoom in/out from fixed point
+
+        void move_raw(float world_x, float world_y);
+        void zoom_raw(float zoom_factor);   // straight up set zoom factor
 
         void reset();
 
@@ -38,6 +42,14 @@ class DrawContext
         int icon_coding, icon_flow, icon_fork, icon_join, icon_lock,
             icon_uturn;
 
-    private:
+        float get_zoom_factor();
+        void get_offsets(float& woffset_x, float& woffset_y);
+
+        void get_screen_size(int &screen_x, int &screen_y);
+
+        Gtk::GLArea* get_gl_area();
+
         float zoom_factor, woffset_x, woffset_y;
+    private:
+        Gtk::GLArea* gl_area;  // to get screen size
 };

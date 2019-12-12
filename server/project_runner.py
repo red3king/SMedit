@@ -7,18 +7,12 @@ class ProjectRunner(object):
 
     def __init__(self):
         self.command_handler = None
-        self.make_project()
         self._started = False
         self._paused = False
-
-    def make_project(self):
-        if hasattr(self, "project"):
-            self.project.broadcast_signal -= self.on_broadcast
-
-        self.project = Project()
-        self.project.broadcast_signal += self.on_broadcast
+        self.new_project()
 
     def on_broadcast(self, broadcast):
+        print("PROJECTRUNNER GOT BCAST = " + str(broadcast))
         broadcast_dict = broadcast.to_dict()
         self.command_handler.send_broadcast(broadcast_dict)
 
@@ -48,8 +42,11 @@ class ProjectRunner(object):
         if self.project_running:
             raise InadequateUserException("Cannot create a project when one is running.")
 
-        self.project = Project()
+        if hasattr(self, "project"):
+            self.project.broadcast_signal -= self.on_broadcast
 
+        self.project = Project()
+        self.project.broadcast_signal += self.on_broadcast
 
     def project_add_file(self, file_name, filedata_b64):
         try:

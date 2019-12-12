@@ -20,9 +20,9 @@ class BroadcastEvents
     public:
         BroadcastEvents();
 
-        sigc::signal<void, uint32_t, uint32_t, json> machine_state_changed;  // machine_id, state_id, state vars
-        sigc::signal<void, uint32_t, uint32_t> machine_created;              // machine_id, def_id
-        sigc::signal<void, uint32_t> machine_deleted;                        // machine_id
+        sigc::signal<void, int, int, json> machine_state_changed;  // machine_id, state_id, state vars
+        sigc::signal<void, int, int> machine_created;              // machine_id, def_id
+        sigc::signal<void, int> machine_deleted;                        // machine_id
 
         void handle_broadcast(json broadcast);
 

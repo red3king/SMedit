@@ -3,6 +3,7 @@
 
 #include "zoom.h"
 #include "move.h"
+#include "auto_pan.h"
 #include "move_state.h"
 #include "move_resourcelock.h"
 #include "resize_box_entity.h"
@@ -76,16 +77,23 @@ bool _mcgo_resourcelock(GUIModel* model, GUIState& gui_state, CurrentEvents& cur
 }
 
 
-bool GUIOpFactory::maybe_create_gui_op(GUIState& gui_state, CurrentEvents& current_events, GUIOperation*& pref)
+bool GUIOpFactory::maybe_create_gui_op(GUIState& gui_state, CurrentEvents& current_events, GUIOperation*& pref, GUIAreaMode mode)
 {
-    if(_apply_on(gui_state, current_events, TRANSITION, _mcgo_transition, pref))
+    if(mode == GAM_BUILD)
+    {
+        if(_apply_on(gui_state, current_events, TRANSITION, _mcgo_transition, pref))
+            return true;
+
+        if(_apply_on(gui_state, current_events, STATE, _mcgo_state, pref))
+            return true;
+
+        if(_apply_on(gui_state, current_events, RESOURCELOCK, _mcgo_resourcelock, pref))
+            return true;
+    }
+
+    else if(AutoPan::maybe_create(gui_state, current_events, pref))
         return true;
 
-    if(_apply_on(gui_state, current_events, STATE, _mcgo_state, pref))
-        return true;
-
-    if(_apply_on(gui_state, current_events, RESOURCELOCK, _mcgo_resourcelock, pref))
-        return true;
 
     if(Move::maybe_create(gui_state, current_events, pref))
         return true;

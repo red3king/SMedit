@@ -72,7 +72,6 @@ void LineClient::on_disconnect_disp()
 
 void LineClient::on_line_receive_dispatch()
 {
-    log("LineClient firing signal!");
     string next;
     while(received_lines.pop(next))
         line_received_signal.emit(next);
@@ -95,49 +94,48 @@ void LineClient::on_receive(const boost::system::error_code& error, std::size_t 
         return;
     }
 
-    log("LineClient got data (not seg yet) : " + string(receive_array, BUFLEN) ); 
-
-    int i;
-    for(i=0; i<num_bytes; i++)
+    bool first = true;
+    int last_i = -2;
+    
+    for(int i=0; i<num_bytes; i++)
     {
         if(receive_array[i] == '\r')
-            break;
-    }
-
-    bool found = i < num_bytes;
-    
-    // todo - break this line splitting out into its own testable function
-    // not efficient whatsoever
-    if(found)
-    {
-        string rest_of_line(receive_array, i);    
-
-        string remainder;
-        if(i >= num_bytes-2)
-            remainder = "";
-
-        else
         {
-            int rem_len = num_bytes - i - 2;
-            string remainder(&receive_array[i+2], rem_len);
+            // get chunk of text between newlines
+            int newpos = last_i + 2;      // + 1 if \r only not \r\n
+            if(newpos >= num_bytes)
+                break;
+
+            char *pointer = receive_array + newpos; 
+            int length = i - last_i;
+            string chunk(pointer, length); //TODO check pointer arithmetic 
+
+            string line;
+            if(first)
+            {
+                line = partial_line + chunk;
+                first = false;
+            }
+
+            else
+                line = chunk;
+
+            received_lines.push(line);
+
+            last_i = i; 
         }
-
-        string line = partial_line + rest_of_line;
-        partial_line = remainder;
-
-        received_lines.push(line);
-        log("LineClient got line " + line + ", sending signal");
-        line_receive_dispatch.emit();
     }
 
+    line_receive_dispatch.emit();
+
+    int newpos = last_i + 2;
+    char *pointer = receive_array + newpos;  // +1 if \r only
+    int length = num_bytes - last_i;
+    
+    if(newpos >= num_bytes || length < 1)
+        partial_line = "";
     else
-    {
-        if(partial_line.length() > 3*BUFLEN)
-            partial_line = "";
-
-        string more(receive_array, num_bytes);
-        partial_line = partial_line + more;
-    }
+        partial_line = string(pointer, length);
 
     begin_receive();
 }
@@ -146,7 +144,6 @@ void LineClient::on_receive(const boost::system::error_code& error, std::size_t 
 void LineClient::send(string line)
 {
     line += "\r\n";
-    log("LineClient::send(" + line + ")");
 
     while(line.length() > MAX_SEND_LENGTH)
     {

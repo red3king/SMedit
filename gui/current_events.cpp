@@ -44,6 +44,12 @@ Key get_key(guint keyval)
 }
 
 
+CurrentEvents::CurrentEvents()
+{
+    clear_current_event();
+}
+
+
 void CurrentEvents::clear_current_event()
 {
     event_type = ET_NONE;
@@ -51,6 +57,33 @@ void CurrentEvents::clear_current_event()
     mouse_button = MB_NONE;
     mouse_scroll = SC_NONE;
     scroll_amount = 0;
+
+    ap_target_x = 0;
+    ap_target_y = 0;
+    ap_target_zoom = 1;
+    is_ap = false;
+}
+
+
+void CurrentEvents::enable_ap(float ap_initial_x, float ap_initial_y, float ap_initial_zoom,
+        float ap_target_x, float ap_target_y, float ap_target_zoom)
+{
+    is_ap = true;
+    ap_when = high_resolution_clock::now();
+
+    this->ap_initial_x = ap_initial_x;
+    this->ap_initial_y = ap_initial_y;
+    this->ap_initial_zoom = ap_initial_zoom;
+
+    this->ap_target_x = ap_target_x;
+    this->ap_target_y = ap_target_y;
+    this->ap_target_zoom = ap_target_zoom;
+}
+
+
+void CurrentEvents::disable_ap()
+{
+    is_ap = false;
 }
 
 

@@ -8,5 +8,5 @@
 class GUIOpFactory
 {
     public:
-        static bool maybe_create_gui_op(GUIState& gui_state, CurrentEvents& current_events, GUIOperation*& pref);
+        static bool maybe_create_gui_op(GUIState& gui_state, CurrentEvents& current_events, GUIOperation*& pref, GUIAreaMode mode);
 };

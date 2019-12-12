@@ -91,6 +91,7 @@ class State : public BoxEntity
 
         vector<Transition*> incoming_transitions, outgoing_transitions;
 
+        vector<Transition*> get_all_transitions();
         void add_transition(Transition* transition, bool incoming);
         void remove_transition(Transition* transition, bool incoming);
         void update_transition_positions();

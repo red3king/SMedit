@@ -32,7 +32,7 @@ MachinesController::MachinesController(HistoryManager* history_manager, Glib::Re
     builder->get_widget("selected_item_stack", selected_item_stack);
     builder->get_widget("machine_edit_gl_area", gl_area);
 
-    gui_context = new GUIContext(gl_area, history_manager);
+    gui_context = new GUIContext(gl_area, history_manager, GAM_BUILD);
     draw_context = &gui_context->gui_state.draw_context;
 
     list_view_controller = new ListViewController(tree_view, "Name:");

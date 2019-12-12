@@ -1,10 +1,12 @@
+#include <gdkmm/rgba.h>
+
 #include "run_controller.h"
 #include "utils.h"
 #include "net/actions/all.h"
-#include <gdkmm/rgba.h>
-
 #include "log.h"
-
+#include "options.h"
+#include "gui/gui_state.h"  // for GAM_RUN 
+#include "gui/gui_context.h"
 
 
 RunController::RunController(HistoryManager* history_manager, ProjectInfo* project_info, Glib::RefPtr<Gtk::Builder> const& builder) : actionator(&line_client, &broadcast_events) , rgb_same("green") , rgb_unknown("white") , rgb_different("red")
@@ -19,9 +21,12 @@ RunController::RunController(HistoryManager* history_manager, ProjectInfo* proje
 
     local_checksum = CHK_UNKNOWN;
     server_checksum = CHK_UNKNOWN;
+    running_state = new RunningState(broadcast_events);
+
     this->history_manager = history_manager;
     this->project_info = project_info;
 
+    builder->get_widget("run_gl_area", gl_area);
     builder->get_widget("server_name_entry", server_entry);
     builder->get_widget("server_hash_label", server_hash_label);
     builder->get_widget("project_hash_label", project_hash_label);
@@ -29,6 +34,18 @@ RunController::RunController(HistoryManager* history_manager, ProjectInfo* proje
     builder->get_widget("deploy_button", deploy_button);
     builder->get_widget("start_button", start_button);
     builder->get_widget("pause_button", pause_button);
+
+    builder->get_widget("lopt_auto_pan", lopt_auto_pan_cb);
+    builder->get_widget("lopt_open_spawned", lopt_open_spawned_cb);
+    builder->get_widget("sopt_min_trans_time", sopt_min_trans_time_entry);
+
+    gui_context = new GUIContext(gl_area, history_manager, GAM_RUN, running_state);
+
+    lopt_auto_pan_cb->set_active(options.get_auto_pan());
+    lopt_open_spawned_cb->set_active(options.get_open_spawned());
+
+    lopt_auto_pan_cb->signal_toggled().connect(sigc::mem_fun(*this, &RunController::on_lopt_auto_pan_changed));
+    lopt_open_spawned_cb->signal_toggled().connect(sigc::mem_fun(*this, &RunController::on_lopt_open_spawned_changed));
 
     signals.project_save.connect(sigc::mem_fun(this, &RunController::on_project_saved));
     signals.project_load.connect(sigc::mem_fun(this, &RunController::on_project_loaded));
@@ -44,6 +61,21 @@ RunController::RunController(HistoryManager* history_manager, ProjectInfo* proje
     pause_button->signal_clicked().connect(sigc::mem_fun(this, &RunController::on_pause_click));
 
     update_enabled();
+}
+
+
+void RunController::on_lopt_auto_pan_changed()
+{
+    bool value = lopt_auto_pan_cb->get_active();
+    options.set_auto_pan(value);
+
+}
+
+
+void RunController::on_lopt_open_spawned_changed()
+{
+    bool value = lopt_open_spawned_cb->get_active();
+    options.set_open_spawned(value);
 }
 
 
@@ -90,11 +122,17 @@ void RunController::on_get_hash_complete(Action* action)
     GetHash* get_hash = (GetHash*) action;
 
     if(get_hash->status == AS_SUCCESS)
+    {
         server_checksum = get_hash->project_hash;
+        deployed_project = project_info->saved_project;
+        running_state->set_project(&deployed_project);
+    }
     else
     {
         server_checksum = CHK_UNKNOWN;
         display_action_error(action);
+        deployed_project = Project();
+        running_state->set_project(&deployed_project); // maybe use nullptr to signify no project?
     }
 
     update_enabled();

@@ -20,6 +20,7 @@ void Actionator::submit_action(Action* action)
     action->assign_id(action_id_ctr++);
     json request = action->create_request();
     string jstr = request.dump();
+    log("actionator: >>> SEND >>> " + jstr);
     string result = base64_encode((unsigned char*)jstr.c_str(), jstr.length()) + "\r\n";
     current_actions.push_back(action);
     line_client->send(result);
@@ -72,7 +73,7 @@ void Actionator::on_line_received(string line)
     try { line = base64_decode(line); }
     catch (...) { log("actionator: not base64!"); return; }
 
-    log("Actionator::on_line_received(" + line + ")");
+    log("actionator: <<< RECV <<< " + line);
 
     try { response = json::parse(line); }
     catch (...) { log("actionator: line invalid"); return; }
@@ -113,7 +114,6 @@ void Actionator::handle_response(json response)
     {
         message_id = response["mid"];
         status = response["status"];
-        log("status=" + std::to_string(status));
     }
 
     catch (nlohmann::detail::type_error& ex)

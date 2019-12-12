@@ -4,9 +4,16 @@
 #define ZFAC 1.2
 
 
-DrawContext::DrawContext()
+DrawContext::DrawContext(Gtk::GLArea* gl_area)
 {
+    this->gl_area = gl_area;
     reset();
+}
+
+
+Gtk::GLArea* DrawContext::get_gl_area()
+{
+    return gl_area;
 }
 
 
@@ -75,10 +82,33 @@ void DrawContext::zoom(float zoom_amount, float fp_screen_x, float fp_screen_y)
 }
 
 
+void DrawContext::zoom_raw(float zoom_factor)
+{
+    this->zoom_factor = zoom_factor;
+}
+
+
 void DrawContext::move(float world_dx, float world_dy)
 {
     woffset_x -= world_dx;
     woffset_y -= world_dy;
+}
+
+
+void DrawContext::move_raw(float world_x, float world_y)
+{
+    /*
+    float sch = gl_area->get_height() / 2.0;
+    float scw = gl_area->get_width() / 2.0;
+
+    sch = screen_dist_to_world(sch);
+    scw = screen_dist_to_world(scw);
+    
+    woffset_x = scw-world_x;
+    woffset_y = sch-world_y; */
+
+    woffset_x = world_x;
+    woffset_y = world_y;
 }
 
 
@@ -119,3 +149,22 @@ void DrawContext::draw_text_many_lines(std::string text, int font, float size, N
 
 }
 
+
+float DrawContext::get_zoom_factor()
+{
+    return zoom_factor;
+}
+
+
+void DrawContext::get_offsets(float& woffset_x, float& woffset_y)
+{
+    woffset_x = this->woffset_x;
+    woffset_y = this->woffset_y;
+}
+
+
+void DrawContext::get_screen_size(int &screen_x, int &screen_y)
+{
+   screen_x = gl_area->get_width();
+   screen_y = gl_area->get_height();
+}

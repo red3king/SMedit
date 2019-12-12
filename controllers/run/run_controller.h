@@ -7,6 +7,7 @@
 
 #include "saveload.h"
 #include "signals.h"
+#include "run_state.h"
 #include "net/actionator.h"
 #include "net/broadcast_events.h"
 #include "models/project.h"
@@ -31,10 +32,14 @@ class RunController
     private:
         HistoryManager* history_manager;
         ProjectInfo* project_info;
+        RunningState* running_state;
 
         LineClient line_client;
         Actionator actionator;
         BroadcastEvents broadcast_events;       
+
+        GUIContext* gui_context;
+        Gtk::GLArea *gl_area;
 
         HashState hash_state;
         int32_t local_checksum, server_checksum;
@@ -45,6 +50,10 @@ class RunController
         Gtk::Entry *server_entry;
         Gtk::Label *server_hash_label, *project_hash_label;
         Gtk::Button *connect_button, *deploy_button, *start_button, *pause_button;
+
+        // options controls
+        Gtk::Entry *sopt_min_trans_time_entry;
+        Gtk::CheckButton *lopt_auto_pan_cb, *lopt_open_spawned_cb;
 
         Gdk::RGBA rgb_same, rgb_unknown, rgb_different;
 
@@ -66,6 +75,10 @@ class RunController
         void on_start_click();
         void on_pause_click();
 
+        // options click callbacks
+        void on_lopt_auto_pan_changed();
+        void on_lopt_open_spawned_changed();
+        void on_sopt_min_trans_time_changed();
 
         void update_enabled();
         void begin_get_hash();

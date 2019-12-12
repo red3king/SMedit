@@ -19,6 +19,7 @@ class ConnectedClient(object):
         self.twisted_proto = twisted_proto
 
     def send_response(self, response_line):
+        print("raw send: " + str(response_line))
         self.twisted_proto.sendLine(response_line)
 
 

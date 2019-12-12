@@ -71,6 +71,12 @@ json Transition::to_json()
 }
 
 
+float Transition::get_length()
+{
+    return sqrt(pow(x1 - x0, 2) + pow(y1 - y0, 2));
+}
+
+
 string Transition::describe()
 {
     if(type == EVENT)

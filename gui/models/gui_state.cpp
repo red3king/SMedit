@@ -5,6 +5,19 @@
 GMState::GMState(DrawContext* ctx, State* state) : GMBox(ctx, STATE)
 {
     this->state = state;
+    is_current_state = false;
+}
+
+
+int GMState::get_state_def_id()
+{
+    return state->id;
+}
+
+
+void GMState::set_is_current(bool is_current)
+{
+    is_current_state = is_current;
 }
 
 
@@ -38,7 +51,11 @@ void GMState::draw_interior(float x, float y, float w, float h)
     NVGcontext* vg = ctx->vg;
     nvgBeginPath(vg);     
     nvgRect(vg, x, y, w, h);
-    nvgFillColor(vg, nvgRGBA(0x00, 0x2b, 0x36, 155));
+
+    // TODO make current selection better ? at the very least, make sure pink has good contrast
+    // to all interior colors
+    auto bg_col = is_current_state ? PINK : nvgRGBA(0x00, 0x2b, 0x36, 155); 
+    nvgFillColor(vg, bg_col);
     nvgFill(vg);
 
     // adjust for the icon size, may change this later

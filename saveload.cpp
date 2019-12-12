@@ -110,6 +110,7 @@ IOResult save_project(Project& project, ProjectInfo& project_info, string save_p
         return IOResult(false, "Damn, " + what);
     }
 
+    project_info.saved_project = project;
     return IOResult(true);
 }
 
@@ -152,6 +153,7 @@ IOResult load_project(Project& project, ProjectInfo& project_info, string load_p
     project = Project(jdata);   // TODO maybe reconsider the frequent copying (assignment, copy ctor, etc)
                                 // of Project objects, happens 2 unnecessary times on project load now
                                 // This could get slow when projects get big.
+    project_info.saved_project = project;
 
     unsigned int state_id;
     for(const auto& entry : filesystem::directory_iterator(load_path))

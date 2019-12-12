@@ -1,7 +1,35 @@
+#include "log.h"
 #include "gui_state.h"
+#include "colors.h"
 #include "gui/models/gui_transition.h"
 #include "gui/models/gui_resourcelock.h"
 #include "gui/models/gui_state.h"
+
+
+GUIState::GUIState(GUIAreaMode execution_mode, RunningState* running_state, Gtk::GLArea* gl_area) : draw_context(gl_area)
+{
+    mode = execution_mode;
+    this->running_state = running_state; // only  for GAM_RUN
+
+    //if(mode == GAM_RUN)
+    //    running_state->select_state.connect(sigc::mem_fun(*this, &GUIState::on_rs_state_select));
+}
+
+
+void GUIState::rs_state_select(int state_def_id)
+{
+    for(int i=0; i<gui_models.size(); i++)
+    {
+        auto model = gui_models[i];
+
+        if(model->type != STATE)
+            continue;
+
+        GMState* state = (GMState*) model;
+        bool current = state->get_state_def_id() == state_def_id;
+        state->set_is_current(current);
+    }
+}
 
 
 GUIModel* GUIState::get_model_by_id(unsigned int id)
@@ -73,6 +101,25 @@ void GUIState::draw()
 {
     for(int i=0; i<gui_models.size(); i++)
         gui_models[i]->draw();
+
+    int font = draw_context.font_hack;
+    float current_x, current_y, current_zoom;
+    current_zoom = draw_context.get_zoom_factor();
+    auto gl_area = draw_context.get_gl_area();
+    float sch = gl_area->get_height();
+    float scw = gl_area->get_width();
+    draw_context.screen_to_world(current_x, current_y, scw/2.0, sch/2.0);
+    string x_line = "x = " + std::to_string(current_x);
+    string y_line = "y = " + std::to_string(current_y);
+    string z_line = "zoom = " + std::to_string(current_zoom);
+    string wxline = "woffset_x = " + std::to_string(draw_context.woffset_x);
+    string wyline = "woffset_y = " + std::to_string(draw_context.woffset_y);
+    draw_context.draw_text_one_line("[screen center]", font, 15, WHITE, 10, 0, 300);
+    draw_context.draw_text_one_line(x_line, font, 15, WHITE, 10, 20, 300);
+    draw_context.draw_text_one_line(y_line, font, 15, WHITE, 10, 40, 300);
+    draw_context.draw_text_one_line(z_line, font, 15, WHITE, 10, 60, 300);
+    draw_context.draw_text_one_line(wxline, font, 15, WHITE, 10, 80, 300);
+    draw_context.draw_text_one_line(wyline, font, 15, WHITE, 10, 100, 300);
 }
 
 
@@ -98,6 +145,7 @@ CursorType _filterupdate(vector<GUIModel*>& models, CurrentEvents& current_event
 
 CursorType GUIState::update_models(CurrentEvents& current_events, GUIModel*& just_selected, bool& clear_selected)
 {
+    // asks each of the models if the cursor is within them, did they get selected, etc..
     CursorType result = CT_DEFAULT;
     CursorType current;
     just_selected = nullptr;
@@ -207,4 +255,7 @@ void GUIState::remove_gui_model(unsigned int entity_id)
 }
 
 
-
+void GUIState::force_gui_context_update()
+{
+    signal_force_update.emit();
+}   

@@ -2,6 +2,8 @@
 
 #include <unordered_set>
 #include <gdk/gdk.h>
+#include <chrono>
+
 
 using std::unordered_set;
 
@@ -47,6 +49,10 @@ enum CurrentEventType
 };
 
 
+using namespace std::chrono;
+typedef high_resolution_clock::time_point millitime;
+
+
 class CurrentEvents
 {
     // holds current set of keys held down, click events just made by user,
@@ -61,6 +67,8 @@ class CurrentEvents
      * */
 
     public:
+        CurrentEvents();
+
         // relating to current event
         CurrentEventType event_type;
         Key key;
@@ -72,6 +80,16 @@ class CurrentEvents
         float mouse_x, mouse_y;
         unordered_set<Key> pressed_keys;
         unordered_set<MouseButton> pressed_buttons;
+
+        // stuff pertaining to auto-pan to current state (RUN mode)
+        float ap_initial_x, ap_initial_y, ap_initial_zoom, 
+              ap_target_x, ap_target_y, ap_target_zoom;
+        bool is_ap;
+        millitime ap_when;
+
+        void enable_ap(float ap_initial_x, float ap_initial_y, float ap_initial_zoom,
+                float ap_target_x, float ap_target_y, float ap_target_zoom);
+        void disable_ap();
 
         void clear_current_event();
 

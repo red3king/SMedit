@@ -152,3 +152,14 @@ void State::update_transition_positions()
     for(int i=0; i<outgoing_transitions.size(); i++)
         outgoing_transitions[i]->update_positions();
 }
+
+
+vector<Transition*> State::get_all_transitions()
+{
+    vector<Transition*> result;
+    for(int i=0; i<incoming_transitions.size(); i++)
+        result.push_back(incoming_transitions[i]);
+    for(int i=0; i<outgoing_transitions.size(); i++)
+        result.push_back(outgoing_transitions[i]);
+    return result;
+}

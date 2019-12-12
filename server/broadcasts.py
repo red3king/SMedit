@@ -19,7 +19,7 @@ class Broadcast(ABC):
         pass
 
     def to_dict(self):
-        broadcast_dict = {
+        return {
             "type": self.broadcast_type,
             "data": self.to_dict_impl()
         }
@@ -36,7 +36,7 @@ class MachineCreateBroadcast(Broadcast):
         return BroadcastType.MACHINE_CREATE
 
     def to_dict_impl(self):
-        broadcast_dict = {
+        return {
             "machine_id": self.machine_id,
             "def_id": self.def_id
         }
@@ -68,9 +68,9 @@ class StateChangeBroadcast(Broadcast):
 
     def to_dict_impl(self):
         broadcast_dict = {
-            "machine_id": machine_id,
-            "state_id": state_id,
-            "vars": vars_dict
+            "machine_id": self.machine_id,
+            "state_id": self.state_id,
+            "vars": self.vars_dict
         }
 
         return broadcast_dict
