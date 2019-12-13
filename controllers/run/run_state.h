@@ -13,9 +13,10 @@ using std::vector;
 class RunningMachine
 {
     public:
-        RunningMachine(int id, int machine_def_id);
+        RunningMachine(int id, int machine_def_id, string name);
 
         int id;
+        string name;
         int machine_def_id;
         int current_state_def_id;
         json state_vars;
@@ -32,10 +33,13 @@ class RunningState
         
         void set_project(Project* current_project);
 
+        void user_select_machine(int machine_id);   // user clicked on a machine, emit the signal. 
+
+        vector<RunningMachine>& get_running_machines();
+
         // signals for the GUIContext & GUIState
         sigc::signal<void, Machine*> select_machine;    // may be nullptr to un-select
         sigc::signal<void, int> select_state;
-
 
     private:
         Project* current_project;

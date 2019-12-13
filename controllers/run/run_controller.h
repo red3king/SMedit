@@ -12,6 +12,7 @@
 #include "net/broadcast_events.h"
 #include "models/project.h"
 #include "historymanager/historymanager.h"
+#include "controllers/run/machines_list_controller.h"
 
 
 enum HashState { HS_UNKNOWN, HS_SAME, HS_DIFFERENT };
@@ -37,6 +38,7 @@ class RunController
         LineClient line_client;
         Actionator actionator;
         BroadcastEvents broadcast_events;       
+        MachinesListController* machines_list_controller;
 
         GUIContext* gui_context;
         Gtk::GLArea *gl_area;

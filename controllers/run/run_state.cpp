@@ -3,10 +3,11 @@
 
 // RunningMachine
 
-RunningMachine::RunningMachine(int id, int machine_def_id)
+RunningMachine::RunningMachine(int id, int machine_def_id, string name)
 {
     this->id = id;
     this->machine_def_id = machine_def_id;
+    this->name = name;
     current_state_def_id = -1;
 }
 
@@ -32,12 +33,38 @@ void RunningState::set_project(Project* current_project)
 }
 
 
+void RunningState::user_select_machine(int machine_id)
+{
+    for(int i=0; i<running_machines.size(); i++)
+    {
+        auto rm = running_machines[i];
+        
+        if(rm.id == machine_id)
+        {
+            auto machine_def = current_project->get_machine_by_id(rm.machine_def_id);
+            select_machine.emit(machine_def);
+            return;
+        }
+    } 
+
+    select_machine.emit(nullptr);
+}
+
+
+vector<RunningMachine>& RunningState::get_running_machines()
+{
+    return running_machines;
+}
+
+
 void RunningState::on_machine_created(int machine_id, int machine_def_id)
 {
-    running_machines.push_back(RunningMachine(machine_id, machine_def_id));    
+    auto machine_def = current_project->get_machine_by_id(machine_def_id);
+    
+    string rm_name = "M" + std::to_string(machine_id) + " - " + machine_def->name;
+    running_machines.push_back(RunningMachine(machine_id, machine_def_id, rm_name));    
     current_machine_id = machine_id;
 
-    auto machine_def = current_project->get_machine_by_id(machine_def_id);
     select_machine.emit(machine_def);
 }
 

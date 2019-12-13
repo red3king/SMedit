@@ -21,7 +21,9 @@ RunController::RunController(HistoryManager* history_manager, ProjectInfo* proje
 
     local_checksum = CHK_UNKNOWN;
     server_checksum = CHK_UNKNOWN;
+
     running_state = new RunningState(broadcast_events);
+    machines_list_controller = new MachinesListController(builder, broadcast_events, running_state);
 
     this->history_manager = history_manager;
     this->project_info = project_info;
