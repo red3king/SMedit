@@ -15,6 +15,11 @@
 #define STS_JOIN "Join"             // string variable
 
 
+
+#define DEFAULT_STATE_CODE "def code_func(vars_dict, trigger_event=None):\r\n    pass\r\n"
+
+
+
 using std::string;
 using std::vector;
 

@@ -1,148 +1,20 @@
-LOH - done with fixing auto pan, see below bugs:
 
-    bug - pause does not do anything? IIRC
-
-    bug - changing state type to code
-        may end up with blank code window, should have function
-        skeleton inside.    
-
-        
-
-        all my commands
-            pause/unpause
-                for machine, these just call pause/unpause on self.current_operation
-            start
-                for machine, this creates the first srop, then runs it
-            stop
-                for machine, this should pause the current srop (or implement a stop function?) and then set it null
-            load project
-                creates resources
-                creates initial machine(s)
+todo - implement the local and server options:
+    - enable/disable autopan
+    - minimum state transition time on server 
 
 
+animations:
+    also, when the last transition occurs, i might want the machine to stick around so the user can see the full
+        transition into the final state. maybe thats better than trying to build that complicated call stack i wanted.
+        (the user will still be able to use the machine list piker to choose a machine)
 
-
-    animations:
-        also, when the last transition occurs, i might want the machine to stick around so the user can see the full
-            transition into the final state. maybe thats better than trying to build that complicated call stack i wanted.
-            (the user will still be able to use the machine list piker to choose a machine)
-
-        next up: do that machine list picker
-
-
-
-    just added options class
-    and added buttons and click handlers which set auto pand and the follow spawned options
-        next up, need to design the method for connecting the signals to the GUIContext and the run controller:
-
-            run state storage
-                class RunningMachine
-                    int id
-                    int machine_def_id
-                    int curent_state_id
-                
-                class RunningState
-                    vector<RunningMachine> (or ptr)
-
-                signal<RunningMachine or runningmachine_id> machine_state_update;
-                signal< "" > machine_Created;
-                signal< "" > machine_finished;                
-        
-                // in init, add signal handlers for machine create / exit / state changed to keep this updated
-
-            
-
-            current machine selection:
-                for now, we will just follow the latest created machine (ie, always follow spawned machien = true)
-                    when the singal happens:
-                        -call GUIContext.set_machine(), even if the new machine is same as the last selected one
-                            this will reset the models, so the old selected state won't be sleeected
-                        -replay state for selected machine
-
-
-            is_current / selected state design:
-                -store the is_current bool on the state gui model, makes more sense than on State
-                -the gui state object will have a signal handler for the state transition signal
-                -initial: 
-                    -when we get the initial state dict,
-                        clear RunningState
-                        feed it into RunningState
-                        arbitrarily select the first running machine (until we build the list of machine view)                        
-
-            triggering re-draws:
-                -when a broadcast is received, we can trigger a redraw (if animation timer stuff below isnt enough)
-
-
-            GUIContext / GUIState signaling:
-                on machine create                
-                    call GUIContext.set_machine()
-                    set orrect gui model is_currnet = true from signal / RunningState lookup
-
-                on machine delete
-                    call GUIContext.unset_machine()
-                    maybe select a machine to watch arbitrarily from the list of running machines
-
-                on state transition (on RunningState.machine_state_update signal)
-                    if auto_pan is not enabled,
-                        return
-                    
-                    set information about current state in current events
-                        (x, y position, + zoom based on averagee length of state's transitions * 1.5, or max)
-                        
-                    call GUIContext.update
-                        -> there it will create a gui operation for camera panning to the next state.
-                            this will start the animation timer and register itself with it
-                            when the gui op is done, it will unregister itself from the animation timer, 
-                                which shuts it down.
-
-                        -> if there already was an auto pan gui op, the updated current_Events
-                            will cause it to change its pan target
-
-                        
-                    
-                    
-
-
-    machines controller owns
-        GUIContext owns
-            GUIState
-
-    GUIContext:
-        -has event / signal handlers for outside interfacing 
-        -translates those events into calls into GUIState, by creating and running GUIOperations
-
-    GUIState:
-        -provides add_gui_model() and remove_gui_model() functions
-        -has the list of gui models
-        
-    question - what is the difference to be coded, anyways??
-        -all we need to do is to add an is_current boolean to the State GUI Model
-        -in the state gui model render code, we do something visible when this is true
-        -how do we set this is_current vairable?
-            we can manipulate the gui model,
-            or we could have the is_current be on the State object itself.
-            the project is visible to the run controller, so we could:
-                -easily modify the project's states
-                -then do something to schedule redraw
-
-        -animation timer?
-            -if we don't hack a quick set x/y thing on update, we need to animate
-            -the best way to do this is to integrate it with the existing gui operation system
-            -this way, when the camera's panning, the user can't pan
-            -but when the user is panning, the camera won't snap away and the user can still navigate
-            -we can also add some sort of priority so all the user's actions have priority over the automatic
-                camera panning/zooming
-            -question remains, how do we have the animation timer trigger GUIContext::update?
-                it should call it.
-                but the real question is what turns off the animation timer?
-                when the current gui operation is done (if timer active)?
-                    I think that makes sense but need to double check
-
-        
+    next up: do that machine list picker
 
 
 at some point, find a way to catch errors in the functions sent into the twisted event loop, 
     and display those on the client.
+
 
 eventually, build the get current running project status command,
     which will sync up the current:
@@ -151,7 +23,6 @@ eventually, build the get current running project status command,
     this should happen before we can render, after we get a hash match, on connect.
 
 
-then: Render the execution
 then: add in custom state types & implement http and file io states.
 
 

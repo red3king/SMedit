@@ -45,7 +45,7 @@ State::State(unsigned int id) : BoxEntity(id)
     string empty = "";
     launch_task_name = LVOV(empty);
     has_return_value = false;
-    code = "def code_func(vars_dict, trigger_event=None):\r\n    pass\r\n";
+    code = DEFAULT_STATE_CODE;
 } 
 
 

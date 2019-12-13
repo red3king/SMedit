@@ -179,7 +179,20 @@ IOResult load_project(Project& project, ProjectInfo& project_info, string load_p
         project_info.add_file(filename, code);
         state->code = code;
     }   
-    
+  
+    // Code states with nothing saved should get the default function stub 
+    for(int i=0; i<project.machines.size(); i++)
+    {
+        auto mach = project.machines[i];
+        for(int j=0; j<mach->states.size(); j++)
+        {
+            auto state = mach->states[j];
+            if(state->code == "")
+                state->code = DEFAULT_STATE_CODE;
+        }
+    }
+
+
     return IOResult(true);
 }
 
