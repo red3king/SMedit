@@ -73,6 +73,11 @@ class Project(object):
         self.broadcast_signal(broadcast)
         self.running_machines.remove(machine)
 
+    def create_initial_machines(self):
+        for machine_def in self.project_def.machine_defs:
+            if machine_def.run_on_start:
+                self.create_machine(machine_def)
+ 
     def load(self):
         # load defs
         project_def = ProjectDef(self.files)
@@ -81,11 +86,6 @@ class Project(object):
         # resources
         for resource_def in project_def.resource_defs:
             self.resources.append(Resource(resource_def))
-    
-        # machines
-        for machine_def in project_def.machine_defs:
-            if machine_def.run_on_start:
-                self.create_machine(machine_def)
         
         self._loaded = True
 
@@ -121,7 +121,8 @@ class Project(object):
             resource.unpause()
 
     def start(self):
-        
+        self.create_initial_machines()
+
         #self.unpause()
         for machine in self.running_machines:
             machine.start()
@@ -132,7 +133,7 @@ class Project(object):
     def stop(self):
         for machine in self.running_machines:
             machine.stop()
+            self.delete_machine(machine)
 
         for resource in self.resources:
             resource.stop()
-

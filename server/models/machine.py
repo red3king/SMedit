@@ -123,7 +123,8 @@ class Machine(object):
     
     def stop(self):
         self.log("stop()")
-        pass
+        if self.current_operation is not None:
+            self.current_operation.stop()
 
     def pause(self):
         self.log("pause()")

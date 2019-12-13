@@ -37,6 +37,9 @@ class StateResultOperation(ABC):
 
     def start(self):
         self.start_impl()
+    
+    def stop(self):
+        self.stop_impl()
 
     @property
     @abstractmethod
@@ -53,6 +56,10 @@ class StateResultOperation(ABC):
 
     @abstractmethod
     def start_impl(self):
+        pass
+
+    @abstractmethod
+    def stop_impl(self):
         pass
 
     @abstractmethod
@@ -85,6 +92,9 @@ class JoinSROP(StateResultOperation):
     def start_impl(self):
         pass
 
+    def stop_impl(self):
+        pass
+
     def notify_machine_finished(self, return_value):
         # save the return value into variable (is None when user defines no return value):
         self.machine.set_variable(self.result_var, return_value)
@@ -114,7 +124,7 @@ class RunLaterCancelROP(StateResultOperation):
 
         self.state = self.S_DEFAULT
 
-        self.seconds_elapsed = 0
+        self.seconds_elapsed = 0.0
         self.start_time = None
 
     @property
@@ -126,7 +136,7 @@ class RunLaterCancelROP(StateResultOperation):
             self.cancel_task()
             self.state = self.S_PAUSED
             now = datetime.now()
-            self.seconds_elapsed += now - self.start_time
+            self.seconds_elapsed += (now - self.start_time).total_seconds()
             self.start_time = now
 
     def unpause_impl(self):
@@ -141,6 +151,14 @@ class RunLaterCancelROP(StateResultOperation):
 
         self.launch_task(delay)
         self.state = self.S_LAUNCHED
+
+    def stop_impl(self):
+        self.pause_impl()
+        self.tear_down_for_stop()
+
+    def tear_down_for_stop(self):
+        # override to do teardown when stop() is called if needed.
+        pass 
 
     def set_task_finished(self):
         self.state = self.S_DEFAULT

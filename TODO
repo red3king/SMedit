@@ -1,24 +1,33 @@
 LOH - done with fixing auto pan, see below bugs:
 
+    bug - pause does not do anything? IIRC
+
     bug - changing state type to code
         may end up with blank code window, should have function
         skeleton inside.    
 
-    bug - stop button does not stop an infinite loop program
+        
+
+        all my commands
+            pause/unpause
+                for machine, these just call pause/unpause on self.current_operation
+            start
+                for machine, this creates the first srop, then runs it
+            stop
+                for machine, this should pause the current srop (or implement a stop function?) and then set it null
+            load project
+                creates resources
+                creates initial machine(s)
+
+
+
 
     animations:
-        machine create, state select signals working fine
-        animation is mostly working, except the math is all wrong. 
-            I need to check if the woffset_x is really world coords, probably given its name though
-            not sure what it is, but the animation stops at the right time so its only a matter of fixing the error
-
         also, when the last transition occurs, i might want the machine to stick around so the user can see the full
             transition into the final state. maybe thats better than trying to build that complicated call stack i wanted.
             (the user will still be able to use the machine list piker to choose a machine)
 
         next up: do that machine list picker
-
-           
 
 
 
