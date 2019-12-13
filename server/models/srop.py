@@ -144,7 +144,7 @@ class RunLaterCancelROP(StateResultOperation):
 
     def start_impl(self):
         if self.state == self.S_PAUSED:
-            delay = self.delay - self.elapsed_seconds
+            delay = self.delay - self.seconds_elapsed
         else:
             delay = self.delay
             self.start_time = datetime.now()

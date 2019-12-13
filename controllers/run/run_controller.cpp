@@ -222,9 +222,29 @@ void RunController::on_start_stop_complete(Action* action)
 
 void RunController::on_pause_click()
 {
+    auto pause_unpause_cb = boost::bind(&RunController::on_pause_unpause_complete, this, _1);
+    Action* action;
+    
+    if(project_paused)
+       action = new UnpauseProjectAction(pause_unpause_cb);
+    else
+       action = new PauseProjectAction(pause_unpause_cb);
 
+    actionator.submit_action(action);
 }
 
+
+void RunController::on_pause_unpause_complete(Action* action)
+{
+    if(action->status != AS_SUCCESS)
+    {
+        display_action_error(action);
+        return;
+    }
+
+    project_paused = !project_paused;
+    update_enabled();
+}
 
 
 

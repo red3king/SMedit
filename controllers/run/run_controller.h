@@ -22,8 +22,8 @@ class RunController
     /*
     TODO 
      - ADD OPTIONS PANEL WITH
-     -CONFIGURABLE STATE DELAY
-     -CAMERA TRACKING 
+        - CONFIGURABLE STATE DELAY
+        - CAMERA TRACKING 
     */
 
     public:
@@ -67,6 +67,7 @@ class RunController
         
         void on_get_hash_complete(Action* action);
         void on_start_stop_complete(Action* action);
+        void on_pause_unpause_complete(Action* action);
 
         void on_disconnection(bool intentional);
 
