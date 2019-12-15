@@ -1,3 +1,15 @@
+next up:
+    test async spawn/join
+    test return values
+    test any other types of state or alternate functionality of tested states
+
+
+BIG TICKET ITEMS
+    state synch on connect
+    custom state types w/ premade unmodifiiable transitions
+    resource implementation
+    resourcelock implementaiton
+    
 
 todo - implement the local and server options:
     - enable/disable autopan

@@ -97,16 +97,6 @@ void DrawContext::move(float world_dx, float world_dy)
 
 void DrawContext::move_raw(float world_x, float world_y)
 {
-    /*
-    float sch = gl_area->get_height() / 2.0;
-    float scw = gl_area->get_width() / 2.0;
-
-    sch = screen_dist_to_world(sch);
-    scw = screen_dist_to_world(scw);
-    
-    woffset_x = scw-world_x;
-    woffset_y = sch-world_y; */
-
     woffset_x = world_x;
     woffset_y = world_y;
 }

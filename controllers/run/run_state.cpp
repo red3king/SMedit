@@ -13,7 +13,6 @@ RunningMachine::RunningMachine(int id, int machine_def_id, string name)
 
 
 
-
 // RunningState
 
 RunningState::RunningState(BroadcastEvents& broadcast_events)
@@ -42,12 +41,12 @@ void RunningState::user_select_machine(int machine_id)
         if(rm.id == machine_id)
         {
             auto machine_def = current_project->get_machine_by_id(rm.machine_def_id);
-            select_machine.emit(machine_def);
+            fire_machine_selected(rm.id, machine_def);
             return;
         }
     } 
 
-    select_machine.emit(nullptr);
+    fire_machine_selected(-1, nullptr);
 }
 
 
@@ -60,12 +59,9 @@ vector<RunningMachine>& RunningState::get_running_machines()
 void RunningState::on_machine_created(int machine_id, int machine_def_id)
 {
     auto machine_def = current_project->get_machine_by_id(machine_def_id);
-    
     string rm_name = "M" + std::to_string(machine_id) + " - " + machine_def->name;
-    running_machines.push_back(RunningMachine(machine_id, machine_def_id, rm_name));    
-    current_machine_id = machine_id;
-
-    select_machine.emit(machine_def);
+    running_machines.push_back(RunningMachine(machine_id, machine_def_id, rm_name));       
+    fire_machine_selected(machine_id, machine_def);
 }
 
 
@@ -86,8 +82,7 @@ void RunningState::on_machine_deleted(int machine_id)
     {
         if(running_machines.size() == 0)
         {
-            current_machine_id = -1;
-            select_machine.emit(nullptr);
+            fire_machine_selected(-1, nullptr);
             return;
         }
 
@@ -97,7 +92,8 @@ void RunningState::on_machine_deleted(int machine_id)
         // of the parent machine
         auto running_machine = running_machines[running_machines.size() - 1];
         auto machine_def = current_project->get_machine_by_id(running_machine.machine_def_id);
-        select_machine.emit(machine_def);
+
+        fire_machine_selected(running_machine.id, machine_def);
         select_state.emit(running_machine.current_state_def_id);
     }
 }
@@ -119,4 +115,13 @@ void RunningState::on_machine_state_changed(int machine_id, int state_def_id, js
         select_state.emit(state_def_id);
 }
 
+
+void RunningState::fire_machine_selected(int id, Machine* machine)
+{
+    if(current_machine_id != -1)
+       select_machine.emit(-1, nullptr);
+
+    select_machine.emit(id, machine);
+    current_machine_id = id;
+}
 

@@ -19,6 +19,10 @@ class State(ABC):
     def is_initial(self):
         return self.__class__ == InitialState
 
+    @property
+    def is_joining(self):  # overridden where true
+        return False
+
     def execute(self, vars_dict, trigger_event=None):
         # do stuff, then return SROP if next state else return None
         return self.execute_impl(vars_dict, trigger_event)
@@ -107,6 +111,10 @@ class JoinState(State):
     def join_pid_variable(self):
         return self.state_def.join_pid_variable
     
+    @property 
+    def is_joining(self):
+        return True
+
     @property
     def join_result_variable(self):
         return self.state_def.join_result_variable
@@ -117,17 +125,25 @@ class JoinState(State):
     
         if return_val is None:
             # if the child hasn't finished, return JoinSROP to wait for it
-            return JoinSROP(self.machine, self.join_pid_variable, self.join_result_variable)
+            return JoinSROP(self.machine, self.join_result_variable)
 
         # otherwise, assign return value and go to next state
         self.machine.set_variable(join_result_variable, return_val)
         return self.srop_if_next()
 
 
-class SpawnState(JoinState):
+class SpawnState(State):
+    '''
+        If async:
+            -launch task, store child pid in launch_result_variable
+            -srop if next to next state
 
-    # Subclass from JoinState to run its execute_impl if synchronous
-
+        If synch:
+            -launch task, don't exit
+            -task return value gets stored in launch_result_variable
+            -then srop if next
+    '''
+    
     def __init__(self, machine, state_def):
         super().__init__(machine, state_def)
 
@@ -135,17 +151,45 @@ class SpawnState(JoinState):
     def launch_synchronous(self):
         return self.state_def.launch_synchronous
 
+    @property
+    def is_joining(self):
+        return self.launch_synchronous
+
+    @property
+    def join_pid_variable(self):
+        return '__SpawnState_join_pid_variable__'
+
+    @property
+    def task_name(self):
+        return self.state_def.launch_task_name
+
+    @property
+    def task_args(self):
+        return self.state_def.launch_args
+
+    @property
+    def result_variable(self):
+        return self.state_def.launch_result_variable
+
     def execute_impl(self, vars_dict, trigger_event):
-        # if async, fire spawn event, and srop if next
-        # if synch, fire spawn event, do whatever JoinState does
-       
-        self.machine.send_spawn_request(task_name, task_args)
+        
+        # Turn self.task_name and self.task_args from LVOV / Arg objects
+        # into concrete values given the current machine's variables:
+        task_name_str = self.task_name.evaluate(self.machine)        
+        task_args_dict = {}
+
+        for arg in self.task_args:
+            task_args_dict[arg.variable_name] = arg.argument_value.evaluate(self.machine)
+        
+        # launch
+        child_pid = self.machine.send_spawn_request(task_name_str, task_args_dict)
+        self.machine.set_variable(self.join_pid_variable, child_pid)
 
         if not self.launch_synchronous:
             return self.srop_if_next()
        
         else:
-            return super().execute_impl(vars_dict, trigger_event)
+            return JoinSROP(self.machine, self.result_variable)
 
 
 class ReturnState(State):

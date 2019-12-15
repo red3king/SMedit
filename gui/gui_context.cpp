@@ -32,7 +32,7 @@ GUIContext::GUIContext(Gtk::GLArea* gl_area, HistoryManager* history_manager, GU
 }
 
 
-void GUIContext::rs_hndl_select_machine(Machine* machine_def)
+void GUIContext::rs_hndl_select_machine(int machine_id, Machine* machine_def)
 {
     // RUN mode only
     if(machine_def == nullptr)
@@ -78,8 +78,9 @@ void GUIContext::calc_to_state_zoom(State* state, float& target_x, float& target
             longest_transition = length;
     }
 
-    // goal -  in screen coordinates, longest transition should be approrximately 
+    // goal -  in screen coordinates, longest transition + state diagonal should be approrximately 
     // the size of the screen
+    longest_transition += sqrt(pow(state->w,2) + pow(state->h,2));
     float longest_transition_screen = gui_state.draw_context.world_dist_to_screen(longest_transition);
     float half_screen_diagonal = sqrt(pow(scw,2) + pow(sch,2)) / 2.0;
     float ratio = longest_transition_screen / half_screen_diagonal;

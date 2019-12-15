@@ -20,7 +20,8 @@ void Actionator::submit_action(Action* action)
     action->assign_id(action_id_ctr++);
     json request = action->create_request();
     string jstr = request.dump();
-    log("actionator: >>> SEND >>> " + jstr);
+    string res = jstr.length() > 150 ? jstr.substr(0, 150) + "..." : jstr;
+    log("actionator: >>> SEND >>> " + res);
     string result = base64_encode((unsigned char*)jstr.c_str(), jstr.length()) + "\r\n";
     current_actions.push_back(action);
     line_client->send(result);

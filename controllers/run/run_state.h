@@ -38,7 +38,7 @@ class RunningState
         vector<RunningMachine>& get_running_machines();
 
         // signals for the GUIContext & GUIState
-        sigc::signal<void, Machine*> select_machine;    // may be nullptr to un-select
+        sigc::signal<void, int, Machine*> select_machine;    // int is running maching id. mach def may be nullptr to un-select
         sigc::signal<void, int> select_state;
 
     private:
@@ -49,4 +49,6 @@ class RunningState
         void on_machine_created(int machine_id, int machine_def_id);
         void on_machine_deleted(int machine_id);
         void on_machine_state_changed(int machine_id, int state_def_id, json state_vars);
+
+        void fire_machine_selected(int id, Machine* machine);
 };

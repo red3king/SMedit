@@ -20,5 +20,9 @@ class LVOV(object):
         else:   # VT_REF, VT_STR
             self.value = valstr
 
+    def evaluate(self, machine):
+        if self.type == ValueType.VT_REF:
+            return machine.get_variable(self.value)
 
+        return self.value
 

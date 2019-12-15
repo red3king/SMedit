@@ -1,7 +1,6 @@
 #include "machines_list_controller.h"
 
 
-
 MachinesListController::MachinesListController(Glib::RefPtr<Gtk::Builder> const& builder, BroadcastEvents& broadcast_events, RunningState* running_state)
 {
     Gtk::TreeView* tree_view;
@@ -10,21 +9,14 @@ MachinesListController::MachinesListController(Glib::RefPtr<Gtk::Builder> const&
     list_view_controller = new ListViewController(tree_view);
     this->running_state = running_state;
 
-    broadcast_events.machine_created.connect(sigc::mem_fun(this, &MachinesListController::on_machine_created));
-    broadcast_events.machine_deleted.connect(sigc::mem_fun(this, &MachinesListController::on_machine_deleted));
+    running_state->select_machine.connect(sigc::mem_fun(this, &MachinesListController::on_machine_select));
     list_view_controller->selection_changed_details.connect(sigc::mem_fun(this, &MachinesListController::on_selection_changed));
 }
 
 
-void MachinesListController::on_machine_created(int machine_id, int machine_def_id)
+void MachinesListController::on_machine_select(int machine_id, Machine* machine_def)
 {
     _update_list(machine_id);
-}
-
-
-void MachinesListController::on_machine_deleted(int machine_id)
-{
-    _update_list();
 }
 
 

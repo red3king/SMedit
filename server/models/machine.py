@@ -91,7 +91,7 @@ class Machine(object):
     def notify_child_returned(self, child_id, return_value):
         child_pid_match = False
 
-        if self.current_state.__class__ == JoinState:
+        if self.current_state.is_joining:
             child_pid = self.get_variable(self.current_state.join_pid_variable)
             child_pid_match = child_id == child_pid
         
@@ -194,14 +194,14 @@ class Machine(object):
         return None
    
     def set_variable(self, variable_name, variable_value):
-        self.vars_dict[varaible_name] = variable_value
+        self.vars_dict[variable_name] = variable_value
 
     def get_variable(self, variable_name):
         return self.vars_dict[variable_name]
 
     def send_spawn_request(self, task_name_str, task_args_dict):
         self.log("send_spawn_request(" + task_name_str + ")")
-        self.spawn_request_signal(self, task_name_str, task_args_dict)
+        return self.spawn_request_signal(self, task_name_str, task_args_dict)
 
     def send_finished_signal(self, return_value):
         self.log("send_finished_signal()")

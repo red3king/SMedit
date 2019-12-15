@@ -31,10 +31,9 @@ class Project(object):
         self.broadcast_signal(broadcast)
 
     def on_machine_finished(self, machine, return_value):
-        if return_value is not None:
-            parent = self.child_to_parent[machine]
-            parent.notify_child_returned(machine.id, return_value)
-        
+        parent = self.child_to_parent[machine]
+        parent.notify_child_returned(machine.id, return_value)
+    
         self.delete_machine(machine)
 
         if machine in self.child_to_parent:
@@ -46,7 +45,8 @@ class Project(object):
         machine_def = self.project_def.get_machine_def(machine_name)
         child = self.create_machine(machine_def, machine_args)
         self.child_to_parent[child] = machine 
-        child.unpause()
+        child.start()
+        return child.id
 
     def create_machine(self, machine_def, machine_args=None):
         # Creates a machine, but does not start running it
@@ -56,7 +56,6 @@ class Project(object):
         machine.broadcast_signal += self.on_broadcast
         machine.finished_signal += self.on_machine_finished
         machine.spawn_request_signal += self.on_machine_spawn_request
-        #machine.join_signal += self.on_machine_join
 
         broadcast = MachineCreateBroadcast(machine.id, machine_def.id)
         self.broadcast_signal(broadcast)
@@ -67,7 +66,6 @@ class Project(object):
         machine.broadcast_signal -= self.on_broadcast
         machine.finished_signal -= self.on_machine_finished
         machine.spawn_request_signal -= self.on_machine_spawn_request
-        #machine.join_signal -= self.on_machine_join
 
         broadcast = MachineDeleteBroadcast(machine.id)
         self.broadcast_signal(broadcast)

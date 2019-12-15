@@ -46,7 +46,7 @@ class GUIContext
         void handle_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id);
 
         // RunningState signals
-        void rs_hndl_select_machine(Machine* machine_def);
+        void rs_hndl_select_machine(int machine_id, Machine* machine_def);
         void rs_hndl_select_state(int state_def_id);
           
         void update();

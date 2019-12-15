@@ -109,17 +109,11 @@ void GUIState::draw()
     float sch = gl_area->get_height();
     float scw = gl_area->get_width();
     draw_context.screen_to_world(current_x, current_y, scw/2.0, sch/2.0);
-    string x_line = "x = " + std::to_string(current_x);
-    string y_line = "y = " + std::to_string(current_y);
-    string z_line = "zoom = " + std::to_string(current_zoom);
-    string wxline = "woffset_x = " + std::to_string(draw_context.woffset_x);
-    string wyline = "woffset_y = " + std::to_string(draw_context.woffset_y);
-    draw_context.draw_text_one_line("[screen center]", font, 15, WHITE, 10, 0, 300);
-    draw_context.draw_text_one_line(x_line, font, 15, WHITE, 10, 20, 300);
-    draw_context.draw_text_one_line(y_line, font, 15, WHITE, 10, 40, 300);
-    draw_context.draw_text_one_line(z_line, font, 15, WHITE, 10, 60, 300);
-    draw_context.draw_text_one_line(wxline, font, 15, WHITE, 10, 80, 300);
-    draw_context.draw_text_one_line(wyline, font, 15, WHITE, 10, 100, 300);
+
+    string coords = "(" + std::to_string(current_x) + ", " + std::to_string(current_y) + ") z=" +
+        std::to_string(current_zoom);
+
+    draw_context.draw_text_one_line(coords, font, 15, WHITE, 10, 8, 300);
 }
 
 

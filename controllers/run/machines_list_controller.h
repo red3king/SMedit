@@ -26,11 +26,12 @@ class MachinesListController
         MachinesListController(Glib::RefPtr<Gtk::Builder> const& builder, BroadcastEvents& broadcast_events, RunningState* running_state);
 
     private:
+        bool selecting;
+
         ListViewController* list_view_controller;
         RunningState* running_state;
 
-        void on_machine_created(int machine_id, int machine_def_id);
-        void on_machine_deleted(int machine_id);
+        void on_machine_select(int machine_id, Machine* machine_def);
         void on_selection_changed(unsigned int machine_id, bool from_user);
 
         void _update_list(int machine_id = -1);

@@ -28,11 +28,20 @@ class Signal(object):
         return self
 
     def fire(self, *args, **kwargs):
+        res = []
         for f in self.functions:
-            f(*args, **kwargs)
+            res.append(f(*args, **kwargs))
+
+        if len(res) > 1:
+            return res
+
+        if len(res) == 1:
+            return res[0]
+
+        return None
 
     def __call__(self, *args, **kwargs):
-        self.fire(*args, **kwargs)
+        return self.fire(*args, **kwargs)
 
 
 

@@ -26,6 +26,10 @@ class ConnectedClient(object):
 class LJProtocol(LineReceiver):
     # "line json" protocol
 
+    MAX_LENGTH = 10000000   # increased to 10M because files are uploaded in a single line
+                            # may cause problems and have to use a better file upload strategy
+                            # TODO maybe fix?
+
     def __init__(self, command_handler):
         self.command_handler = command_handler
         self.client = None

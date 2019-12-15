@@ -152,7 +152,6 @@ void LineClient::send(string line)
     }
 
     lines_to_send.push(line);
-    
     lines_to_send.pop(line);
     io_service.post(boost::bind(&LineClient::do_send, this, line));
 }
