@@ -31,8 +31,9 @@ class Project(object):
         self.broadcast_signal(broadcast)
 
     def on_machine_finished(self, machine, return_value):
-        parent = self.child_to_parent[machine]
-        parent.notify_child_returned(machine.id, return_value)
+        if machine in self.child_to_parent:
+            parent = self.child_to_parent[machine]
+            parent.notify_child_returned(machine.id, return_value)
     
         self.delete_machine(machine)
 

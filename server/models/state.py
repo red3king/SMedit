@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+
+from common import ValueType
 from models.srop import *
 from models.state_def import StateType
 
@@ -128,7 +130,7 @@ class JoinState(State):
             return JoinSROP(self.machine, self.join_result_variable)
 
         # otherwise, assign return value and go to next state
-        self.machine.set_variable(join_result_variable, return_val)
+        self.machine.set_variable(self.join_result_variable, return_val)
         return self.srop_if_next()
 
 
@@ -183,12 +185,13 @@ class SpawnState(State):
         
         # launch
         child_pid = self.machine.send_spawn_request(task_name_str, task_args_dict)
-        self.machine.set_variable(self.join_pid_variable, child_pid)
 
         if not self.launch_synchronous:
+            self.machine.set_variable(self.result_variable, child_pid)
             return self.srop_if_next()
        
         else:
+            self.machine.set_variable(self.join_pid_variable, child_pid)
             return JoinSROP(self.machine, self.result_variable)
 
 

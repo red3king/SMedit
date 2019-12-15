@@ -113,7 +113,7 @@ void GUIState::draw()
     string coords = "(" + std::to_string(current_x) + ", " + std::to_string(current_y) + ") z=" +
         std::to_string(current_zoom);
 
-    draw_context.draw_text_one_line(coords, font, 15, WHITE, 10, 8, 300);
+    draw_context.draw_text_one_line(coords, font, 15, WHITE, 6, 6, 300);
 }
 
 
