@@ -1,8 +1,21 @@
-next up:
-    test async spawn/join
-    test return values
-    test any other types of state or alternate functionality of tested states
+right now - better machine termination rendering
+    currently, when a machine finishes, the ui immediatly removes it
+    it should be kept around for long enough for the auto pan to its terminal state to finish, 
+        and the word "finished" should be displayed on the screen
 
+
+now
+    machine finishes
+    RunningState::on_machine_deleted() immediately fires its machine_selected
+    
+plan
+    machine finishes
+    RunningState::on_machine_deleted() begins a timer
+    timer elapsed -> fire machine_selected
+    
+    if a second machine is deleted when the timer is running,
+        immediately fire machine_selected to go to second deleted machine,
+        then set the timer up again.
 
 BIG TICKET ITEMS
     state synch on connect

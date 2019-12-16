@@ -69,7 +69,6 @@ class StateResultOperation(ABC):
 
 class JoinSROP(StateResultOperation):
 
-    #def __init__(self, machine, pid_var, result_var):
     def __init__(self, machine, result_var):
         super().__init__(machine)
         #self.pid_var = pid_var   appears to be not needed?

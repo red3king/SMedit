@@ -1,4 +1,5 @@
 #include "run_state.h"
+#include "log.h"
 
 
 // RunningMachine
@@ -9,6 +10,7 @@ RunningMachine::RunningMachine(int id, int machine_def_id, string name)
     this->machine_def_id = machine_def_id;
     this->name = name;
     current_state_def_id = -1;
+    terminated = false;
 }
 
 
@@ -19,6 +21,7 @@ RunningState::RunningState(BroadcastEvents& broadcast_events)
 {
     current_project = nullptr;
     current_machine_id = -1;
+    terminated_timer_running = false;
 
     broadcast_events.machine_created.connect(sigc::mem_fun(*this, &RunningState::on_machine_created));
     broadcast_events.machine_deleted.connect(sigc::mem_fun(*this, &RunningState::on_machine_deleted));
@@ -67,12 +70,45 @@ void RunningState::on_machine_created(int machine_id, int machine_def_id)
 
 void RunningState::on_machine_deleted(int machine_id)
 {
-    // update state
-    int i=0;
-    for(; i<running_machines.size(); i++)
+    if(terminated_timer_running)
+    {
+        log("TERMINATED TIMER RUNNING, STOPPING");
+        // cancel terminated timer
+        terminated_timer_connection.disconnect();
+
+        // immediately act as if current timer finished
+        on_terminated_timer_tick();
+
+        // then, continues to below to reschedule timer to next non-deleted machine
+    }
+
+    for(int i=0; i<running_machines.size(); i++)
     {
         if(running_machines[i].id == machine_id)
+            running_machines[i].terminated = true;
+    }
+
+    log("starting terminated timer");
+    terminated_timer_running = true;
+    terminated_timer_connection = Glib::signal_timeout().connect(sigc::mem_fun(*this, &RunningState::on_terminated_timer_tick), 2000);
+}
+
+
+bool RunningState::on_terminated_timer_tick()
+{
+    terminated_timer_running = false;
+
+    log("terminated timer on_tick");
+    // find the terminated machine
+    int i=0;
+    int machine_id = 0;
+    for(; i<running_machines.size(); i++)
+    {
+        if(running_machines[i].terminated)
+        {
+            machine_id = running_machines[i].id;
             break;
+        }
     }
 
     running_machines.erase(running_machines.begin() + i);
@@ -83,7 +119,7 @@ void RunningState::on_machine_deleted(int machine_id)
         if(running_machines.size() == 0)
         {
             fire_machine_selected(-1, nullptr);
-            return;
+            return false;
         }
 
         // TODO actually keep track of the machines spawn stack
@@ -96,6 +132,8 @@ void RunningState::on_machine_deleted(int machine_id)
         fire_machine_selected(running_machine.id, machine_def);
         select_state.emit(running_machine.current_state_def_id);
     }
+
+    return false;
 }
 
 

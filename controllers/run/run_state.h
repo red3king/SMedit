@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <sigc++/sigc++.h>
+#include <gtkmm.h>
 #include "lib/json.hpp"
 
 #include "net/broadcast_events.h"
@@ -20,6 +21,7 @@ class RunningMachine
         int machine_def_id;
         int current_state_def_id;
         json state_vars;
+        bool terminated;  // runningmachines are kept around for a few seconds before being removed
 };
 
 
@@ -27,6 +29,10 @@ class RunningState
 {
     // Keeps track of the current state each running machine is in on the server
     // Also emits signals to update the GUI area
+
+    // When a machine finishes ("terminated"), RunningState
+    // waits for a few seconds before emitting the select_machine signal,
+    // to give the UI time to show that machine enter its final state.
 
     public:
         RunningState(BroadcastEvents& broadcast_events);
@@ -45,6 +51,11 @@ class RunningState
         Project* current_project;
         vector<RunningMachine> running_machines;
         int current_machine_id;  // id of RunningMachine displayed on screen. not def id.
+
+        bool terminated_timer_running;
+        sigc::connection terminated_timer_connection;
+
+        bool on_terminated_timer_tick();
 
         void on_machine_created(int machine_id, int machine_def_id);
         void on_machine_deleted(int machine_id);

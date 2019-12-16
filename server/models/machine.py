@@ -142,13 +142,17 @@ class Machine(object):
 
     def update(self):
         self.log("update()")
-        srop = self.current_state.execute(self.vars_dict)
+        
+        #moved below so broadcast for entering terminal/return state
+        # comes before we execute it, otherwise the state change signal 
+        # gets disconnected before sending the signal.
+        #srop = self.current_state.execute(self.vars_dict)
         
         broadcast = StateChangeBroadcast(self.id, self.current_state.id, self.vars_dict)
         self.broadcast_signal(broadcast)
+        
+        srop = self.current_state.execute(self.vars_dict)
 
-        #if srop is not None:
-        #    self.run_srop(srop)
         return srop
 
     def get_next_states(self, from_state, transition_type=None):
