@@ -6,13 +6,13 @@
 #include "gui/models/gui_state.h"
 
 
-GUIState::GUIState(GUIAreaMode execution_mode, RunningState* running_state, Gtk::GLArea* gl_area) : draw_context(gl_area)
+GUIState::GUIState(GUIAreaMode execution_mode, RunningState* running_state, BannerDisplayer* banner_displayer, 
+        Gtk::GLArea* gl_area) : draw_context(gl_area)
 {
     mode = execution_mode;
-    this->running_state = running_state; // only  for GAM_RUN
 
-    //if(mode == GAM_RUN)
-    //    running_state->select_state.connect(sigc::mem_fun(*this, &GUIState::on_rs_state_select));
+    this->running_state = running_state; // only  for GAM_RUN
+    this->banner_displayer = banner_displayer;
 }
 
 
@@ -102,6 +102,7 @@ void GUIState::draw()
     for(int i=0; i<gui_models.size(); i++)
         gui_models[i]->draw();
 
+
     int font = draw_context.font_hack;
     float current_x, current_y, current_zoom;
     current_zoom = draw_context.get_zoom_factor();
@@ -114,6 +115,9 @@ void GUIState::draw()
         std::to_string(current_zoom);
 
     draw_context.draw_text_one_line(coords, font, 15, WHITE, 6, 6, 300);
+
+    if(mode == GAM_RUN)    
+        banner_displayer->draw(draw_context);
 }
 
 
@@ -249,7 +253,3 @@ void GUIState::remove_gui_model(unsigned int entity_id)
 }
 
 
-void GUIState::force_gui_context_update()
-{
-    signal_force_update.emit();
-}   

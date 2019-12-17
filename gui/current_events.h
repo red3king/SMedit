@@ -2,7 +2,8 @@
 
 #include <unordered_set>
 #include <gdk/gdk.h>
-#include <chrono>
+
+#include "timestuff.h"
 
 
 using std::unordered_set;
@@ -47,10 +48,6 @@ enum CurrentEventType
     ET_MB_TRIPLE,
     ET_SCROLL
 };
-
-
-using namespace std::chrono;
-typedef high_resolution_clock::time_point millitime;
 
 
 class CurrentEvents

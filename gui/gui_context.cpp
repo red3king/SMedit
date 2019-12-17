@@ -11,16 +11,18 @@
 #include "log.h"
 
 
-GUIContext::GUIContext(Gtk::GLArea* gl_area, HistoryManager* history_manager, GUIAreaMode execution_mode, RunningState* running_state) : gui_state(execution_mode, running_state, gl_area)
+GUIContext::GUIContext(Gtk::GLArea* gl_area, HistoryManager* history_manager, GUIAreaMode execution_mode, RunningState* running_state, BannerDisplayer* banner_displayer) : gui_state(execution_mode, running_state, banner_displayer, gl_area)
 {
     this->gl_area = gl_area;
     this->history_manager = history_manager;
+    this->banner_displayer = banner_displayer;
+    this->running_state = running_state;
+
     mode = execution_mode;
     current_operation = nullptr;
     current_machine_id = 0;
     current_cursor_type = CT_DEFAULT;
 
-    gui_state.signal_force_update.connect(sigc::mem_fun(*this, &GUIContext::update));
     register_sm_signal_handlers();
     register_gtk_signal_handlers();
 
@@ -38,7 +40,7 @@ void GUIContext::rs_hndl_select_machine(int machine_id, Machine* machine_def)
     if(machine_def == nullptr)
         unset_machine();
     else
-        set_machine(machine_def);
+        set_machine(machine_def, machine_id);
 }
 
 
@@ -96,20 +98,39 @@ void GUIContext::calc_to_state_zoom(State* state, float& target_x, float& target
 }
 
 
-void GUIContext::set_machine(Machine* current_machine)
+void GUIContext::set_machine(Machine* current_machine, int running_machine_id)
 {
+    
+    // disable auto pan when changing machines, we should only smoothly
+    // move camera when going between 2 places in one machine
+    current_events.disable_ap();   
+    
     this->current_machine = current_machine;
     current_machine_id = current_machine->id;
     gui_state.set_machine(current_machine);
 
-    // pan to location of initial state
+
     State* state = nullptr;
-    for(int i=0; i<current_machine->states.size(); i++)
-    {
-        if(current_machine->states[i]->type == INITIAL)
-            state = current_machine->states[i];
-    }
     
+    if(mode == GAM_BUILD)
+    {
+        for(int i=0; i<current_machine->states.size(); i++)
+        {
+            if(current_machine->states[i]->type == INITIAL)
+                state = current_machine->states[i];
+        }
+    }
+
+    else
+    {
+        auto running_machine = running_state->get_running_machine(running_machine_id);
+        for(int i=0; i<current_machine->states.size(); i++)
+        {
+            if(current_machine->states[i]->id == running_machine.current_state_def_id)
+                state = current_machine->states[i];        
+        }
+    }
+
     if(state != nullptr)
     {
         float target_x, target_y, target_zoom;
@@ -290,6 +311,9 @@ bool GUIContext::has_current_operation()
 
 void GUIContext::update()
 {
+    if(mode == GAM_RUN)
+        banner_displayer->update();
+
     // Let gui models react to mouse being nearby & possibly get new cursor 
     bool clear_selected;
     GUIModel* just_selected;

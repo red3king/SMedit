@@ -5,9 +5,10 @@
 #include <vector>
 #include <map>
 
+#include "gui/gui_context.h"
+
 using std::vector;
 using std::map;
-typedef boost::function<void()> AnimationCB;
 
 
 #define ANIMATION_TICK_MS 33    // 30 fps, but event loop probably runs around 15 fps or something
@@ -16,14 +17,15 @@ typedef boost::function<void()> AnimationCB;
 class AnimationTimer
 {
     public:
-        AnimationTimer();
+        AnimationTimer(GUIContext* gui_context);
 
-        int add_callback(AnimationCB callback);
-        void remove_callback(int submission_id);
+        int add_request();
+        void remove_request(int submission_id);
 
     private:
-        map<int, AnimationCB> callbacks;
-        
+        GUIContext* gui_context;
+        vector<int> requests;
+
         sigc::connection timer_connection;
         int _id_ctr;
 
@@ -32,4 +34,4 @@ class AnimationTimer
 
 
 
-extern AnimationTimer animation_timer;
+extern AnimationTimer *animation_timer;

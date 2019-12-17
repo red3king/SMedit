@@ -6,7 +6,8 @@
 #include "current_events.h"
 #include "gui_state.h"
 #include "historymanager/historymanager.h"
-#include "gui/operations/gui_operation.h"
+#include "operations/gui_operation.h"
+#include "banner_display.h"
 #include "controllers/run/run_state.h"
 
 
@@ -17,14 +18,14 @@ class GUIContext
     // TODO name these better?
 
     public:
-        GUIContext(Gtk::GLArea* gl_area, HistoryManager* history_manager, GUIAreaMode execution_mode, RunningState* running_state=nullptr); // RunningState only for GAM_RUN
+        GUIContext(Gtk::GLArea* gl_area, HistoryManager* history_manager, GUIAreaMode execution_mode, RunningState* running_state=nullptr, BannerDisplayer* banner_displayer=nullptr); // RunningState & BannerDisplayer only for GAM_RUN
 
         GUIAreaMode mode; // are we a place for the user to build a state machine,
                           // or a place to watch it run?
 
         unsigned int current_machine_id;
 
-        void set_machine(Machine* current_machine);
+        void set_machine(Machine* current_machine, int running_machine_id = -1);
         void unset_machine();
         
         void reset(bool reload);
@@ -54,6 +55,8 @@ class GUIContext
         Gtk::GLArea* gl_area;
         NVGcontext* vg;
 
+        BannerDisplayer* banner_displayer;
+
         CurrentEvents current_events;
         GUIState gui_state;
         GUIOperation* current_operation;
@@ -64,6 +67,9 @@ class GUIContext
         HistoryManager* history_manager;
 
     private:
+
+        RunningState* running_state;
+
         void calc_to_state_zoom(State* state, float& target_x, float& target_y, float& target_zoom);
 
         bool has_current_operation();

@@ -1,21 +1,5 @@
-right now - better machine termination rendering
-    currently, when a machine finishes, the ui immediatly removes it
-    it should be kept around for long enough for the auto pan to its terminal state to finish, 
-        and the word "finished" should be displayed on the screen
-
-
-now
-    machine finishes
-    RunningState::on_machine_deleted() immediately fires its machine_selected
-    
-plan
-    machine finishes
-    RunningState::on_machine_deleted() begins a timer
-    timer elapsed -> fire machine_selected
-    
-    if a second machine is deleted when the timer is running,
-        immediately fire machine_selected to go to second deleted machine,
-        then set the timer up again.
+just finished making animations better and delaying signals for user to see final states.
+next up? proabaly a big ticket item from list
 
 BIG TICKET ITEMS
     state synch on connect
@@ -29,26 +13,9 @@ todo - implement the local and server options:
     - minimum state transition time on server 
 
 
-animations:
-    also, when the last transition occurs, i might want the machine to stick around so the user can see the full
-        transition into the final state. maybe thats better than trying to build that complicated call stack i wanted.
-        (the user will still be able to use the machine list piker to choose a machine)
-
-    next up: do that machine list picker
-
-
 at some point, find a way to catch errors in the functions sent into the twisted event loop, 
     and display those on the client.
 
-
-eventually, build the get current running project status command,
-    which will sync up the current:
-        -list of running machines and their states
-        -whether or not the current project is paused, started or stopped
-    this should happen before we can render, after we get a hash match, on connect.
-
-
-then: add in custom state types & implement http and file io states.
 
 
 undoing and then redoing the same thing seems buggy, after a while there's no more undo/redo at all

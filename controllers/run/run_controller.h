@@ -11,6 +11,7 @@
 #include "net/actionator.h"
 #include "net/broadcast_events.h"
 #include "models/project.h"
+#include "gui/banner_display.h"
 #include "historymanager/historymanager.h"
 #include "controllers/run/machines_list_controller.h"
 
@@ -39,6 +40,7 @@ class RunController
         Actionator actionator;
         BroadcastEvents broadcast_events;       
         MachinesListController* machines_list_controller;
+        BannerDisplayer banner_displayer;
 
         GUIContext* gui_context;
         Gtk::GLArea *gl_area;
@@ -82,6 +84,10 @@ class RunController
         void on_lopt_auto_pan_changed();
         void on_lopt_open_spawned_changed();
         void on_sopt_min_trans_time_changed();
+
+        // display banner when things happen
+        void banner_on_mach_create(int machine_id, int machine_def_id);
+        void banner_on_mach_delete(int machine_id);
 
         void update_enabled();
         void begin_get_hash();

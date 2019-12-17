@@ -1,17 +1,14 @@
 #include <boost/bind.hpp>
-#include <chrono>
 
 #include "log.h"
 #include "auto_pan.h"
-
-using namespace std::chrono;
+#include "timestuff.h"
 
 
 AutoPan::AutoPan(GUIState& gui_state)
 {
     has_last_update = false;
-    animation_callback = boost::bind(&GUIState::force_gui_context_update, &gui_state);
-    cb_id = animation_timer.add_callback(animation_callback);
+    cb_id = animation_timer->add_request();
 }
 
 
@@ -43,7 +40,7 @@ double AutoPan::get_elapsed_seconds(CurrentEvents& current_events)
 {
     millitime now = high_resolution_clock::now();
     millitime then = current_events.ap_when;
-    return std::chrono::duration_cast<std::chrono::milliseconds>(now - then).count() / 1000.0;
+    return timedelta_ms(now, then) / 1000.0;
 }
 
 
@@ -52,6 +49,9 @@ bool AutoPan::on_continue(GUIState& gui_state, CurrentEvents& current_events, Op
     CurrentEvents& c = current_events;
     float dt = get_elapsed_seconds(current_events);
     float t = dt / AUTO_PAN_SECONDS;   // t is parameter from 0 to 1
+   
+    // juicy time warp  
+    t = pow(t, 1.0/2.5);
 
     //  f(x) = x0 + t(x1 - x0) linear interpolate position
     float new_x = c.ap_initial_x + t * (c.ap_target_x - c.ap_initial_x);
@@ -81,6 +81,6 @@ bool AutoPan::on_continue(GUIState& gui_state, CurrentEvents& current_events, Op
 bool AutoPan::on_end(GUIState& gui_state, CurrentEvents& current_events, Operation*& op)
 {
     current_events.disable_ap();
-    animation_timer.remove_callback(cb_id);
+    animation_timer->remove_request(cb_id);
     return false;
 }

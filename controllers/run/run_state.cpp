@@ -11,6 +11,7 @@ RunningMachine::RunningMachine(int id, int machine_def_id, string name)
     this->name = name;
     current_state_def_id = -1;
     terminated = false;
+    created = false;
 }
 
 
@@ -32,6 +33,18 @@ RunningState::RunningState(BroadcastEvents& broadcast_events)
 void RunningState::set_project(Project* current_project)
 {
     this->current_project = current_project;
+}
+
+
+RunningMachine& RunningState::get_running_machine(int machine_id)
+{
+    for(int i=0; i<running_machines.size(); i++)
+    {
+        if(running_machines[i].id == machine_id)
+            return running_machines.at(i);
+    }
+
+    return running_machines.at(0);
 }
 
 
@@ -61,36 +74,59 @@ vector<RunningMachine>& RunningState::get_running_machines()
 
 void RunningState::on_machine_created(int machine_id, int machine_def_id)
 {
+    // For the first machine created, fire the signal immediately
+    // for subsequent machines, use the timer to delay the signal.
+
+    bool has_current_machine = current_machine_id != -1;
+
+    if(has_current_machine)
+        _finish_timer_if_active();
+    
     auto machine_def = current_project->get_machine_by_id(machine_def_id);
-    string rm_name = "M" + std::to_string(machine_id) + " - " + machine_def->name;
-    running_machines.push_back(RunningMachine(machine_id, machine_def_id, rm_name));       
-    fire_machine_selected(machine_id, machine_def);
+    string rm_name = machine_def->name + "__" + std::to_string(machine_id);
+    auto rm = RunningMachine(machine_id, machine_def_id, rm_name);
+    rm.created = has_current_machine;
+    running_machines.push_back(rm);       
+
+    if(has_current_machine)
+        _start_timer();
+
+    else
+        fire_machine_selected(rm.id, machine_def);
 }
 
 
-void RunningState::on_machine_deleted(int machine_id)
+void RunningState::_finish_timer_if_active()
 {
     if(terminated_timer_running)
     {
-        log("TERMINATED TIMER RUNNING, STOPPING");
         // cancel terminated timer
         terminated_timer_connection.disconnect();
 
         // immediately act as if current timer finished
         on_terminated_timer_tick();
-
-        // then, continues to below to reschedule timer to next non-deleted machine
     }
+}
 
+
+void RunningState::_start_timer()
+{
+    terminated_timer_running = true;
+    terminated_timer_connection = Glib::signal_timeout().connect(sigc::mem_fun(*this, &RunningState::on_terminated_timer_tick), VIEW_DELAY_MS);   
+}
+
+
+void RunningState::on_machine_deleted(int machine_id)
+{
+    _finish_timer_if_active();
+    
     for(int i=0; i<running_machines.size(); i++)
     {
         if(running_machines[i].id == machine_id)
             running_machines[i].terminated = true;
     }
 
-    log("starting terminated timer");
-    terminated_timer_running = true;
-    terminated_timer_connection = Glib::signal_timeout().connect(sigc::mem_fun(*this, &RunningState::on_terminated_timer_tick), 2000);
+    _start_timer();
 }
 
 
@@ -98,39 +134,53 @@ bool RunningState::on_terminated_timer_tick()
 {
     terminated_timer_running = false;
 
-    log("terminated timer on_tick");
     // find the terminated machine
     int i=0;
     int machine_id = 0;
+    bool created;
     for(; i<running_machines.size(); i++)
     {
-        if(running_machines[i].terminated)
+        if(running_machines[i].terminated || running_machines[i].created)
         {
             machine_id = running_machines[i].id;
+            created = running_machines[i].created;
             break;
         }
     }
 
-    running_machines.erase(running_machines.begin() + i);
-
-    // emit signals if current deleted
-    if(machine_id == current_machine_id)
+    if(created)
     {
-        if(running_machines.size() == 0)
+        // emit signals when new machine created
+        auto rm = running_machines.at(i);
+        auto machine_def = current_project->get_machine_by_id(rm.machine_def_id);
+        running_machines[i].created = false;
+        fire_machine_selected(rm.id, machine_def); 
+        select_state.emit(rm.current_state_def_id);
+    }
+    
+    else
+    {
+        running_machines.erase(running_machines.begin() + i);
+
+        // emit signals only if current selected machine deleted
+        if(machine_id == current_machine_id)
         {
-            fire_machine_selected(-1, nullptr);
-            return false;
+            if(running_machines.size() == 0)
+            {
+                fire_machine_selected(-1, nullptr);
+                return false;
+            }
+
+            // TODO actually keep track of the machines spawn stack
+            // so we can go back to the spawner of the machine that just died.
+            // for this we will have to modify the machine created broadcast to include id
+            // of the parent machine
+            auto running_machine = running_machines[running_machines.size() - 1];
+            auto machine_def = current_project->get_machine_by_id(running_machine.machine_def_id);
+
+            fire_machine_selected(running_machine.id, machine_def);
+            select_state.emit(running_machine.current_state_def_id);
         }
-
-        // TODO actually keep track of the machines spawn stack
-        // so we can go back to the spawner of the machine that just died.
-        // for this we will have to modify the machine created broadcast to include id
-        // of the parent machine
-        auto running_machine = running_machines[running_machines.size() - 1];
-        auto machine_def = current_project->get_machine_by_id(running_machine.machine_def_id);
-
-        fire_machine_selected(running_machine.id, machine_def);
-        select_state.emit(running_machine.current_state_def_id);
     }
 
     return false;

@@ -8,6 +8,8 @@
 #include "net/broadcast_events.h"
 #include "models/project.h"
 
+#define VIEW_DELAY_MS 900
+
 using std::vector;
 
 
@@ -22,6 +24,7 @@ class RunningMachine
         int current_state_def_id;
         json state_vars;
         bool terminated;  // runningmachines are kept around for a few seconds before being removed
+        bool created;
 };
 
 
@@ -42,6 +45,7 @@ class RunningState
         void user_select_machine(int machine_id);   // user clicked on a machine, emit the signal. 
 
         vector<RunningMachine>& get_running_machines();
+        RunningMachine& get_running_machine(int machine_id);
 
         // signals for the GUIContext & GUIState
         sigc::signal<void, int, Machine*> select_machine;    // int is running maching id. mach def may be nullptr to un-select
@@ -56,6 +60,9 @@ class RunningState
         sigc::connection terminated_timer_connection;
 
         bool on_terminated_timer_tick();
+
+        void _finish_timer_if_active();
+        void _start_timer();
 
         void on_machine_created(int machine_id, int machine_def_id);
         void on_machine_deleted(int machine_id);

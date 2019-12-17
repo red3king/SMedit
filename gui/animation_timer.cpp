@@ -2,18 +2,18 @@
 #include "log.h"
 
 
-AnimationTimer::AnimationTimer()
+AnimationTimer::AnimationTimer(GUIContext* gui_context)
 {
     _id_ctr = 0;
+    this->gui_context = gui_context;
 }
 
 
-int AnimationTimer::add_callback(AnimationCB callback)
+int AnimationTimer::add_request()
 {
     int submission_id = _id_ctr++;
-
-    bool started = callbacks.size() > 0;
-    callbacks[submission_id] = callback;
+    bool started = requests.size() > 0;
+    requests.push_back(submission_id);
 
     //start if not
     if(!started)
@@ -23,22 +23,27 @@ int AnimationTimer::add_callback(AnimationCB callback)
 }
 
 
-void AnimationTimer::remove_callback(int submission_id)
+void AnimationTimer::remove_request(int submission_id)
 {
-    callbacks.erase(submission_id);
+    int i=0;
+    for(; i<requests.size(); i++)
+    {
+        if(requests[i] == submission_id)
+            break;
+    }
 
-    if(callbacks.size() == 0)
+    requests.erase(requests.begin() + i); 
+
+    if(requests.size() == 0)
         timer_connection.disconnect();
 }
 
 
 bool AnimationTimer::on_tick()
 {
-    for(auto it=callbacks.begin(); it != callbacks.end(); it++)
-        it->second();
-
+    gui_context->update();
     return true;
 }
 
 
-AnimationTimer animation_timer;
+AnimationTimer *animation_timer;

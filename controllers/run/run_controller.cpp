@@ -1,5 +1,6 @@
 #include <gdkmm/rgba.h>
 
+#include "gui/animation_timer.h"
 #include "run_controller.h"
 #include "utils.h"
 #include "net/actions/all.h"
@@ -41,8 +42,9 @@ RunController::RunController(HistoryManager* history_manager, ProjectInfo* proje
     builder->get_widget("lopt_open_spawned", lopt_open_spawned_cb);
     builder->get_widget("sopt_min_trans_time", sopt_min_trans_time_entry);
 
-    gui_context = new GUIContext(gl_area, history_manager, GAM_RUN, running_state);
-
+    gui_context = new GUIContext(gl_area, history_manager, GAM_RUN, running_state, &banner_displayer);
+    animation_timer = new AnimationTimer(gui_context);
+    
     lopt_auto_pan_cb->set_active(options.get_auto_pan());
     lopt_open_spawned_cb->set_active(options.get_open_spawned());
 
@@ -62,7 +64,24 @@ RunController::RunController(HistoryManager* history_manager, ProjectInfo* proje
     start_button->signal_clicked().connect(sigc::mem_fun(this, &RunController::on_start_click));
     pause_button->signal_clicked().connect(sigc::mem_fun(this, &RunController::on_pause_click));
 
+    broadcast_events.machine_created.connect(sigc::mem_fun(this, &RunController::banner_on_mach_create));
+    broadcast_events.machine_deleted.connect(sigc::mem_fun(this, &RunController::banner_on_mach_delete));
+
     update_enabled();
+}
+
+
+void RunController::banner_on_mach_create(int machine_id, int machine_def_id)
+{
+    RunningMachine& mach = running_state->get_running_machine(machine_id);
+    banner_displayer.display_banner(mach.name + " spawned");       
+}
+
+
+void RunController::banner_on_mach_delete(int machine_id)
+{
+    RunningMachine& mach = running_state->get_running_machine(machine_id);
+    banner_displayer.display_banner(mach.name + " terminated");
 }
 
 
@@ -70,7 +89,6 @@ void RunController::on_lopt_auto_pan_changed()
 {
     bool value = lopt_auto_pan_cb->get_active();
     options.set_auto_pan(value);
-
 }
 
 
@@ -216,6 +234,7 @@ void RunController::on_start_stop_complete(Action* action)
     }
 
     project_started = !project_started;
+    banner_displayer.display_banner(project_started ? "started" : "stopped");
     update_enabled();
 }
 
@@ -245,6 +264,7 @@ void RunController::on_pause_unpause_complete(Action* action)
     }
 
     project_paused = !project_paused;
+    banner_displayer.display_banner(project_paused ? "paused" : "unpaused");
     update_enabled();
 }
 

@@ -3,7 +3,8 @@
 #include <vector>
 
 #include "draw_context.h"
-#include "gui/models/gui_model.h"
+#include "models/gui_model.h"
+#include "banner_display.h"
 #include "signals.h"
 #include "controllers/run/run_state.h"
 
@@ -16,11 +17,10 @@ class GUIState
     // Describes the state of the opengl box containing states, transitions, and resourcelocks
 
     public:
-        GUIState(GUIAreaMode execution_mode, RunningState* running_state, Gtk::GLArea* gl_area);
+        GUIState(GUIAreaMode execution_mode, RunningState* running_state, 
+                BannerDisplayer* banner_displayer, Gtk::GLArea* gl_area);
 
         GUIAreaMode mode;
-
-        sigc::signal<void> signal_force_update;
 
         DrawContext draw_context;
         RunningState* running_state;
@@ -40,10 +40,11 @@ class GUIState
         void draw();
 
         // GAM_RUN animation stuff
-        void force_gui_context_update();
         void rs_state_select(int state_def_id);
 
     private:
+        BannerDisplayer* banner_displayer;
+
         void delete_models();
         void create_models();
 

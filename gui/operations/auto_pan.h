@@ -6,7 +6,7 @@
 #include "gui/animation_timer.h"
 
 
-#define AUTO_PAN_SECONDS 1.2
+#define AUTO_PAN_SECONDS 0.8
 
 
 class AutoPan : public GUIOperation
@@ -24,7 +24,6 @@ class AutoPan : public GUIOperation
     private:
         bool has_last_update;
         time_t last_update_time;
-        AnimationCB animation_callback;        
         int cb_id;
 
         double get_elapsed_seconds(CurrentEvents& current_events);
