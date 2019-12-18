@@ -4,12 +4,21 @@
 
 BroadcastEvents::BroadcastEvents()
 {
+    enabled = false;
+}
 
+
+void BroadcastEvents::set_enabled(bool enabled)
+{
+    this->enabled = enabled;
 }
 
 
 void BroadcastEvents::handle_broadcast(json broadcast)
 {
+    if(!enabled)
+        return;
+
     json resp;
 
     try { resp  = broadcast["resp"]; }

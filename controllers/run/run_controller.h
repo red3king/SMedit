@@ -48,6 +48,7 @@ class RunController
         HashState hash_state;
         int32_t local_checksum, server_checksum;
         bool has_deployed_project, project_open, is_connected, is_connecting;
+        bool state_synchronized;
         bool project_started, project_paused;
         Project deployed_project;
 
@@ -70,6 +71,7 @@ class RunController
         void on_connection_attempt_complete(ConnectionResult result);
         
         void on_get_hash_complete(Action* action);
+        void on_state_synch_complete(Action* action);
         void on_start_stop_complete(Action* action);
         void on_pause_unpause_complete(Action* action);
 

@@ -25,8 +25,11 @@ class BroadcastEvents
         sigc::signal<void, int> machine_deleted;                        // machine_id
 
         void handle_broadcast(json broadcast);
+        void set_enabled(bool enabled);
 
     private:
+        bool enabled;
+        
         void handle_machine_state_changed(json data);
         void handle_machine_created(json date);
         void handle_machine_deleted(json data);

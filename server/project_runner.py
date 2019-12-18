@@ -109,3 +109,10 @@ class ProjectRunner(object):
 
     def load_project(self):
         self.project.load()
+
+    def dump_state(self):
+        return {
+            "project_started": self._started,
+            "project_paused": self._paused,
+            "machines_list": self.project.dump_state()
+        }

@@ -18,6 +18,7 @@ RunController::RunController(HistoryManager* history_manager, ProjectInfo* proje
     is_connecting = false;
     project_started = false;
     project_paused = false;
+    state_synchronized = false;
     hash_state = HS_UNKNOWN;
 
     local_checksum = CHK_UNKNOWN;
@@ -131,9 +132,12 @@ void RunController::on_connection_attempt_complete(ConnectionResult result)
 {
     is_connected = result == CR_SUCCESS;
     is_connecting = false;
+    state_synchronized = false;
 
     update_enabled();
-    begin_get_hash();
+    
+    if(is_connected)
+        begin_get_hash();
 }
 
 
@@ -144,16 +148,55 @@ void RunController::on_get_hash_complete(Action* action)
     if(get_hash->status == AS_SUCCESS)
     {
         server_checksum = get_hash->project_hash;
-        deployed_project = project_info->saved_project;
-        running_state->set_project(&deployed_project);
+        hash_state = local_checksum == server_checksum ? HS_SAME : HS_DIFFERENT; 
+       
+        if(hash_state == HS_SAME) 
+        {
+            deployed_project = project_info->saved_project;
+            running_state->set_project(&deployed_project);
+
+            auto synch_cb = boost::bind(&RunController::on_state_synch_complete, this, _1);
+            auto state_synch = new StateSynchAction(synch_cb);
+            actionator.submit_action(state_synch);
+        }
+
+        else
+        {
+            deployed_project = Project();
+            running_state->set_project(&deployed_project);
+        }
     }
+
     else
     {
+        hash_state = HS_UNKNOWN;
         server_checksum = CHK_UNKNOWN;
         display_action_error(action);
         deployed_project = Project();
-        running_state->set_project(&deployed_project); // maybe use nullptr to signify no project?
+        running_state->set_project(&deployed_project); // TODO maybe use nullptr to signify no project?
     }
+
+    update_enabled();
+}
+
+
+void RunController::on_state_synch_complete(Action* action)
+{
+    StateSynchAction* synch = (StateSynchAction*) action;
+
+    if(synch->status != AS_SUCCESS)
+    {
+        display_action_error(action);
+        return;
+    }
+
+    project_started = synch->project_started;
+    project_paused = synch->project_paused;
+    running_state->initial_state_synch(synch->current_running_machines);
+    broadcast_events.set_enabled(true);
+    
+    state_synchronized = true;
+    
 
     update_enabled();
 }
@@ -163,7 +206,9 @@ void RunController::on_disconnection(bool intentional)
 {
     is_connected = false;
     is_connecting = false;
+    state_synchronized = false;
     server_checksum = CHK_UNKNOWN;
+    broadcast_events.set_enabled(false);
     update_enabled();
 }
 
@@ -269,8 +314,6 @@ void RunController::on_pause_unpause_complete(Action* action)
 }
 
 
-
-
 string make_hash_label(int hash)
 {
     if(hash == CHK_UNKNOWN)
@@ -290,25 +333,6 @@ void RunController::begin_get_hash()
 
 void RunController::update_enabled()
 {
-    // logic
-    HashState new_hash_state = HS_UNKNOWN;
-    if(is_connected && local_checksum != CHK_UNKNOWN && server_checksum != CHK_UNKNOWN)
-        new_hash_state = local_checksum == server_checksum ? HS_SAME : HS_DIFFERENT;
-
-    if(new_hash_state != hash_state)
-    {
-        if(hash_state == HS_SAME)
-        {
-            //enable stuff
-        }
-        else if(hash_state == HS_DIFFERENT)
-        {
-            //disable stuff
-        }
-    }
-
-    hash_state = new_hash_state;
-
     // widget updates
     server_entry->set_sensitive(project_open && !is_connected && !is_connecting);
     deploy_button->set_sensitive(project_open && is_connected && !is_connecting);
@@ -332,9 +356,9 @@ void RunController::update_enabled()
     server_hash_label->override_color(color);
 
     bool hash_match = hash_state == HS_SAME;
-    start_button->set_sensitive(is_connected && hash_match);
+    start_button->set_sensitive(state_synchronized && is_connected && hash_match);
     start_button->set_label(project_started ? "stop" : "start");
-    pause_button->set_sensitive(is_connected && hash_match);
+    pause_button->set_sensitive(state_synchronized && is_connected && hash_match);
     pause_button->set_label(project_paused ? "unpause" : "pause"); 
 }
 

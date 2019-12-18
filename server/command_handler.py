@@ -24,7 +24,8 @@ class CommandHandler(object):
                 "stop project": self.stop_project_handler,
                 "pause project": self.pause_project_handler,
                 "unpause project": self.unpause_project_handler,
-                "project hash": self.project_hash_handler
+                "project hash": self.project_hash_handler,
+                "state synch" : self.state_synch_handler
             }
 
     def add_client(self, client):
@@ -173,3 +174,6 @@ class CommandHandler(object):
         self.project_runner.load_project()
         return self.success_response(message_id)
 
+    def state_synch_handler(self, client, message_id, command_json):
+        response_data = self.project_runner.dump_state()
+        return self.success_response(message_id, response_data)

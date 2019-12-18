@@ -72,6 +72,43 @@ vector<RunningMachine>& RunningState::get_running_machines()
 }
 
 
+void RunningState::initial_state_synch(json machines_list)
+{
+    running_machines.clear();
+    current_machine_id = -1;
+
+    for(int i=0; i<machines_list.size(); i++)
+    {
+        json machine = machines_list[i];
+        int id = machine["id"];
+        int machine_def_id = machine["machine_def_id"];
+        int current_state_def_id = machine["current_state_def_id"];
+        auto rm = make_running_machine(id, machine_def_id, current_state_def_id);
+        running_machines.push_back(rm);
+    }
+
+    int l = running_machines.size();
+
+    if(l > 0)
+    {
+        auto rm = running_machines[l-1];
+        auto machine_def = current_project->get_machine_by_id(rm.machine_def_id);
+        fire_machine_selected(rm.id, machine_def);
+        select_state.emit(rm.current_state_def_id);
+    }
+}
+
+
+RunningMachine RunningState::make_running_machine(int id, int machine_def_id, int state_def_id)
+{
+    auto machine_def = current_project->get_machine_by_id(machine_def_id);
+    string name = machine_def->name + "__" + std::to_string(id);
+    auto machine = RunningMachine(id, machine_def_id, name);
+    machine.current_state_def_id = state_def_id;
+    return machine;
+}
+
+
 void RunningState::on_machine_created(int machine_id, int machine_def_id)
 {
     // For the first machine created, fire the signal immediately
@@ -82,9 +119,7 @@ void RunningState::on_machine_created(int machine_id, int machine_def_id)
     if(has_current_machine)
         _finish_timer_if_active();
     
-    auto machine_def = current_project->get_machine_by_id(machine_def_id);
-    string rm_name = machine_def->name + "__" + std::to_string(machine_id);
-    auto rm = RunningMachine(machine_id, machine_def_id, rm_name);
+    auto rm = make_running_machine(machine_id, machine_def_id);
     rm.created = has_current_machine;
     running_machines.push_back(rm);       
 
@@ -92,7 +127,10 @@ void RunningState::on_machine_created(int machine_id, int machine_def_id)
         _start_timer();
 
     else
+    {
+        Machine* machine_def = current_project->get_machine_by_id(machine_def_id);
         fire_machine_selected(rm.id, machine_def);
+    }
 }
 
 

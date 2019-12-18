@@ -122,7 +122,6 @@ class Project(object):
     def start(self):
         self.create_initial_machines()
 
-        #self.unpause()
         for machine in self.running_machines:
             machine.start()
 
@@ -136,3 +135,11 @@ class Project(object):
 
         for resource in self.resources:
             resource.stop()
+
+    def dump_state(self):
+        machines_list = []
+        
+        for machine in self.running_machines:
+            machines_list.append(machine.dump_state())
+
+        return machines_list

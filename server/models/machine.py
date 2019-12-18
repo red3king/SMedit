@@ -52,6 +52,13 @@ class Machine(object):
 
         # TODO - support resourcelocks
 
+    def dump_state(self):
+        return {
+            "id": self.id,
+            "machine_def_id": self.machine_def.id,
+            "current_state_def_id": self.current_state.id
+        }
+
     def log(self, message):
         print(self.describe() + ": " + message)
 

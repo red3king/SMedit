@@ -1,8 +1,6 @@
-just finished making animations better and delaying signals for user to see final states.
-next up? proabaly a big ticket item from list
+up next, another big ticket
 
 BIG TICKET ITEMS
-    state synch on connect
     custom state types w/ premade unmodifiiable transitions
     resource implementation
     resourcelock implementaiton

@@ -11,6 +11,7 @@
 #define VIEW_DELAY_MS 900
 
 using std::vector;
+using nlohmann::json;
 
 
 class RunningMachine
@@ -47,7 +48,11 @@ class RunningState
         vector<RunningMachine>& get_running_machines();
         RunningMachine& get_running_machine(int machine_id);
 
+        void initial_state_synch(json machines_list);
+
         // signals for the GUIContext & GUIState
+        // these signals are delayed compared to the ones from broadcaststatus,
+        // giving the user time to see things instead of immediately cutting the camera away.
         sigc::signal<void, int, Machine*> select_machine;    // int is running maching id. mach def may be nullptr to un-select
         sigc::signal<void, int> select_state;
 
@@ -60,6 +65,8 @@ class RunningState
         sigc::connection terminated_timer_connection;
 
         bool on_terminated_timer_tick();
+
+        RunningMachine make_running_machine(int id, int machine_def_id, int state_def_id = -1);
 
         void _finish_timer_if_active();
         void _start_timer();
