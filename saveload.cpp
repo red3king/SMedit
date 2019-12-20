@@ -233,10 +233,21 @@ uint16_t ProjectInfo::get_hash()
         return hash;
     
     hash = 0;
+    
+    /*
     for(auto it = filename_to_data.begin(); it != filename_to_data.end(); it++)
     {
         boost::crc_32_type crc_comp;
         crc_comp.process_bytes(it->second.c_str(), it->second.length());
+        hash ^= crc_comp.checksum();
+    }
+    */
+
+    for(int i=0; i<get_num_files(); i++)
+    {
+        boost::crc_32_type crc_comp;
+        string data = get_filedata(i);
+        crc_comp.process_bytes(data.c_str(), data.length());
         hash ^= crc_comp.checksum();
     }
 
@@ -247,22 +258,56 @@ uint16_t ProjectInfo::get_hash()
 
 int ProjectInfo::get_num_files()
 {
-    return filename_to_data.size();
+    int num_resources = saved_project.resources.size();
+    return filename_to_data.size() + num_resources;
 }
 
 
 string ProjectInfo::get_filename(int i)
 {
-    auto it = filename_to_data.begin();
-    while(i--) it++;
-    return it->first;
+    int l = filename_to_data.size();
+    if(i < l)
+    {
+        auto it = filename_to_data.begin(); 
+        while(i--) it++;    // NOTE: can't simplify to it + i here, iterator does not support addition.
+        return it->first;
+    }
+
+    return saved_project.resources[i-l]->name;
 }
 
 
 string ProjectInfo::get_filedata(int i)
 {
-    auto it = filename_to_data.begin();
-    while(i--) it++;
-    return it->second;
+    int l = filename_to_data.size();
+    if(i < l)
+    {
+        auto it = filename_to_data.begin();
+        while(i--) it++;
+        return it->second;
+    }
+
+    Resource *resource = saved_project.resources[i-l];
+    string result;
+    file_to_string(resource->path, result);
+    return result;
 }
 
+
+bool ProjectInfo::any_missing_files(string& missing_filenames)
+{
+    bool any_missing = false;
+    missing_filenames = "";
+
+    for(int i=0; i<saved_project.resources.size(); i++)
+    {
+        Resource *resource = saved_project.resources[i];
+        if(!std::experimental::filesystem::exists(resource->path))
+        {
+            any_missing = true;
+            missing_filenames += "\n" + resource->name + " : " + resource->path;
+        }
+    }
+
+    return any_missing;
+}

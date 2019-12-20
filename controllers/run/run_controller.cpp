@@ -230,6 +230,13 @@ void RunController::on_connect_click()
 
 void RunController::on_deploy_click()
 {
+    string missing_files;
+    if(project_info->any_missing_files(missing_files))
+    {
+        display_error("Can't deploy. The following resource(s) are missing files:" + missing_files);
+        return;
+    }
+
     auto new_project = new NewProjectAction();
 
     for(int i=0; i<project_info->get_num_files(); i++)

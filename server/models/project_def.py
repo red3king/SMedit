@@ -20,7 +20,7 @@ class ProjectDef(object):
         
         # Resources
         for resource_json in self.spec["resources"]:
-            self.resource_defs.append(ResourceDef(resource_json))
+            self.resource_defs.append(ResourceDef(resource_json, file_name_to_data))
             
         # Machines
         for machine_json in self.spec["machines"]:

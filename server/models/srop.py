@@ -12,19 +12,14 @@ class Priority(object):
     RUN_STATE_TIMEOUT = 8
     
 
-class StateResultOperation(ABC):
-    ''' 
-    Contains what the state is doing or going to do next. For instance:
-        -could return cancellable object representing an in progress io activity
-        -could return the name of the state to execute next
-        -could return a timeout object which will go to a given state after time elasped, if nothing else happens
-        -could return nothing and then the machine stays in this state unless a event moves it to the next one
+class AsyncOperation(ABC):
 
-    '''
+    # Whenever something triggers code to run later in the twisted event loop,
+    # an AsyncOperation (AOP) is used to represent that and control its execution
+    # so when the user hits pause, everything can be easliy stopped
 
-    def __init__(self, machine):
+    def __init__(self):
         self.paused = False
-        self.machine = machine
         self.finished = Signal()  # no arg signal, call this when done to un-set srop from machine.
 
     def pause(self):
@@ -40,11 +35,6 @@ class StateResultOperation(ABC):
     
     def stop(self):
         self.stop_impl()
-
-    @property
-    @abstractmethod
-    def priority(self):
-        pass
 
     @abstractmethod
     def pause_impl(self):
@@ -67,11 +57,32 @@ class StateResultOperation(ABC):
         pass
 
 
+class StateResultOperation(AsyncOperation):
+    # An AsyncOperation which is the result of executing a Machine's State
+
+    ''' 
+    Contains what the state is doing or going to do next. For instance:
+        -could return cancellable object representing an in progress io activity
+        -could return the name of the state to execute next
+        -could return a timeout object which will go to a given state after time elasped, if nothing else happens
+        -could return nothing and then the machine stays in this state unless a event moves it to the next one
+
+    '''
+
+    def __init__(self, machine):
+        super().__init__()
+        self.machine = machine
+
+    @property
+    @abstractmethod
+    def priority(self):
+        pass
+
+
 class JoinSROP(StateResultOperation):
 
     def __init__(self, machine, result_var):
         super().__init__(machine)
-        #self.pid_var = pid_var   appears to be not needed?
         self.result_var = result_var
 
     def describe(self):
@@ -106,9 +117,9 @@ class JoinSROP(StateResultOperation):
             self.machine.run_srop(srop)
 
 
-class RunLaterCancelROP(StateResultOperation):
+class RunLaterCancelAOP(AsyncOperation):
     '''
-        ROP ABC for stuff which, if paused, should be re-started in the same way
+        AOP ABC for stuff which, if paused, should be re-started in the same way
         when the user unpauses.
         can either get to work immediately or do it on a timer
 
@@ -119,8 +130,8 @@ class RunLaterCancelROP(StateResultOperation):
     S_LAUNCHED = 1
     S_PAUSED = 2
 
-    def __init__(self, machine):
-        super().__init__(machine)
+    def __init__(self):
+        super().__init__()
 
         self.state = self.S_DEFAULT
 
@@ -181,13 +192,13 @@ class RunLaterCancelROP(StateResultOperation):
         pass
 
 
-class TwistedRLCROP(RunLaterCancelROP):
+class TwistedRLCAOP(RunLaterCancelAOP):
     '''
-    RunLaterCancelROP for running/scheduling code inside Twisted's reactor
+    RunLaterCancelAOP for running/scheduling code inside Twisted's reactor
     '''
 
-    def __init__(self, machine):
-        super().__init__(machine)
+    def __init__(self):
+        super().__init__()
         self.call_id = None
 
     def launch_task(self, seconds_wait):
@@ -214,10 +225,39 @@ class TwistedRLCROP(RunLaterCancelROP):
         pass
 
 
-class RunNextStateROP(TwistedRLCROP):
+class ResourceTRLCAOP(TwistedRLCAOP):
+    # AOP for use by resources
+    # Unlike AOPs for state transitions, this will keep running every delay_seconds
+    # until stop or pause is called.
+    
+    def __init__(self, delay_seconds):
+        super().__init__()
+        self.tick = Signal()    # no params
+        self.delay_seconds = delay_seconds
+
+    def post_finished(self):
+        self.stop()
+        self.start()
+
+    def tear_down_for_stop(self):
+        self.call_id = None
+
+    def callback_impl(self):
+        self.tick()
+
+    def get_delay(self):
+        return self.delay_seconds
+
+    def describe(self):
+        return "resource-trlcaop"
+
+
+class RunNextStateROP(StateResultOperation, TwistedRLCAOP):
 
     def __init__(self, machine, next_state, timeout=0):
-        super().__init__(machine)
+        TwistedRLCAOP.__init__(self)
+        StateResultOperation.__init__(self, machine)
+        
         self.next_state = next_state
         self.timeout = timeout
 

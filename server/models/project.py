@@ -49,6 +49,10 @@ class Project(object):
         child.start()
         return child.id
 
+    def on_event(self, event):
+        for machine in self.running_machines:
+            machine.feed_event(event)
+
     def create_machine(self, machine_def, machine_args=None):
         # Creates a machine, but does not start running it
         self.machine_id_counter += 1
@@ -84,7 +88,9 @@ class Project(object):
 
         # resources
         for resource_def in project_def.resource_defs:
-            self.resources.append(Resource(resource_def))
+            resource = Resource.create(resource_def)
+            resource.event_signal += self.on_event
+            self.resources.append(resource)
         
         self._loaded = True
 

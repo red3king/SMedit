@@ -21,9 +21,12 @@ class ProjectInfo
         void add_file(string filename, string filedata);
         uint16_t get_hash();
 
+        // ProjectInfo returns file data from loaded code files,
+        // and data from external resource python files
         int get_num_files();
         string get_filename(int i);
         string get_filedata(int i);
+        bool any_missing_files(string& missing_filenames);  // returns true if file referred to by Resource is missing
 
     private:
         bool hash_calculated;
