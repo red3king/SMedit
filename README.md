@@ -54,15 +54,10 @@ source venv/bin/activate   # assumes you have venv set up in the server dir
 
 No versioning to speak of so far. At some point I will declare it 0.0.0.1.
 
-## Authors
+## Author
 
-* **Rory Timar** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+**Rory Timar**
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
 ## Acknowledgments
 
