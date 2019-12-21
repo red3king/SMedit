@@ -1,6 +1,16 @@
 # SMedit
 
-State machine builder and runner. The builder is a linux native program built with GTK and openGL which lets you visually lay out your state machine and type python code into each state. The runner is built on the event loop provided by the Twisted web framework. The builder program is also used to control the runner and view the state of execution.
+State machine builder and runner. 
+
+**Creating a demo:**
+![Builder, building](doc/img/build.gif)
+
+The builder is a linux native program built with GTK and openGL which lets you visually lay out your state machine and type python code into each state. 
+
+**Running the demo:**
+![Builder, running](doc/img/run.gif)
+
+The runner is built on the event loop provided by the Twisted web framework. The builder program is also used to control the runner and view the state of execution.
 
 **SECURITY WARNING:** as it stands, the runner is designed to execute python code received over the network. THERE IS NO AUTHENTICATION YET. It will be added when I'm finished implementing all the major planned features.
 

@@ -11,12 +11,15 @@
 #define APT .7      // arrow point
 
 // Highlight distances
-#define EP_THRESH 10
-#define LD_THRESH 7
+#define EP_THRESH 12
+#define LD_THRESH 8
 
 // Arc mode
 #define D0 150.0
 #define R1 50.0
+
+// Dot size
+#define DOT_SIZE 8
 
 
 GMTransition::GMTransition(DrawContext* ctx, Transition* transition) : GUIModel(ctx, TRANSITION)
@@ -61,8 +64,8 @@ void GMTransition::draw()
 
     if(mouse_over)
     {
-        nvgCircle(vg, d0x, d0y, 6);
-        nvgCircle(vg, d1x, d1y, 6);
+        nvgCircle(vg, d0x, d0y, DOT_SIZE);
+        nvgCircle(vg, d1x, d1y, DOT_SIZE);
         nvgFillColor(vg, get_highlight_color());
         nvgFill(vg);
         nvgReset(vg);
