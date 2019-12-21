@@ -1,8 +1,8 @@
 # SMedit
 
-State machine builder and runner. 
+Graphical python state machine builder and runner. 
 
-**Creating a demo:**
+**Creating a demo FSM:**
 ![Builder, building](doc/img/build.gif)
 
 The builder is a linux native program built with GTK and openGL which lets you visually lay out your state machine and type python code into each state. 
@@ -12,9 +12,10 @@ The builder is a linux native program built with GTK and openGL which lets you v
 
 The runner is built on the event loop provided by the Twisted web framework. The builder program is also used to control the runner and view the state of execution.
 
-**SECURITY WARNING:** as it stands, the runner is designed to execute python code received over the network. THERE IS NO AUTHENTICATION YET. It will be added when I'm finished implementing all the major planned features.
+**SECURITY WARNING:** as it stands, the runner is designed to execute python code received over the network. **there is no authentication yet**. It will be added when I'm finished implementing all the major planned features.
 
-Note: SMedit is just a placeholder name and I will probably rename it once I can come up with a better name.  
+Note: SMedit is just a placeholder name and I will probably rename it once I can come up with a better name.
+
 
 ## Getting Started
 
@@ -30,7 +31,8 @@ Once the prerequisites are installed, use make to build the runner:
 make
 ```
 
-There is no install target for make for now.
+There is no install target for make for now. 
+There is currently a bug in the makefile, it doesn't always realize it needs to recompile when headers or certain files are changed. To fix this, run make clean and then make again.
 
 
 ### Preparing the Runner
@@ -56,22 +58,31 @@ source venv/bin/activate   # assumes you have venv set up in the server dir
 ./main.py
 ```
 
-## Built With
+## Built With / Acknowledgments
+* Nanovg - Mikko Mononen [https://github.com/memononen/nanovg](https://github.com/memononen/nanovg)
 
-* TODO - merge the stuff from license.txt here
+* Icons: Iconnic, Ralf Schmitzer, Dmitry Baranovskiy. All from [http:://thenounproject.com](http:://thenounproject.com)
 
-## Versioning
+* Hack Font  -  https://sourcefoundry.org/hack/
 
-No versioning to speak of so far. At some point I will declare it 0.0.0.1.
+* nlohmann::json  -  Niels Lohmann [https://github.com/nlohmann/json](https://github.com/nlohmann/json)
+
+* Base64 - Rene Nyffenegger  [https://github.com/ReneNyffenegger/cpp-base64](https://github.com/ReneNyffenegger/cpp-base64)
+
+* Boost::asio, crc, thread, lockfree - Boost project [https://www.boost.org](https://www.boost.org)
+
+* This readme is based off PurpleBooth's Readme.md [template](https://gist.github.com/PurpleBooth/109311bb0361f32d87a2#file-readme-template-md)
+
+
 
 ## Author
 
 **Rory Timar**
 
 
-## Acknowledgments
 
-* This readme is based off PurpleBooth's Readme.md [template](https://gist.github.com/PurpleBooth/109311bb0361f32d87a2#file-readme-template-md)
-* TODO - copy other acknowledgements from license.txt to here
+
+
+
 
 
