@@ -1,7 +1,51 @@
+resourcelock implementation
+
+    in each state, you pick form a list which resources you want to use
+    they are then put into the auto-generated function def line
+    if you pick a resource that needs a lock, display error icon over state until its in a reousrclock
+    
+    features - client:
+        - display error icons with hover texts on state objects
+            (make extsible enough so i could put them on transitions too later)
+        - state used_resources list:
+            - add to model
+            - add operations to change
+            - add checkboxlist to code state edit gui
+        - resource deletion:
+            - count resourcelocks, resources referring to it, 
+                and pop up confirmation dialog
+            - if user says yes, delete those resourcelocks, and modify states referring to it
+        - requires_lock scan:
+            - on program load, on resource filename change, possibly if user requests it w/button
+            - this will set Resource.requires_lock to YES, NO, or UNKNOWN
+                - should trigger the gui to update accordingly
+
+    features - server:
+        - project.on_machine_lock_release()
+            - if any machines waiting for this lock, take first, remove from list, "give it the lock", and..
+            - call (new method) machine.notify_lock_available():
+                - this calls RunNextStateSrop.notify_lock_available() (runnextstatesrop or its subclass can be the only srop you have when you are waiting for a lock.)
+                - notify_lock_available() works just like JoniSROP.notify_machine_finished(), it 
+                    calls srop_if_next() and runs that.
+
+        - when a lock is released, the server looks at the list ofo "i need lock" machines,
+            and gives it to the first one in the list ( one list per lock type ofc)
+
+        - modify state change srop:
+            - if lock is needed that we don't have:  
+                - call machine.acquire_lock signal
+                    acquire_lock returns true (project has given you the lock, ok):
+                        continue as usual
+
+                    acquire_lock returns false (another machine has the lock, this machine is added to a list of machines waiting for the lock):
+                        don't do anything, don't go to next srop or state. (behave like joinSROP)
+            
+            - if lock is have that we don't need: fire machine.release_lock(...) signal for the unneeded resource
+        
+
 
 BIG TICKET ITEMS
     custom state types w/ premade unmodifiiable transitions
-    resourcelock implementaiton
     
 
 todo - implement the local and server options:
