@@ -55,7 +55,27 @@ bool GMBox::new_border_valid(BorderType border, float world_mouse_position)
 }
 
 
-void GMBox::draw()
+void GMBox::get_notification_coordinates(float& world_x, float& world_y)
+{
+    // notifications are off to the right of the box
+    auto entity = (BoxEntity*) get_entity();
+    float offset = ctx->screen_dist_to_world(5);
+    world_x = entity->x + entity->w + offset;
+    world_y = entity->y;
+}
+
+
+bool GMBox::too_small()
+{
+    float x, y, w, h;
+    get_coords(x, y, w, h);
+    float screen_w = ctx->world_dist_to_screen(w);
+    float screen_h = ctx->world_dist_to_screen(h);
+    return screen_w < ICON_PADDED_SIZE || screen_h < ICON_PADDED_SIZE;
+}
+
+
+void GMBox::draw_impl()
 {
     text_line_no = 0;
 
@@ -66,10 +86,10 @@ void GMBox::draw()
     screen_w = ctx->world_dist_to_screen(w);
     screen_h = ctx->world_dist_to_screen(h);
 
-    NVGcontext* vg = ctx->vg;
+    NVGcontext *vg = ctx->vg;
     nvgReset(vg);
 
-    bool too_small = screen_w < ICON_PADDED_SIZE || screen_h < ICON_PADDED_SIZE;
+    bool too_small = this->too_small();
 
     // interior 
     if(!too_small)
@@ -123,7 +143,7 @@ void GMBox::draw()
         int iy = screen_y + ICON_MARGIN;
         NVGpaint paint = nvgImagePattern(vg, ix, iy, ICON_SIZE, ICON_SIZE, 0, icon_image, 255.0);
         nvgBeginPath(vg);
-        nvgRect(vg, ix, iy, 30, 30);
+        nvgRect(vg, ix, iy, ICON_SIZE, ICON_SIZE);
         nvgFillPaint(vg, paint);
         nvgFill(vg);
     }
@@ -239,7 +259,11 @@ bool GMBox::text(string text, NVGcolor color, bool stay)
     }
 
     else
-        text_line_pos += ctx->measure_text(text, ctx->font_hack_bold, TEXT_FONT_SIZE);
+    {
+        float tw, th;
+        ctx->measure_text(tw, th, text, ctx->font_hack_bold, TEXT_FONT_SIZE);
+        text_line_pos += tw;    
+    }
 
     return true;
 }

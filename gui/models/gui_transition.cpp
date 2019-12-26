@@ -4,11 +4,10 @@
 
 
 // Positions of graphical components
-#define D0T .04     // dot 0
-#define D1T .96     // dot 1
-#define LST .08      // line start
-#define LET .92      // line end
 #define APT .7      // arrow point
+#define TR_EP_OFFSET 9  // px offset of circles from line endpoints
+#define LE_OFFSET 33     // px offset of line segment
+
 
 // Highlight distances
 #define EP_THRESH 12
@@ -34,10 +33,9 @@ bool GMTransition::is_arc()
 }
 
 
-void GMTransition::draw()
+void GMTransition::draw_impl()
 {
     /*
-     
        |                      |
        | * ------------->-- * |
        |                      |
@@ -50,7 +48,7 @@ void GMTransition::draw()
         draw_as_line();
 
     float d0t, d1t, d0x, d0y, d1x, d1y;           // dot 0, dot 1 
-    get_dts(d0t, d1t);
+    get_ts(d0t, d1t, TR_EP_OFFSET);
     interp(d0t, d0x, d0y);
     interp(d1t, d1x, d1y);
     ctx->world_to_screen(d0x, d0y, d0x, d0y);
@@ -92,8 +90,10 @@ void GMTransition::draw()
     float theta_al = theta + .75 * M_PI;
     float theta_ar = theta + 1.25 * M_PI;
 
-    move_in_direction(apx, apy, 12.0, theta_al, alx, aly);
-    move_in_direction(apx, apy, 12.0, theta_ar, arx, ary);
+    float arclen = 12.0;
+    arclen = ctx->screen_dist_to_world(arclen);
+    move_in_direction(apx, apy, arclen, theta_al, alx, aly);
+    move_in_direction(apx, apy, arclen, theta_ar, arx, ary);
     ctx->world_to_screen(apx, apy, apx, apy);
     ctx->world_to_screen(alx, aly, alx, aly);
     ctx->world_to_screen(arx, ary, arx, ary);
@@ -117,13 +117,38 @@ void GMTransition::draw()
 }
 
 
+bool GMTransition::too_small()
+{
+    if(is_arc())
+    {
+        float cx, cy, r, a0, a1;
+        int dir;
+        calc_arc_params(cx, cy, r, a0, a1, dir);
+        return ctx->world_dist_to_screen(2*r) < 50;
+    }
+
+    float len = transition->get_length();
+    return ctx->world_dist_to_screen(len) < 50;
+}
+
+
+void GMTransition::get_notification_coordinates(float& world_x, float& world_y)
+{
+    // right below text
+    interp(.5, world_x, world_y);
+    world_y += ctx->screen_dist_to_world(21);
+}
+
+
 void GMTransition::draw_as_line()
 {
     // Establish relavant coordinates
     float lsx, lsy, lex, ley;           // line start, end
+    float lst, let;
 
-    interp(LST, lsx, lsy);
-    interp(LET, lex, ley);
+    get_ts(lst, let, LE_OFFSET);
+    interp(lst, lsx, lsy);
+    interp(let, lex, ley);
 
     ctx->world_to_screen(lsx, lsy, lsx, lsy);
     ctx->world_to_screen(lex, ley, lex, ley);
@@ -311,18 +336,27 @@ bool GMTransition::mouse_within(float mouse_x, float mouse_y)
 }
 
 
-void GMTransition::get_dts(float& d0t, float& d1t)
+void GMTransition::get_ts(float& d0t, float& d1t, float soffset)
 {
-    if(transition->is_loopback())
+    if(transition->is_loopback() || is_arc())
     {
         d0t = 0.0;
         d1t = 1.0;
         return;
     }
     
-    bool arc = is_arc();
-    d0t = !arc && transition->from_connected() ? D0T : 0.0;
-    d1t = !arc && transition->to_connected() ? D1T : 1.0;
+    float w_len = transition->get_length();
+    float w_desired = ctx->screen_dist_to_world(soffset);
+    float frac = w_desired / w_len;
+
+    d0t = transition->from_connected() ? frac : 0.0;
+    d1t = transition->to_connected() ? 1.0 - frac : 1.0;
+
+    if(d0t > .2)
+        d0t = .2;
+
+    if(d1t < .8)
+        d1t = .8;
 }
 
 
@@ -332,7 +366,7 @@ TransitionBorder GMTransition::mouse_on_border(float mouse_x, float mouse_y)
     ctx->screen_to_world(mouse_wx, mouse_wy, mouse_x, mouse_y);
 
     float d0t, d1t, d0x, d0y, d1x, d1y;
-    get_dts(d0t, d1t);
+    get_ts(d0t, d1t, TR_EP_OFFSET);
     interp(d0t, d0x, d0y);
     interp(d1t, d1x, d1y);
     

@@ -11,10 +11,13 @@ class GMTransition : public GUIModel
     public:
         GMTransition(DrawContext* ctx, Transition* transition);
 
-        void draw();
+        void draw_impl();
         CursorType update_impl(CurrentEvents& current_events);
         bool mouse_within(float mouse_x, float mouse_y);
         Entity* get_entity();
+
+        void get_notification_coordinates(float& world_x, float& world_y);
+        bool too_small();
 
         Transition* transition;
         TransitionBorder mouse_on_border(float mouse_x, float mouse_y);
@@ -26,7 +29,7 @@ class GMTransition : public GUIModel
         void draw_as_arc();
         void main_color_stroke();
 
-        void get_dts(float& d0t, float& d1t);
+        void get_ts(float& d0t, float& d1t, float soffset);
 
         bool is_arc();
         bool arc_loop_upwards();

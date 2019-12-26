@@ -9,6 +9,7 @@ Icons:
     flow   -  Dmitry Baranovskiy
     join   -  Dmitry Baranovskiy
     fork   -  Dmitry Baranovskiy
+    error  -  Alice Design
 
 Icons found on Noun Project:
 http:://thenounproject.com

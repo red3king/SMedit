@@ -30,7 +30,7 @@ class DrawContext
 
         NVGtextRow one_line_row;
 
-        float measure_text(std::string text, int font, float size);
+        void measure_text(float& width, float& height, std::string text, int font, float size, float max_width=-1.0);   // if max width is passed, text will go multi-line
         void draw_text_noclip(std::string text, int font, float size, NVGcolor color, float x, float y);
         void draw_text_one_line(std::string text, int font, float size, NVGcolor color, float x, float y,
                 float max_width);
@@ -41,6 +41,7 @@ class DrawContext
         int font_hack, font_hack_bold;
         int icon_coding, icon_flow, icon_fork, icon_join, icon_lock,
             icon_uturn;
+        int notif_icon_lock, notif_icon_error;
 
         float get_zoom_factor();
         void get_offsets(float& woffset_x, float& woffset_y);

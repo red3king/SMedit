@@ -61,7 +61,7 @@ source venv/bin/activate   # assumes you have venv set up in the server dir
 ## Built With / Acknowledgments
 * Nanovg - Mikko Mononen [https://github.com/memononen/nanovg](https://github.com/memononen/nanovg)
 
-* Icons: Iconnic, Ralf Schmitzer, Dmitry Baranovskiy. All from [http:://thenounproject.com](http:://thenounproject.com)
+* Icons: Iconnic, Ralf Schmitzer, Dmitry Baranovskiy, Alice Design. All from [http:://thenounproject.com](http:://thenounproject.com)
 
 * Hack Font  -  https://sourcefoundry.org/hack/
 

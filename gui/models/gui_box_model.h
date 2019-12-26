@@ -19,9 +19,11 @@ class GMBox : public GUIModel
 
         void get_coords(float& x, float& y, float& w, float& h); 
         void set_coords(float x, float y, float w, float h);
+        bool too_small();
 
         CursorType update_impl(CurrentEvents& current_events);
-        void draw();
+        void draw_impl();
+        void get_notification_coordinates(float& world_x, float& world_y);
 
         bool mouse_within(float mouse_x, float mouse_y);
         BorderType mouse_on_border(float mouse_x, float mouse_y);

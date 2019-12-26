@@ -30,6 +30,9 @@ void DrawContext::set_nvg_context(NVGcontext* vg)
     icon_join = nvgCreateImage(vg, "resources/icons/join.png", 0);
     icon_lock = nvgCreateImage(vg, "resources/icons/lock.png", 0);
     icon_uturn = nvgCreateImage(vg, "resources/icons/uturn.png", 0);
+
+    notif_icon_lock = icon_lock;
+    notif_icon_error = nvgCreateImage(vg, "resources/icons/error.png", 0);
 }
 
 
@@ -125,17 +128,29 @@ void DrawContext::draw_text_one_line(std::string text, int font, float size, NVG
 }
 
 
-float DrawContext::measure_text(std::string text, int font, float size)
+void DrawContext::measure_text(float& width, float& height, std::string text, int font, float size, float max_width)
 {
     float bounds[4];
-    nvgTextBounds(vg, 0, 0, text.c_str(), nullptr, bounds);
-    return bounds[2] - bounds[0];
+    
+    if(max_width < 0)
+        nvgTextBounds(vg, 0, 0, text.c_str(), nullptr, bounds);
+
+    else
+        nvgTextBoxBounds(vg, 0, 0, max_width, text.c_str(), nullptr, bounds);
+
+    width = bounds[2] - bounds[0];
+    height = bounds[3] - bounds[1];
 }
 
 
 void DrawContext::draw_text_many_lines(std::string text, int font, float size, NVGcolor color, float x,
         float y, float max_width, float max_height)
 {
+    nvgFontSize(vg, size);
+    nvgFontFaceId(vg, font);
+    nvgFillColor(vg, color);
+    nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
+    nvgTextBox(vg, x, y, max_width, text.c_str(), nullptr);
 
 }
 
