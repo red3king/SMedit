@@ -1,31 +1,46 @@
 # SMedit
 
-Graphical python state machine builder and runner. 
+Graphical python state machine builder (the client) and runner (the server). 
 
 **Creating a demo FSM:**
 ![Builder, building](doc/img/build.gif)
 
-The builder is a linux native program built with GTK and openGL which lets you visually lay out your state machine and type python code into each state. 
+The client is a linux native program built with GTK and openGL which lets you visually lay out your state machine and type python code into each state. 
 
 **Running the demo:**
 ![Builder, running](doc/img/run.gif)
 
-The runner is built on the event loop provided by the Twisted web framework. The builder program is also used to control the runner and view the state of execution.
+The server is built on the event loop provided by the Twisted web framework. The client program is also used to control the server and view the state of execution.
 
-**SECURITY WARNING:** as it stands, the runner is designed to execute python code received over the network. **there is no authentication yet**. It will be added when I'm finished implementing all the major planned features.
+**SECURITY WARNING:** as it stands, the server is designed to execute python code received over the network. **there is no authentication yet**. It will be added when I'm finished implementing all the major planned features.
 
 Note: SMedit is just a placeholder name and I will probably rename it once I can come up with a better name.
+
 
 
 ## Getting Started
 
 How to build and run SMedit.
 
-### Building SMedit Builder
 
-Install Prequesites:  TODO  figure out what they are, write them here.
+### Building SMedit Client
 
-Once the prerequisites are installed, use make to build the runner:
+Install Prequesites:  
+
+(Tested on Kubuntu 19.10)
+
+Install python3 pip, libraries:
+
+```
+sudo apt-get install python3-pip python3-venv libgtkmm-3.0-dev libgtksourceviewmm-3.0-dev libboost-all-dev
+```
+
+Install cog with the python 3 pip:
+```
+sudo pip3 install cogapp
+```
+
+Once the prerequisites are installed, use make to build the server:
 
 ```
 make
@@ -37,24 +52,28 @@ There is currently a bug in the makefile, it doesn't always realize it needs to 
 
 ### Preparing the Runner
 
-The easiest way to set up the runner is to install the runner's dependencies in a virtualenv. 
+The easiest way to set up the server is to install the server's dependencies in a virtualenv. 
 To do this, 
+
 ```
-TODO
+cd SMedit/server
+pyvenv-3.7 venv
+source venv/bin/activate
+pip install -r requirements.txt
 ```
 
 ## Running SMedit
 
-To run the builder:
+To run the client:
 ```
 ./smedit
 ```
 
-To launch the runner, run the following:
+To launch the server, run the following:
 
 ```
-cd server/
-source venv/bin/activate   # assumes you have venv set up in the server dir
+cd SMedit/server/
+source venv/bin/activate
 ./main.py
 ```
 

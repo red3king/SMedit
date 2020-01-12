@@ -8,4 +8,5 @@ test
 *.pyc
 __pycache__
 venv
+.kdev4/
 

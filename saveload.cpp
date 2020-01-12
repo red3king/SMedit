@@ -234,15 +234,6 @@ uint16_t ProjectInfo::get_hash()
     
     hash = 0;
     
-    /*
-    for(auto it = filename_to_data.begin(); it != filename_to_data.end(); it++)
-    {
-        boost::crc_32_type crc_comp;
-        crc_comp.process_bytes(it->second.c_str(), it->second.length());
-        hash ^= crc_comp.checksum();
-    }
-    */
-
     for(int i=0; i<get_num_files(); i++)
     {
         boost::crc_32_type crc_comp;
