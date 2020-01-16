@@ -1,5 +1,5 @@
-CXXFLAGS = -std=c++17 -iquote ./ -ggdb $(shell pkg-config --cflags  gtkmm-3.0 gtksourceviewmm-3.0 epoxy)
-LDFLAGS = -lstdc++fs $(shell pkg-config --libs gtkmm-3.0 gtksourceviewmm-3.0 epoxy) -L/usr/lib -lpthread -lboost_system -lboost_thread
+CXXFLAGS = -std=c++17 -iquote ./ -ggdb $(shell pkg-config --cflags  python3 gtkmm-3.0 gtksourceviewmm-3.0 epoxy)
+LDFLAGS = -lstdc++fs $(shell pkg-config --libs python3 gtkmm-3.0 gtksourceviewmm-3.0 epoxy) -L/usr/lib -lpthread -lboost_system -lboost_thread
 
 # generated source files (generated in place by cog)
 autogens = $(wildcard historymanager/operations/*.cpp) \
@@ -22,6 +22,7 @@ presrc = $(filter-out main.cpp, $(filter-out test_main.cpp, $(wildcard *.cpp))) 
 	$(wildcard models/datatypes/*.cpp) \
 	$(wildcard net/*.cpp) \
 	$(wildcard net/actions/*.cpp) \
+	$(wildcard py_embedded/*.cpp) \
 	$(wildcard lib/base64/*.cpp) 
 
 src := $(presrc) main.cpp

@@ -7,6 +7,10 @@
 #include "historymanager/operations/resource_ops.h"
 #include "historymanager/operations/resourcelock_ops.h"
 #include "historymanager/operations/transition_ops.h"
+#include "py_embedded/run_script.h"
+
+
+PYScripts scripts;
 
 
 MainWindow::MainWindow(BaseObjectType* obj, Glib::RefPtr<Gtk::Builder> const& builder) : Gtk::ApplicationWindow(obj) , builder{builder}
@@ -20,6 +24,8 @@ MainWindow::MainWindow(BaseObjectType* obj, Glib::RefPtr<Gtk::Builder> const& bu
     main_window = this;
 
     get_widgets();
+    
+    scripts.initialize();
 
     history_manager = new HistoryManager(50, 20, 15);
 

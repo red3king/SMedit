@@ -1,3 +1,22 @@
+LEFT OFF HERE:
+    i have created a ScriptResult class
+    I am implementing a PYScripts class which will hold PyObject pointers to my scripts
+        so i dont have to reload them every time I want to run one of them
+    
+    CURRENT ISSUE: 
+        i wanted to use variadic function templates to accept arbitrary arguments to my execute_script function
+        I didn't investigate the standard VA_args way because somebody on SO said va_args was for c or something
+        anyways, my approach was to build a vector<PyOBject*> from the recursive template function
+        Now I realize there is a method Py_BuildValue which itself takes a variable number of args
+        
+        so either:
+            -keep my vector<Pyobject*> and find a tuple constructor which takes a PyObject*'s
+            -or, implement my own use of va_args, which would construct a format string for Py_BuildValue
+                this may be simpler given how many template functions I already had to set up
+                (although they're done already..)
+
+
+
 resourcelock implementation
 
     in each state, you pick form a list which resources you want to use
@@ -5,7 +24,7 @@ resourcelock implementation
     if you pick a resource that needs a lock, display error icon over state until its in a reousrclock
     
     features - client:
-        - display error icons with hover texts on state objects
+x        - display error icons with hover texts on state objects
             (make extsible enough so i could put them on transitions too later)
         - state used_resources list:
             - add to model

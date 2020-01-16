@@ -18,34 +18,35 @@
 #include "saveload.h"
 
 
+
 class MainWindow : public Gtk::ApplicationWindow 
 {
     public:
     
-        MainWindow(BaseObjectType* obj, Glib::RefPtr<Gtk::Builder> const& builder);
+        MainWindow(BaseObjectType *obj, Glib::RefPtr<Gtk::Builder> const& builder);
         virtual ~MainWindow() = default;
 
-        HistoryManager* history_manager;
-        GUIContext* gui_context;
+        HistoryManager *history_manager;
+        GUIContext *gui_context;
         ProjectInfo project_info;
 
-        ResourcesController* resources_controller;
-        MachinesController* machines_controller;
-        RunController* run_controller;
+        ResourcesController *resources_controller;
+        MachinesController *machines_controller;
+        RunController *run_controller;
 
         // UI state variables
         bool project_open, may_undo, may_redo, unsaved_changes;
         string current_filename;
 
         // Widgets
-        Gtk::GLArea* machine_edit_gl_area;
+        Gtk::GLArea *machine_edit_gl_area;
         
         Gtk::ImageMenuItem *file_new, *file_open, *file_save, *file_save_as, *file_quit, 
             *edit_undo, *edit_redo, *edit_cut, *edit_copy, *edit_paste, *edit_delete,
             *about_licenses;
 
-        Gtk::Stack* main_stack;
-        Gtk::StackSwitcher* main_switcher;
+        Gtk::Stack *main_stack;
+        Gtk::StackSwitcher *main_switcher;
 
         // init functions
         void get_widgets();
@@ -59,7 +60,7 @@ class MainWindow : public Gtk::ApplicationWindow
         void on_project_close();
         void on_close_click();
         void on_new_click();
-        void on_save_click();
+        void on_save_click();                                         
         void on_save_as_click();
         void on_open_click();
         void on_about_click();
