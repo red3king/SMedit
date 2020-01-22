@@ -24,6 +24,10 @@ bool MoveTransitionEndpoint::maybe_create(GMTransition* transition_gmodel, GUISt
     if(border == TB_NONE || border == TB_MID)
         return false;
 
+    // Can't un-attach child transitions from their parent state
+    if(border == TB_BEGIN && transition_gmodel->is_child_transition())
+        return false;
+    
     pref = new MoveTransitionEndpoint(transition_gmodel, border == TB_BEGIN);
     return true;
 }
@@ -67,7 +71,13 @@ GUIOpResult MoveTransitionEndpoint::should_continue(GUIState& gui_state, Current
             continue;
 
         if(state_gmodel->mouse_within(current_events.mouse_x, current_events.mouse_y))
+        {
+            // Can't attach outgoing transitions to custom states
+            if(state_gmodel->is_custom() && is_endpoint_0)
+                continue;
+            
             connect_state = state_gmodel->state;
+        }
     }
 
     return END;

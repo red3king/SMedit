@@ -16,6 +16,9 @@ class TransitionChgOperation : public Operation  // abstract
 };
 
 
+Transition *create_transition(Project& project, unsigned int machine_id, bool is_child, float x0, float y0, float x1, float y1, int type);
+
+
 class OpTransitionCreate : public Operation
 {
     public:
@@ -29,6 +32,7 @@ class OpTransitionCreate : public Operation
 };
 
 
+
 class OpTransitionDelete : public Operation
 {
     public:
@@ -39,6 +43,9 @@ class OpTransitionDelete : public Operation
     private:
         unsigned int machine_id, transition_id;
 };
+
+
+void delete_transition(Machine *machine, Transition *transition)
 
 
 class OpTransitionMove : public Operation

@@ -1,20 +1,86 @@
-LEFT OFF HERE:
-    i have created a ScriptResult class
-    I am implementing a PYScripts class which will hold PyObject pointers to my scripts
-        so i dont have to reload them every time I want to run one of them
+custom state type implementation - CLIENT
+    class CustomState(State):
+        def get_transition_defs(self):
+            '''
+            eg [
+                { 'direction': INCOMING, 'name': 'on turboencabulation', 'type': TIMEOUT }  // use same field names as transition json
+                ...
+            ]
+            '''
+            pass
+            
     
-    CURRENT ISSUE: 
-        i wanted to use variadic function templates to accept arbitrary arguments to my execute_script function
-        I didn't investigate the standard VA_args way because somebody on SO said va_args was for c or something
-        anyways, my approach was to build a vector<PyOBject*> from the recursive template function
-        Now I realize there is a method Py_BuildValue which itself takes a variable number of args
+    class CustomStateDef
+    {
+        vector<CSTransitionDef> transitions;
+        string name;
         
-        so either:
-            -keep my vector<Pyobject*> and find a tuple constructor which takes a PyObject*'s
-            -or, implement my own use of va_args, which would construct a format string for Py_BuildValue
-                this may be simpler given how many template functions I already had to set up
-                (although they're done already..)
+        operator ==(CSD other) { ... }
+        
+        json to_json();
+        json from_json();
+    }
+    
+    
+    - implement CustomStateDef class
+    
+    - DONT DO THIS, USE ALTERNATIVE B on save, write current state def list to project.json
+    
+    - on load, scan all resources and compare that list to project.json
+        - fire signal
+        - this does not go in the undo system because it happens before the user can do anything
 
+    - two alternatives:
+        - don't persist any custom state def (other than uuid) into the project.json:
+            at load, always read each cust state def into our c objects
+            This could be a problem because the user may be confused if somebody else changed the files when they weren't paying attention
+                this is a small issue though
+                
+        - do persist this data
+            at load, read the data but ask the user what to do if there is any difference
+            this way, the user will know if something went wrong
+    
+    UI STUFF
+        - on_custom_state_def_changed():
+            - when a user sets the custom state python file path,
+                the code which reads the custom state file and updates the custom state's def
+                should live in on Operation, so the data will be correct if the user ctrl-z's before 
+                the custom state was created and the redoes until after the state def path was set
+                
+            - update gui, which will cause the gui models of states using this custom state type
+                to possibly go invalid with error message about changed state specs
+
+    model changes
+x        add custom state class model
+        modify state + transition model? (may need to change to support cscs, eg add is_custom_state() function)
+ 
+    gui op / normal op changes
+x        - add custom state class operations
+x        - modify state delete operation so it deletes mandatory transitions
+x        - modify state type change operation so it creates/deletes transitions as well
+        - modify transition operations:
+x            - can't move one endpoint of cust state transitions
+x            - can't drag-move any cust state transition (probably already true since one end is always connected)
+x            - can't delete cust state transitions (not part of operation, part of gui or the operation factory)
+x            - can't select cust state transitions ? (should they be editable? or just always perscribed?)
+x                let's start with making them unmodifiiable
+x            - can't attach outgoing normal transitions to custom state types (can attach incomin ofc)
+                this could be changed in the future?
+        - when user tries to delete:
+            ask for confirmation
+            then also delete all instances of this custom state and their transitions
+        
+    project load stuff
+        reset list of registered custom state clases? (if this data isn't stored in a Proejct object)
+        modify saveload to handle custom state classes
+        
+    net stuff
+        modify project upload to also upload the custom state classes
+        
+
+                
+custom state type integration - SERVER
+    modify project load code to exec all custom state files, and register resulting classes in some dict, "StateClasses" or soemthing
 
 
 resourcelock implementation

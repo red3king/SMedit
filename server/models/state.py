@@ -35,7 +35,35 @@ class State(ABC):
     @abstractmethod
     def execute_impl(self, vars_dict, trigger_event):
         pass
+    
 
+class CustomState(State):
+    @staticmethod
+    @abstractmethod
+    def get_outgoing_transition_defs():
+        '''
+        Return list of transition def dicts (same as TransitionDef's transition_json 
+        but without the id field ), eg:
+        
+        return [
+            {
+                "type": TransitionType.EVENT,
+                "event_name": "on success",
+                "timeout": 0
+            },
+            {
+                "type": TransitionType.EVENT,
+                "event_name": "on failure",
+                "timeout": 0
+            }
+        ]
+        '''
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def get_name():
+        pass
 
 class StateFactory(object):
     

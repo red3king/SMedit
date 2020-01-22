@@ -8,6 +8,12 @@ RESOURCE_OP_SPECS = [
 ]
 
 
+CUSTOM_STATE_CLASS_OP_SPECS = [
+    os("path", "string"),
+    os("name", "string")
+]
+
+
 MACHINE_OP_SPECS = [
     os("name", "string"),
     os("run_on_start", "bool")
@@ -15,7 +21,6 @@ MACHINE_OP_SPECS = [
 
 
 STATE_OP_SPECS = [
-    os("type", "StateType"),
     os("name", "string"),
     os("code", "string"),
     os("join_pid_variable", "string"),
@@ -38,6 +43,7 @@ TRANSITION_OP_SPECS = [
 
 
 resource_opgen = OperationGenerator("Resource", False, RESOURCE_OP_SPECS)
+custom_state_class_opgen = OperationGenerator("CustomStateClass", False, CUSTOM_STATE_CLASS_OP_SPECS)
 machine_opgen = OperationGenerator("Machine", False, MACHINE_OP_SPECS)
 state_opgen = OperationGenerator("State", True, STATE_OP_SPECS)
 transition_opgen = OperationGenerator("Transition", True, TRANSITION_OP_SPECS)

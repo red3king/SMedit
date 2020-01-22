@@ -33,6 +33,12 @@ bool GMTransition::is_arc()
 }
 
 
+bool GMTransition::is_child_transition()
+{
+    return transition->is_child_transition;
+}
+
+
 void GMTransition::draw_impl()
 {
     /*

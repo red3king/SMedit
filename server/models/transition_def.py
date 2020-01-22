@@ -17,9 +17,6 @@ class TransitionDef(object):
         self.event_name = transition_json["event_name"]         # str
         self.timeout = transition_json["timeout"]               # float
 
-        #self.from_state_def = None
-        #self.to_state_def = None
-
     @property
     def from_state_id(self):                                    # uint
         return self.spec["from_state"]
@@ -27,11 +24,3 @@ class TransitionDef(object):
     @property
     def to_state_id(self):
         return self.spec["to_state"]                            # uint
-
-
-    '''
-    def assign_states(from_state_def, to_state_def):
-        self.from_state_def = from_state_def
-        self.to_state_def = to_state_def
-    '''
-

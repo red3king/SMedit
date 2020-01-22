@@ -96,7 +96,12 @@ void SelectedTransition::update()
         return;
 
     name_label->set_text("Transition " + std::to_string(selected_transition->id));
-
+    bool can_edit = !selected_transition->is_child_transition;
+    
+    event_timeout_entry->set_sensitive(can_edit);
+    transition_type_combobox->set_sensitive(can_edit);
+    delete_button->set_sensitive(can_edit);
+    
     if(selected_transition->type == CATCHALL)
     {
         transition_type_combobox->set_active_text("Catchall");

@@ -55,6 +55,7 @@ class Transition : public Entity
         Transition(json jdata);
         Transition(const Transition &other);
 
+        bool is_child_transition;
         TransitionType type;
         string event_name;  // only used for EVENT type
         float timeout;      // only for TIMEOUT type

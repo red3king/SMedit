@@ -26,10 +26,10 @@ using std::vector;
 class Transition;
 
 
-enum StateType { INITIAL, CODE, RETURN, SPAWN, JOIN };
+enum StateType { INITIAL, CODE, RETURN, SPAWN, JOIN, StateType_size };
 
-string state_type_to_string(StateType type);
-StateType string_to_state_type(string input);
+
+bool state_type_is_custom(int type);
 
 
 class State : public BoxEntity
@@ -70,9 +70,12 @@ class State : public BoxEntity
 
         json to_json();
 
-
         string name;
-        StateType type;
+        
+        int type;   // A casted StateType or custom state id 
+        bool is_custom();
+        CustomStateClass *custom_type; // nullptr unless is_custom() is true
+        
         
         // Initial
         vector<ArgDef> initial_args;

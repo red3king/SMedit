@@ -13,7 +13,8 @@ enum EntityType
     RESOURCE,
     STATE,
     TRANSITION,
-    RESOURCELOCK
+    RESOURCELOCK,
+    CUSTOM_STATE_CLASS
 };
 
 
