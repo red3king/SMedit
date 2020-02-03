@@ -18,6 +18,7 @@ class GMTransition : public GUIModel
 
         void get_notification_coordinates(float& world_x, float& world_y);
         bool too_small();
+        bool is_child_transition();
 
         Transition* transition;
         TransitionBorder mouse_on_border(float mouse_x, float mouse_y);

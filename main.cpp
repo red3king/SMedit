@@ -30,6 +30,7 @@ MainWindow::MainWindow(BaseObjectType* obj, Glib::RefPtr<Gtk::Builder> const& bu
     history_manager = new HistoryManager(50, 20, 15);
 
     resources_controller = new ResourcesController(history_manager, builder, this);
+    custom_state_class_controller = new CustomStateClassController(history_manager, builder, this);
     machines_controller = new MachinesController(history_manager, builder, this);
     run_controller = new RunController(history_manager, &project_info, builder);
 

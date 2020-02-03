@@ -84,12 +84,17 @@ class PyScript
     public:
 
         string name;
+        
+        string load_failure_error_message;
+        bool _loaded_successfully;
+        
         PyObject *module, *function;
 
         PyScript()
         {
             module = nullptr;
             function = nullptr;
+            _loaded_successfully = false;
         }
 
         ~PyScript()
@@ -100,14 +105,32 @@ class PyScript
             if(module != nullptr)
                 Py_DECREF(module);
         }
+        
+        bool loaded_successfully(string &err_out)
+        {
+            err_out = load_failure_error_message;
+            return _loaded_successfully;
+        }
+        
+        void set_failed_load(string error_message)
+        {
+            _loaded_successfully = false;
+            load_failure_error_message = error_message;
+        }
+        
+        void set_successful_load(PyObject *module, PyObject *function)
+        {
+            _loaded_successfully = true;
+            this->module = module;
+            this->function = function;
+        }
 
-        static bool create(PyScript*& out, string& err_out, string name)
+        static void create(PyScript*& out, string name)
         {
             name = "py_embedded.scripts." + name;
             
             out = new PyScript();
             out->name = name;
-            err_out = "";
             
             // Import module
             auto name_obj = PyUnicode_FromString(name.c_str());  // ours 
@@ -116,8 +139,14 @@ class PyScript
 
             if(module == nullptr)
             {
-                err_out = "could not import module";
-                return false;
+                string exc_class, exc_msg;
+                get_pyerr(exc_class, exc_msg);
+                
+                string err_out =  "could not import module: " + name;
+                err_out += "\nexception class: " + exc_class;
+                err_out += "\nexception message: " + exc_msg;
+                out->set_failed_load(err_out);
+                return;
             }
 
             // Get function
@@ -125,16 +154,15 @@ class PyScript
             if(function == nullptr)
             {
                 Py_DECREF(module);
-                err_out = "could not find execute() in module";
-                return false;        
+                string err_out = "could not find execute() in module";
+                out->set_failed_load(err_out);  
+                return;
             }
             
-            out->module = module;
-            out->function = function;
-            return true;
+            out->set_successful_load(module, function);
         }
 
-        bool get_pyerr(string& exception_class, string& exception_message)
+        static bool get_pyerr(string& exception_class, string& exception_message)
         {
             if(PyErr_Occurred() == nullptr)
             {
@@ -148,8 +176,7 @@ class PyScript
             char *str;
 
             PyErr_Fetch(&ptype, &pvalue, &ptraceback);  // We own these references
-            PyErr_NormalizeException(&ptype, &pvalue, &ptraceback);
-                       
+            PyErr_NormalizeException(&ptype, &pvalue, &ptraceback);     
            
             auto name_py_str = PyObject_GetAttrString(ptype, "__name__"); // ours
             exception_class = py_str_to_str(name_py_str);
@@ -172,9 +199,11 @@ class PyScript
             {
                 PyObject *pyth_val;
                 pyth_val = PyObject_CallFunctionObjArgs(pyth_func, ptype, pvalue, ptraceback, NULL); // ours
-                exception_message = concat_list(pyth_val);
+                exception_message = pyth_val == nullptr ? "null" : concat_list(pyth_val);
 
-                Py_DECREF(pyth_val);
+                if(pyth_val != nullptr)
+                    Py_DECREF(pyth_val);
+                
                 Py_DECREF(pyth_func);
             }
             
@@ -182,7 +211,7 @@ class PyScript
             {
                 if(pyth_func)
                     Py_DECREF(pyth_func);
-                
+
                 exception_class = "unk";
                 exception_message = "could find traceback.format_exception";
                 goto end;
@@ -192,13 +221,17 @@ class PyScript
             
             Py_DECREF(ptype);
             Py_DECREF(pvalue);
-            Py_DECREF(ptraceback);
+
+            if(ptraceback != nullptr)
+                Py_DECREF(ptraceback);
+
             Py_DECREF(pyth_module);
+            PyErr_Restore(NULL, NULL, NULL);
             
             return true;
         }
         
-        string concat_list(PyObject* fmt_exc_output)
+        static string concat_list(PyObject* fmt_exc_output)
         {
             string tb_str = "";
             int num_lines = (int) PyList_Size(fmt_exc_output);
@@ -214,7 +247,7 @@ class PyScript
             return tb_str;
         }
         
-        string py_str_to_str(PyObject *str)
+        static string py_str_to_str(PyObject *str)
         {
             char *result;
             result = (char*) PyUnicode_AsUTF8AndSize(str, nullptr);
@@ -227,6 +260,7 @@ class PyScript
             auto args_tuple = PyTuple_New(args.size());
             
             for(int i=0; i<args.size(); i++)
+                // Steals reference to args[i]
                 PyTuple_SetItem(args_tuple, i, args[i]);
             
             ScriptResult value;
@@ -264,20 +298,15 @@ class PyScript
 
             if(error)
                 get_pyerr(exception_class, exception_message);
+
             
             // Clean up params and result
+            // Don't decref args tuple elements, their refs were stolen
             Py_DECREF(args_tuple);
     
             if(result != nullptr)
                 Py_DECREF(result);
     
-            for(int i=0; i<args.size(); i++)
-            {
-                if(args[i] == Py_None || args[i] == Py_True || args[i] == Py_False)
-                    continue;
-
-                Py_DECREF(args[i]);
-            }
             
             if(error)
                 return ScriptOutput::create_failure(exception_class, exception_message);
@@ -302,10 +331,14 @@ class PYScripts
         void initialize()
         {
             Py_Initialize();
-
-            // add current directory to path
+            add_to_path("."); // for scripts
+            add_to_path("./server/"); // for definitions
+        }
+        
+        void add_to_path(string location)
+        {
             PyObject *path = PySys_GetObject((char*)"path");    // borrowed
-            auto str = PyUnicode_FromString(".");   // ours
+            auto str = PyUnicode_FromString(location.c_str());   // ours
             PyList_Append(path, str);
             Py_DECREF(str);
         }
@@ -344,16 +377,29 @@ class PYScripts
         {
             if(scripts.find(script_name) == scripts.end())
             {
+                std::cout << "###### can't find " + script_name + ", creating it." << std::endl;
+                
                 PyScript* new_script;
-                string err;
-                
-                if(!PyScript::create(new_script, err, script_name))
-                    return ScriptOutput::create_failure("Couldn't initialize " + script_name, err);
-                
+                PyScript::create(new_script, script_name);               
                 scripts[script_name] = new_script;
             }
             
-            return scripts[script_name]->execute(args);
+            auto script = scripts[script_name];
+            string err;
+            
+            std::cout << "###### try run " + script_name << std::endl;
+            
+            if(!(script->loaded_successfully(err)))
+            {
+                std::cout << "###### script fail load " + script_name << std::endl;
+                return ScriptOutput::create_failure("Couldn't initialize " + script_name, err);
+                
+            }
+            
+            else
+                std::cout << "##### script ok load, running!" <<std::endl;
+                
+            return script->execute(args);
         }
 };
 

@@ -20,6 +20,9 @@ Project::Project(json jdata)
     for(int i=0; i<jdata["resources"].size(); i++)
         resources.push_back(new Resource(jdata["resources"][i]));
 
+    for(int i=0; i<jdata["custom_state_classes"].size(); i++)
+        custom_state_classes.push_back(new CustomStateClass(jdata["custom_state_classes"][i]));
+    
     for(int i=0; i<jdata["machines"].size(); i++)
     {
         json json_machine = jdata["machines"][i];
@@ -41,10 +44,15 @@ void Project::_copy_from(const Project& other)
 {
     resources = vector<Resource*>();
     machines = vector<Machine*>();
+    custom_state_classes = vector<CustomStateClass*>();
+    
     id_ctr = other.id_ctr;
 
     for(int i=0; i<other.resources.size(); i++)
         resources.push_back(new Resource(*other.resources[i]));
+    
+    for(int i=0; i<other.custom_state_classes.size(); i++)
+        custom_state_classes.push_back(new CustomStateClass(*other.custom_state_classes[i]));
     
     for(int i=0; i<other.machines.size(); i++)
     {
@@ -74,6 +82,13 @@ void Project::fix_machine_pointers(Machine* other_machine, Machine* new_machine)
         ResourceLock* other_resourcelock = other_machine->resourcelocks[i];
         auto resource_id = other_resourcelock->resource->id;
         new_resourcelock->resource = get_resource_by_id(resource_id);
+    }
+
+    for(int i=0; i<new_machine->states.size(); i++)
+    {
+        State *new_state = new_machine->states[i];
+        if(new_state->is_custom())
+            new_state->custom_type = get_custom_state_class_by_id(new_state->type);
     }
 
     fix_transition_pointers(new_machine);
@@ -126,6 +141,9 @@ Project::~Project()
 
     for(i=0; i<resources.size(); i++)
         delete resources[i];
+    
+    for(i=0; i<custom_state_classes.size(); i++)
+        delete custom_state_classes[i];
 }
 
 
@@ -134,7 +152,8 @@ json Project::to_json()
     json jdata = {
         { "id_ctr", id_ctr },
         { "resources", json::array() },
-        { "machines", json::array() }
+        { "machines", json::array() },
+        { "custom_state_classes", json::array() }
     };
 
     for(int i=0; i<resources.size(); i++)
@@ -142,6 +161,9 @@ json Project::to_json()
 
     for(int i=0; i<machines.size(); i++)
         jdata["machines"].push_back(machines[i]->to_json());
+    
+    for(int i=0; i<custom_state_classes.size(); i++)
+        jdata["custom_state_classes"].push_back(custom_state_classes[i]->to_json());
 
     return jdata;
 }
@@ -177,9 +199,8 @@ int Project::get_mindex_by_id(unsigned int id)
 }
 
 
-Resource* Project::get_resource_by_id(unsigned int id)
+Resource *Project::get_resource_by_id(unsigned int id)
 {
-    int i = -1;
     for(int j=0; j<resources.size(); j++)
     {
         if(resources[j]->id == id)
@@ -187,6 +208,36 @@ Resource* Project::get_resource_by_id(unsigned int id)
     }
 
     return nullptr;
+}
+
+
+CustomStateClass *Project::get_custom_state_class_by_id(unsigned int id)
+{
+    for(int i=0; i<custom_state_classes.size(); i++)
+    {
+        if(custom_state_classes[i]->id == id)
+            return custom_state_classes[i];
+    }
+    
+    return nullptr;
+}
+
+
+CustomStateClass *Project::get_custom_state_class_by_index(int index)
+{
+    return custom_state_classes[index];
+}
+
+
+int Project::get_cindex_by_id(unsigned int id)
+{
+    for(int i=0; i<custom_state_classes.size(); i++)
+    {
+        if(custom_state_classes[i]->id == id)
+            return i;
+    }
+    
+    return -1;
 }
 
 
@@ -202,13 +253,16 @@ int Project::get_rindex_by_id(unsigned int id)
 }
 
 
-Entity* Project::get_entity_by_id(unsigned int id)
+Entity *Project::get_entity_by_id(unsigned int id)
 {
-    Entity* result = get_machine_by_id(id);
+    Entity *result = get_machine_by_id(id);
 
     if(result == nullptr)
         result = get_resource_by_id(id);
 
+    if(result == nullptr)
+        result = get_custom_state_class_by_id(id);
+    
     int i=0;
 
     while(result == nullptr && i < machines.size())

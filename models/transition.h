@@ -3,14 +3,14 @@
 #include <string>
 #include "lib/json.hpp"
 
+#include "const.h"
 #include "entity.h"
 #include "state.h"
 
 using std::string;
 using nlohmann::json;
 
-enum TransitionType { EVENT, TIMEOUT, CATCHALL };
-enum CornerPosition { CP_NONE=-1, CP_TL=0, CP_TR=1, CP_BL=2, CP_BR=3 };
+
 
 
 class Transition : public Entity 
@@ -55,6 +55,7 @@ class Transition : public Entity
         Transition(json jdata);
         Transition(const Transition &other);
 
+        bool is_child_transition;
         TransitionType type;
         string event_name;  // only used for EVENT type
         float timeout;      // only for TIMEOUT type

@@ -27,6 +27,12 @@ Entity* GMState::get_entity()
 }
 
 
+bool GMState::is_custom()
+{
+    return state->is_custom();
+}
+
+
 NVGcolor GMState::get_border_color()
 {
     return nvgRGBA(255, 255, 255, 255);

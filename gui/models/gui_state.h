@@ -19,6 +19,7 @@ class GMState : public GMBox
 
         State* state;
 
+        bool is_custom();
         int get_state_def_id();
         void set_is_current(bool is_current);   // only used when the gui is in RUN mode
 

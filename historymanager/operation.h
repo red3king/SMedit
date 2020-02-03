@@ -2,7 +2,6 @@
 
 #include "models/project.h"
 
-
 class Operation
 {
     public:

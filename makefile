@@ -1,5 +1,18 @@
-CXXFLAGS = -std=c++17 -iquote ./ -ggdb $(shell pkg-config --cflags  python3 gtkmm-3.0 gtksourceviewmm-3.0 epoxy)
-LDFLAGS = -lstdc++fs $(shell pkg-config --libs python3 gtkmm-3.0 gtksourceviewmm-3.0 epoxy) -L/usr/lib -lpthread -lboost_system -lboost_thread
+
+# use sed to turn -I/usr/blah into -isystem/usr/blah to silence gdkmm warnings
+# TODO combine tr and sed commands
+#CXXFLAGS = -O0 -std=c++17 -iquote ./ -ggdb $(shell { pkg-config --cflags  gtkmm-3.0 gtksourceviewmm-3.0 epoxy; python3.7-config --cflags; } | tr "\n" " "  | sed 's/-I/-isystem/g') -fPIE
+
+CXXFLAGS = -O0 -std=c++17 -iquote ./ -ggdb $(shell pkg-config --cflags  gtkmm-3.0 gtksourceviewmm-3.0 epoxy python-3.7 | sed 's/-I/-isystem/g') -fPIE
+
+#CXXFLAGS = -std=c++17 -iquote ./ -ggdb $(shell pkg-config --cflags  python3 gtkmm-3.0 gtksourceviewmm-3.0 epoxy | sed 's/-I/-isystem/g')
+
+
+LDFLAGS = -lstdc++fs $(shell { pkg-config --libs gtkmm-3.0 gtksourceviewmm-3.0 epoxy; python3.7-config --ldflags; } | tr "\n" " " ) -L/usr/lib -lpthread -lboost_system -lboost_thread
+
+#LDFLAGS = -lstdc++fs $(shell pkg-config --libs python3 gtkmm-3.0 gtksourceviewmm-3.0 epoxy) -L/usr/lib -lpthread -lboost_system -lboost_thread
+
+
 
 # generated source files (generated in place by cog)
 autogens = $(wildcard historymanager/operations/*.cpp) \

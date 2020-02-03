@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from utils import Signal
 from broadcasts import StateChangeBroadcast
-from models.state import StateFactory
+from models.states import StateFactory
 from models.transition import TransitionFactory
 from models.transition_def import TransitionType
 from models.srop import *

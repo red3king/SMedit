@@ -17,6 +17,7 @@ Transition::Transition(unsigned int id) : Entity(id)
     x1 = 0;
     y1 = 0;
     timeout = 0;
+    is_child_transition = false;
 }
 
 
@@ -36,6 +37,7 @@ Transition::Transition(const Transition &other) : Entity(other)
     y1 = other.y1;
 
     loopback_position = other.loopback_position;
+    is_child_transition = other.is_child_transition;
 }
 
 
@@ -52,6 +54,7 @@ Transition::Transition(json jdata) : Entity(jdata)
     x1 = jdata["x1"];
     y0 = jdata["y0"];
     y1 = jdata["y1"];
+    is_child_transition = jdata["is_child_transition"];
 }
 
 
@@ -67,6 +70,7 @@ json Transition::to_json()
     jdata["y1"] = y1;
     jdata["from_state"] = from_state == nullptr ? 0 : from_state->id;
     jdata["to_state"] = to_state == nullptr ? 0 : to_state->id;
+    jdata["is_child_transition"] = is_child_transition;
     return jdata;
 }
 
@@ -91,6 +95,8 @@ string Transition::describe()
 
     if(type == CATCHALL)
         return "*";
+    
+    return "oops";
 }
 
 

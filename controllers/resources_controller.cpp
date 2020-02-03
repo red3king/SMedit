@@ -85,7 +85,6 @@ void ResourcesController::on_delete_clicked()
 
         if(dialog.run() != Gtk::RESPONSE_OK)
             return;
-
     }
 
     auto op = OpResourceDelete(selected_resource);

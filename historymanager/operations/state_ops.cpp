@@ -1,9 +1,11 @@
 #include "state_ops.h"
+#include "transition_ops.h"  // for delete_transition()
 #include "signals.h"
 
 
+
 // Abstract modify
-StateChgOperation::StateChgOperation(Machine* machine, State* state)
+StateChgOperation::StateChgOperation(Machine *machine, State *state)
 {
     machine_id = machine->id;
     state_id = state->id;
@@ -12,8 +14,8 @@ StateChgOperation::StateChgOperation(Machine* machine, State* state)
 
 unsigned int StateChgOperation::execute(Project& project)
 {
-    Machine* machine = project.get_machine_by_id(machine_id);
-    State* state = machine->get_state_by_id(state_id);
+    Machine *machine = project.get_machine_by_id(machine_id);
+    State *state = machine->get_state_by_id(state_id);
     execute_impl(state);
     signals.fire_model_changed(STATE, MODIFY, state_id);
     return state_id;
@@ -22,7 +24,7 @@ unsigned int StateChgOperation::execute(Project& project)
 
 // Create
 
-OpStateCreate::OpStateCreate(Machine* machine, float x, float y)
+OpStateCreate::OpStateCreate(Machine *machine, float x, float y)
 {
     machine_id = machine->id;
     this->x = x;
@@ -32,7 +34,7 @@ OpStateCreate::OpStateCreate(Machine* machine, float x, float y)
 
 unsigned int OpStateCreate::execute(Project& project)
 {
-    State* state = new State(project.get_next_id());
+    State *state = new State(project.get_next_id());
     state->name = "new state";
     state->type = CODE;
     state->x = x;
@@ -40,7 +42,7 @@ unsigned int OpStateCreate::execute(Project& project)
     state->w = 150;
     state->h = 125;
 
-    Machine* machine = project.get_machine_by_id(machine_id);
+    Machine *machine = project.get_machine_by_id(machine_id);
     machine->states.push_back(state);
 
     signals.fire_model_changed(STATE, CREATE, state->id);
@@ -48,7 +50,7 @@ unsigned int OpStateCreate::execute(Project& project)
 }
 
 
-OpStateCreate* OpStateCreate::clone()
+OpStateCreate *OpStateCreate::clone()
 {
     return new OpStateCreate(*this);
 }
@@ -56,18 +58,60 @@ OpStateCreate* OpStateCreate::clone()
 
 // Delete
 
-OpStateDelete::OpStateDelete(Machine* machine, State* state)
+OpStateDelete::OpStateDelete(Machine *machine, State *state)
 {
     machine_id = machine->id;
     state_id = state->id;
 }
 
 
+void delete_state(Machine *machine, State *state)
+{
+    signals.fire_model_changed(STATE, PRE_DELETE, state->id);
+   
+    // Unlink attached incoming transitions
+    for(int i=0; i<state->incoming_transitions.size(); i++)
+    {
+        Transition *transition = state->incoming_transitions[i];
+        transition->to_state = nullptr;
+        transition->update_positions();
+    }
+
+    vector<Transition*> to_delete;
+    
+    for(int i=0; i<state->outgoing_transitions.size(); i++)
+    {
+        Transition *transition = state->outgoing_transitions[i];
+        
+        // custom states and their outgoing transitions are created and deleted with each other
+        if(state->is_custom())
+            //delete_transition(machine, transition);
+            to_delete.push_back(transition);
+            
+        // normal states leave their transitions alone when deleted:
+        else
+        {
+            transition->from_state = nullptr;
+            transition->update_positions();
+        }
+    }
+    
+    for(int i=0; i<to_delete.size(); i++)
+        delete_transition(machine, to_delete[i]);
+
+    int sindex = -1;
+    while(machine->states[++sindex] != state);
+    
+    delete state;
+    machine->states.erase(machine->states.begin() + sindex);  
+}
+
+
 unsigned int OpStateDelete::execute(Project& project)
 {
-    Machine* machine = project.get_machine_by_id(machine_id);
-    
-    State* to_delete;
+    Machine *machine = project.get_machine_by_id(machine_id);
+    State *to_delete;
+    unsigned int deleted_id;
     int i;
 
     for(i=0; i<machine->states.size(); i++)
@@ -78,31 +122,14 @@ unsigned int OpStateDelete::execute(Project& project)
             break;
         }
     }
-
-    signals.fire_model_changed(STATE, PRE_DELETE, state_id);
-
-    // Unlink attached transitions
-    for(int i=0; i<to_delete->incoming_transitions.size(); i++)
-    {
-        Transition* transition = to_delete->incoming_transitions[i];
-        transition->to_state = nullptr;
-        transition->update_positions();
-    }
-
-    for(int i=0; i<to_delete->outgoing_transitions.size(); i++)
-    {
-        Transition* transition = to_delete->outgoing_transitions[i];
-        transition->from_state = nullptr;
-        transition->update_positions();
-    }
-
-    delete to_delete;
-    machine->states.erase(machine->states.begin() + i);
-    return state_id;
+    
+    deleted_id = to_delete->id;
+    delete_state(machine, to_delete);
+    return deleted_id;
 }
 
 
-OpStateDelete* OpStateDelete::clone()
+OpStateDelete *OpStateDelete::clone()
 {
     return new OpStateDelete(*this);
 }
@@ -110,7 +137,7 @@ OpStateDelete* OpStateDelete::clone()
 
 // Move
 
-OpStateMove::OpStateMove(Machine* machine, State* state, float x, float y)
+OpStateMove::OpStateMove(Machine *machine, State *state, float x, float y)
 {
     machine_id = machine->id;
     state_id = state->id;
@@ -121,8 +148,8 @@ OpStateMove::OpStateMove(Machine* machine, State* state, float x, float y)
 
 unsigned int OpStateMove::execute(Project& project)
 {
-    Machine* machine = project.get_machine_by_id(machine_id);
-    State* state = machine->get_state_by_id(state_id);
+    Machine *machine = project.get_machine_by_id(machine_id);
+    State *state = machine->get_state_by_id(state_id);
     state->x = x;
     state->y = y;
     state->update_transition_positions();
@@ -145,10 +172,93 @@ void OpStateMove::collapse(Operation& other)
 }
 
 
-OpStateMove* OpStateMove::clone()
+OpStateMove *OpStateMove::clone()
 {
     return new OpStateMove(*this);
 }
+
+
+
+// type 
+
+OpStateType::OpStateType(Machine* machine, State* state, int type) : StateChgOperation(machine, state)
+{
+    this->type = type;
+}
+
+
+OpStateType* OpStateType::clone()
+{
+    return new OpStateType(*this);
+}
+
+
+
+unsigned int OpStateType::execute(Project& project)
+{
+    Machine *machine = project.get_machine_by_id(machine_id);
+    State *state = machine->get_state_by_id(state_id);
+    
+    if(state_type_is_custom(state->type))
+    {
+        vector<Transition*> to_delete = state->outgoing_transitions;
+        // Delete all outgoing transitions
+        for(int i=0; i<to_delete.size(); i++)
+        {
+            Transition *transition = to_delete[i];
+            delete_transition(machine, transition);
+        }
+    }
+    
+    state->type = type;
+
+    if(state_type_is_custom(type))
+    {
+        // Create outgoing transitions
+        CustomStateClass *cs_class = project.get_custom_state_class_by_id(type);
+        state->custom_type = cs_class;
+
+        for(int i=0; i<cs_class->transition_defs.size(); i++)
+        {
+            auto transition_def = cs_class->transition_defs[i];
+            float to_x = state->x - 250;
+            float to_y = state->y + 50 - (50 * i);
+            Transition *t = create_transition(project, machine_id, true, 0, 0, to_x, to_y, 0);
+            t->from_state = state;
+            t->type = transition_def.type;
+            t->timeout = transition_def.timeout;
+            t->event_name = transition_def.event_name;
+            state->add_transition(t, false);
+            t->update_positions();
+        }
+    }
+
+    else
+        state->custom_type = nullptr;
+    
+    signals.fire_model_changed(STATE, MODIFY, state_id);
+    return state_id;
+}
+
+
+void OpStateType::execute_impl(State* state) { }
+
+
+bool OpStateType::may_collapse_impl(Operation& other)
+{
+    auto op = (OpStateType&) other;
+    return state_id == op.state_id;
+}
+
+
+void OpStateType::collapse(Operation& other)
+{
+    auto op = (OpStateType&) other;
+    type = op.type;
+}
+
+
+
 
 
 // MACHINE GENERATED CODE BELOW, DO NOT EDIT
@@ -165,40 +275,6 @@ for line in state_opgen.make_cpp():
     cog.outl(line)
 
 ]]]*/
-
-
-// type  -  AUTOGENERATED, DO NOT MODIFY
-
-OpStateType::OpStateType(Machine* machine, State* state, StateType type) : StateChgOperation(machine, state)
-{
-    this->type = type;
-}
-
-
-OpStateType* OpStateType::clone()
-{
-    return new OpStateType(*this);
-}
-
-
-void OpStateType::execute_impl(State* state)
-{
-    state->type = type;
-}
-
-
-bool OpStateType::may_collapse_impl(Operation& other)
-{
-    auto op = (OpStateType&) other;
-    return state_id == op.state_id;
-}
-
-
-void OpStateType::collapse(Operation& other)
-{
-    auto op = (OpStateType&) other;
-    type = op.type;
-}
 
 
 // name  -  AUTOGENERATED, DO NOT MODIFY

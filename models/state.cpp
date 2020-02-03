@@ -2,42 +2,16 @@
 #include "transition.h"
 
 
-string state_type_to_string(StateType type)
+bool state_type_is_custom(int type)
 {
-    switch(type)
-    {
-        case INITIAL:
-            return STS_INITIAL;
-        case CODE:
-            return STS_CODE;
-        case RETURN:
-            return STS_RETURN;
-        case SPAWN:
-            return STS_SPAWN;
-        case JOIN:
-            return STS_JOIN;
-    }
-
-    throw std::invalid_argument("unknown StateType");
+    return type >= 0;
 }
 
 
-StateType string_to_state_type(string input)
+bool State::is_custom()
 {
-    if(input == STS_INITIAL)
-        return INITIAL;
-    if(input == STS_CODE)
-        return CODE;
-    if(input == STS_RETURN)
-        return RETURN;
-    if(input == STS_SPAWN)
-        return SPAWN;
-    if(input == STS_JOIN)
-        return JOIN;
-
-    throw std::invalid_argument("unknown StateType string");
+    return state_type_is_custom(type);
 }
-
 
 
 State::State(unsigned int id) : BoxEntity(id) 
@@ -46,11 +20,14 @@ State::State(unsigned int id) : BoxEntity(id)
     launch_task_name = LVOV(empty);
     has_return_value = false;
     code = DEFAULT_STATE_CODE;
-} 
+    custom_type = nullptr;
+    type = INITIAL;
+}
 
 
 State::State(json jdata) : BoxEntity(jdata), return_value(jdata["return_value"]), launch_task_name(jdata["launch_task_name"])
 {
+    custom_type = nullptr;
     name = jdata["name"];
     type = (StateType) jdata["type"];
     
@@ -71,6 +48,7 @@ State::State(json jdata) : BoxEntity(jdata), return_value(jdata["return_value"])
 
 State::State(const State& other) : BoxEntity(other)
 {
+    custom_type = other.custom_type;
     name = other.name;
     type = other.type;
 
@@ -159,6 +137,7 @@ vector<Transition*> State::get_all_transitions()
     vector<Transition*> result;
     for(int i=0; i<incoming_transitions.size(); i++)
         result.push_back(incoming_transitions[i]);
+    
     for(int i=0; i<outgoing_transitions.size(); i++)
         result.push_back(outgoing_transitions[i]);
     return result;

@@ -9,6 +9,7 @@
 #include <epoxy/gl.h>
 
 #include "controllers/resources_controller.h"
+#include "controllers/custom_state_class_controller.h"
 #include "controllers/machines_controller.h"
 #include "controllers/run/run_controller.h"
 #include "historymanager/historymanager.h"
@@ -31,6 +32,7 @@ class MainWindow : public Gtk::ApplicationWindow
         ProjectInfo project_info;
 
         ResourcesController *resources_controller;
+        CustomStateClassController *custom_state_class_controller;
         MachinesController *machines_controller;
         RunController *run_controller;
 

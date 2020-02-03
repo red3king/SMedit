@@ -27,3 +27,10 @@ enum BorderType { BT_NONE, BT_TOP, BT_RIGHT, BT_BOTTOM, BT_LEFT };
 #define SERV_RESP_SUCCESS 1
 #define SERV_RESP_FAILURE 0
 
+
+
+// transition model
+
+enum TransitionType { EVENT, TIMEOUT, CATCHALL };
+enum CornerPosition { CP_NONE=-1, CP_TL=0, CP_TR=1, CP_BL=2, CP_BR=3 };
+

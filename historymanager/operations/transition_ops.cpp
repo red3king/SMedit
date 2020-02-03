@@ -14,18 +14,29 @@ OpTransitionCreate::OpTransitionCreate(Machine* machine, float x0, float y0, flo
 }
 
 
-unsigned int OpTransitionCreate::execute(Project& project)
+Transition *create_transition(Project& project, unsigned int machine_id, bool is_child, float x0, float y0, float x1, float y1, int type)
 {
     Machine* machine = project.get_machine_by_id(machine_id);
     Transition* new_transition = new Transition(project.get_next_id());
 
+    if(type >= 0)
+        new_transition->type = ((TransitionType)type);
+    
     new_transition->x0 = x0;
     new_transition->y0 = y0;
     new_transition->x1 = x1;
     new_transition->y1 = y1;
-
+    new_transition->is_child_transition = is_child;
+    
     machine->transitions.push_back(new_transition);
     signals.fire_model_changed(TRANSITION, CREATE, new_transition->id);
+    return new_transition;   
+}
+
+
+unsigned int OpTransitionCreate::execute(Project& project)
+{
+    Transition *new_transition = create_transition(project, machine_id, false, x0, y0, x1, y1, 0);
     return new_transition->id;
 }
 
@@ -58,7 +69,14 @@ unsigned int OpTransitionDelete::execute(Project& project)
             break;
     }
 
-    signals.fire_model_changed(TRANSITION, PRE_DELETE, transition_id);
+    delete_transition(machine, transition);
+    return transition_id;
+}
+
+
+void delete_transition(Machine *machine, Transition *transition)
+{
+    signals.fire_model_changed(TRANSITION, PRE_DELETE, transition->id);
 
     // Unlink from to and from states
     if(transition->from_state != nullptr)
@@ -68,8 +86,11 @@ unsigned int OpTransitionDelete::execute(Project& project)
         transition->to_state->remove_transition(transition, true);
 
     delete transition;
-    machine->transitions.erase(machine->transitions.begin()+i);
-    return transition_id;
+    
+    int tindex = -1;
+    while(machine->transitions[++tindex] != transition);
+    
+    machine->transitions.erase(machine->transitions.begin() + tindex);    
 }
 
 
@@ -174,8 +195,8 @@ unsigned int OpTransitionEndpointMove::execute(Project& project)
                 transition->from_state->remove_transition(transition, false);
             
             transition->from_state = nullptr;
-    
         }
+        
         else
         {
             transition->x1 = x_new;
@@ -201,6 +222,8 @@ unsigned int OpTransitionEndpointMove::execute(Project& project)
     }
 
     transition->update_positions();
+    
+    return transition_id;
 }
 
 

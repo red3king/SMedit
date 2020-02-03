@@ -24,6 +24,10 @@ bool MoveTransitionEndpoint::maybe_create(GMTransition* transition_gmodel, GUISt
     if(border == TB_NONE || border == TB_MID)
         return false;
 
+    // User cannot detach child transitions from their parent state:
+    if(border == TB_BEGIN && transition_gmodel->is_child_transition())
+        return false;
+
     pref = new MoveTransitionEndpoint(transition_gmodel, border == TB_BEGIN);
     return true;
 }
@@ -60,6 +64,7 @@ GUIOpResult MoveTransitionEndpoint::should_continue(GUIState& gui_state, Current
         return CONTINUE;
 
     // If user lets go on a state, save pointer to connect
+    // (except when attempting to connect a transition from a state of custom type)
     for(int i=0; i<gui_state.gui_models.size(); i++)
     {
         GMState* state_gmodel = dynamic_cast<GMState*>(gui_state.gui_models[i]);
@@ -67,7 +72,13 @@ GUIOpResult MoveTransitionEndpoint::should_continue(GUIState& gui_state, Current
             continue;
 
         if(state_gmodel->mouse_within(current_events.mouse_x, current_events.mouse_y))
+        {
+            // Can't attach outgoing transitions to custom states
+            if(state_gmodel->is_custom() && is_endpoint_0)
+                continue;
+            
             connect_state = state_gmodel->state;
+        }
     }
 
     return END;
