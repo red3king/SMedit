@@ -9,6 +9,9 @@
 using std::map;
 
 
+enum ProjectFileType { PFT_CODE_STATE, PFT_RESOURCE, PFT_CUSTOM_STATE_CLASS };
+
+
 class ProjectInfo
 {
     public:
@@ -23,6 +26,7 @@ class ProjectInfo
 
         // ProjectInfo returns file data from loaded code files,
         // and data from external resource python files
+        int get_file_index(ProjectFileType& file_type, int i);
         int get_num_files();
         string get_filename(int i);
         string get_filedata(int i);

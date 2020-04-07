@@ -1307,10 +1307,10 @@ etc...
                                           </packing>
                                         </child>
                                         <child>
-                                          <object class="GtkLabel">
+                                          <object class="GtkLabel" id="custom_state_detail_label">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
-                                            <property name="label" translatable="yes">Nothing to configure.</property>
+                                            <property name="label" translatable="yes">[nothing to configure / options]</property>
                                           </object>
                                           <packing>
                                             <property name="expand">False</property>
@@ -1319,7 +1319,25 @@ etc...
                                           </packing>
                                         </child>
                                         <child>
-                                          <placeholder/>
+                                          <object class="GtkBox" id="custom_state_options_box">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="orientation">vertical</property>
+                                            <child>
+                                              <placeholder/>
+                                            </child>
+                                            <child>
+                                              <placeholder/>
+                                            </child>
+                                            <child>
+                                              <placeholder/>
+                                            </child>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">2</property>
+                                          </packing>
                                         </child>
                                       </object>
                                       <packing>

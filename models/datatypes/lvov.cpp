@@ -9,6 +9,15 @@ LVOV::LVOV()
 }
 
 
+
+LVOV::LVOV(ValueType value_type)
+{
+    reset();
+    type = value_type;
+}
+
+
+
 LVOV::LVOV(string str_val)
 {
     reset();

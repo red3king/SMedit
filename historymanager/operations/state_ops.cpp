@@ -5,7 +5,7 @@
 
 
 // Abstract modify
-StateChgOperation::StateChgOperation(Machine *machine, State *state)
+StateChgOperation::StateChgOperation(Machine* machine, State* state)
 {
     machine_id = machine->id;
     state_id = state->id;
@@ -14,8 +14,8 @@ StateChgOperation::StateChgOperation(Machine *machine, State *state)
 
 unsigned int StateChgOperation::execute(Project& project)
 {
-    Machine *machine = project.get_machine_by_id(machine_id);
-    State *state = machine->get_state_by_id(state_id);
+    Machine* machine = project.get_machine_by_id(machine_id);
+    State* state = machine->get_state_by_id(state_id);
     execute_impl(state);
     signals.fire_model_changed(STATE, MODIFY, state_id);
     return state_id;
@@ -24,7 +24,7 @@ unsigned int StateChgOperation::execute(Project& project)
 
 // Create
 
-OpStateCreate::OpStateCreate(Machine *machine, float x, float y)
+OpStateCreate::OpStateCreate(Machine* machine, float x, float y)
 {
     machine_id = machine->id;
     this->x = x;
@@ -34,7 +34,7 @@ OpStateCreate::OpStateCreate(Machine *machine, float x, float y)
 
 unsigned int OpStateCreate::execute(Project& project)
 {
-    State *state = new State(project.get_next_id());
+    State* state = new State(project.get_next_id());
     state->name = "new state";
     state->type = CODE;
     state->x = x;
@@ -42,7 +42,7 @@ unsigned int OpStateCreate::execute(Project& project)
     state->w = 150;
     state->h = 125;
 
-    Machine *machine = project.get_machine_by_id(machine_id);
+    Machine* machine = project.get_machine_by_id(machine_id);
     machine->states.push_back(state);
 
     signals.fire_model_changed(STATE, CREATE, state->id);
@@ -50,7 +50,7 @@ unsigned int OpStateCreate::execute(Project& project)
 }
 
 
-OpStateCreate *OpStateCreate::clone()
+OpStateCreate* OpStateCreate::clone()
 {
     return new OpStateCreate(*this);
 }
@@ -58,30 +58,30 @@ OpStateCreate *OpStateCreate::clone()
 
 // Delete
 
-OpStateDelete::OpStateDelete(Machine *machine, State *state)
+OpStateDelete::OpStateDelete(Machine* machine, State* state)
 {
     machine_id = machine->id;
     state_id = state->id;
 }
 
 
-void delete_state(Machine *machine, State *state)
+void delete_state(Machine* machine, State* state)
 {
     signals.fire_model_changed(STATE, PRE_DELETE, state->id);
    
     // Unlink attached incoming transitions
-    for(int i=0; i<state->incoming_transitions.size(); i++)
+    for(int i = 0; i < state->incoming_transitions.size(); i++)
     {
-        Transition *transition = state->incoming_transitions[i];
+        Transition* transition = state->incoming_transitions[i];
         transition->to_state = nullptr;
         transition->update_positions();
     }
 
     vector<Transition*> to_delete;
     
-    for(int i=0; i<state->outgoing_transitions.size(); i++)
+    for(int i = 0; i < state->outgoing_transitions.size(); i++)
     {
-        Transition *transition = state->outgoing_transitions[i];
+        Transition* transition = state->outgoing_transitions[i];
         
         // custom states and their outgoing transitions are created and deleted with each other
         if(state->is_custom())
@@ -96,7 +96,7 @@ void delete_state(Machine *machine, State *state)
         }
     }
     
-    for(int i=0; i<to_delete.size(); i++)
+    for(int i = 0; i < to_delete.size(); i++)
         delete_transition(machine, to_delete[i]);
 
     int sindex = -1;
@@ -109,12 +109,12 @@ void delete_state(Machine *machine, State *state)
 
 unsigned int OpStateDelete::execute(Project& project)
 {
-    Machine *machine = project.get_machine_by_id(machine_id);
-    State *to_delete;
+    Machine* machine = project.get_machine_by_id(machine_id);
+    State* to_delete;
     unsigned int deleted_id;
     int i;
 
-    for(i=0; i<machine->states.size(); i++)
+    for(i = 0; i < machine->states.size(); i++)
     {
         if(machine->states[i]->id == state_id)
         {
@@ -129,7 +129,7 @@ unsigned int OpStateDelete::execute(Project& project)
 }
 
 
-OpStateDelete *OpStateDelete::clone()
+OpStateDelete* OpStateDelete::clone()
 {
     return new OpStateDelete(*this);
 }
@@ -137,7 +137,7 @@ OpStateDelete *OpStateDelete::clone()
 
 // Move
 
-OpStateMove::OpStateMove(Machine *machine, State *state, float x, float y)
+OpStateMove::OpStateMove(Machine* machine, State* state, float x, float y)
 {
     machine_id = machine->id;
     state_id = state->id;
@@ -148,8 +148,8 @@ OpStateMove::OpStateMove(Machine *machine, State *state, float x, float y)
 
 unsigned int OpStateMove::execute(Project& project)
 {
-    Machine *machine = project.get_machine_by_id(machine_id);
-    State *state = machine->get_state_by_id(state_id);
+    Machine* machine = project.get_machine_by_id(machine_id);
+    State* state = machine->get_state_by_id(state_id);
     state->x = x;
     state->y = y;
     state->update_transition_positions();
@@ -172,7 +172,7 @@ void OpStateMove::collapse(Operation& other)
 }
 
 
-OpStateMove *OpStateMove::clone()
+OpStateMove* OpStateMove::clone()
 {
     return new OpStateMove(*this);
 }
@@ -196,18 +196,25 @@ OpStateType* OpStateType::clone()
 
 unsigned int OpStateType::execute(Project& project)
 {
-    Machine *machine = project.get_machine_by_id(machine_id);
-    State *state = machine->get_state_by_id(state_id);
+    Machine* machine = project.get_machine_by_id(machine_id);
+    State* state = machine->get_state_by_id(state_id);
     
     if(state_type_is_custom(state->type))
     {
-        vector<Transition*> to_delete = state->outgoing_transitions;
         // Delete all outgoing transitions
-        for(int i=0; i<to_delete.size(); i++)
+        vector<Transition*> to_delete = state->outgoing_transitions;
+
+        for(int i = 0; i < to_delete.size(); i++)
         {
-            Transition *transition = to_delete[i];
+            Transition* transition = to_delete[i];
             delete_transition(machine, transition);
         }
+        
+        // Clear custom type pointer
+        state->custom_type = nullptr;
+        
+        // Clear custom config
+        state->clear_custom_config();
     }
     
     state->type = type;
@@ -215,15 +222,15 @@ unsigned int OpStateType::execute(Project& project)
     if(state_type_is_custom(type))
     {
         // Create outgoing transitions
-        CustomStateClass *cs_class = project.get_custom_state_class_by_id(type);
+        CustomStateClass* cs_class = project.get_custom_state_class_by_id(type);
         state->custom_type = cs_class;
 
-        for(int i=0; i<cs_class->transition_defs.size(); i++)
+        for(int i = 0; i < cs_class->transition_defs.size(); i++)
         {
             auto transition_def = cs_class->transition_defs[i];
             float to_x = state->x - 250;
             float to_y = state->y + 50 - (50 * i);
-            Transition *t = create_transition(project, machine_id, true, 0, 0, to_x, to_y, 0);
+            Transition* t = create_transition(project, machine_id, true, 0, 0, to_x, to_y, 0);
             t->from_state = state;
             t->type = transition_def.type;
             t->timeout = transition_def.timeout;
@@ -231,10 +238,10 @@ unsigned int OpStateType::execute(Project& project)
             state->add_transition(t, false);
             t->update_positions();
         }
+        
+        // Create default config values
+        state->make_default_config(cs_class->configuration);
     }
-
-    else
-        state->custom_type = nullptr;
     
     signals.fire_model_changed(STATE, MODIFY, state_id);
     return state_id;
@@ -258,6 +265,39 @@ void OpStateType::collapse(Operation& other)
 }
 
 
+// custom config
+
+OpStateConfig::OpStateConfig(Machine* machine, State* state, CustomStateConfig config) : StateChgOperation(machine, state)
+{
+    name = config.name;
+    value = config.value;
+}
+
+
+OpStateConfig* OpStateConfig::clone()
+{
+    return new OpStateConfig(*this);
+}
+
+
+void OpStateConfig::execute_impl(State* state)
+{
+    state->set_custom_config(name, value);
+}
+
+
+bool OpStateConfig::may_collapse_impl(Operation &other)
+{
+    auto config = (OpStateConfig&) other;
+    return name == config.name;
+}
+
+
+void OpStateConfig::collapse(Operation &other)
+{
+    auto config = (OpStateConfig&) other;
+    value = config.value;
+}
 
 
 

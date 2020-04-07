@@ -17,7 +17,7 @@ class State(ABC):
 
     @property
     def is_initial(self):
-        return self.__class__ == InitialState
+        return self.__class__.__name__ == "InitialState"
 
     @property
     def is_joining(self):  # overridden where true
@@ -34,8 +34,23 @@ class State(ABC):
     def execute_impl(self, vars_dict, trigger_event):
         pass
     
+    def feed_event(self, event):
+        if event is not None:
+            return self.machine.feed_event(event)
+
+        return None
+    
 
 class CustomState(State):
+
+    @staticmethod
+    @abstractmethod
+    def get_name():
+        pass    
+    
+    def get_config_value(self, name):
+        return self.state_def.get_custom_config_value(name)
+    
     @staticmethod
     @abstractmethod
     def get_outgoing_transition_defs():
@@ -60,5 +75,37 @@ class CustomState(State):
 
     @staticmethod
     @abstractmethod
-    def get_name():
+    def get_configuration_definition():
+        
+        '''
+        Return list of parameter definitions.
+        
+        ValueType.REF and ANY not allowed here.
+        
+        example:
+        
+        return [
+            {
+                "type": ValueType.STR,
+                "name": "post_url"
+            },
+            {
+                "type": ValueType.FLOAT,
+                "name": "timeout_sec"
+            }
+        ]
+        
+        '''
         pass
+
+
+class CustomStateQuick(CustomState):
+    # Simple custom state which works like a Code state
+    
+    def execute_impl(self, vars_dict, trigger_event):
+        event = self.code_func(vars_dict, trigger_event)
+        self.feed_event(event)
+        return self.srop_if_next()
+
+
+    

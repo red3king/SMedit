@@ -19,3 +19,8 @@ void StateTypeController::set_state(Machine* owning_machine, State* selected_sta
     set_state_impl(owning_machine, selected_state);
 }
 
+
+bool StateTypeController::has_state()
+{
+    return selected_state != nullptr;
+}

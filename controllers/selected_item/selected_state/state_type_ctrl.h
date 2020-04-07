@@ -13,10 +13,12 @@ class StateTypeController
 
     protected:
         virtual void set_state_impl(Machine* owning_machine, State* selected_state)=0;
-
+        bool has_state();
+        
         State* selected_state;
         Machine* owning_machine;
         HistoryManager* history_manager;
+        
 
     private:
 

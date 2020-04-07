@@ -6,6 +6,7 @@
 
 #include "const.h"
 #include "entity.h"
+#include "custom_config.h"
 
 
 using std::string;
@@ -19,11 +20,14 @@ bool load_csc_from_file(CustomStateClass& custom_state_class, string csc_file, s
 class CustomTransitionDef
 {
     public:
+        CustomTransitionDef(json jdata);
+        
         // Same fields from Transition class
         TransitionType type;
         string event_name;  // only used for EVENT type
         float timeout;      // only for TIMEOUT type
         
+        json to_json();
     private:
 };
 
@@ -31,7 +35,7 @@ class CustomTransitionDef
 class CustomStateClass : public Entity
 {
     public:
-        CustomStateClass(unsigned int id=0);
+        CustomStateClass(unsigned int id = 0);
         CustomStateClass(json jdata);
         
         json to_json();
@@ -42,8 +46,12 @@ class CustomStateClass : public Entity
         // file if they accidentally misplace it (they lose the transition defs)
         string name;
         
-        // not persisted to json, reloaded from state def python classes on program start
+        bool has_config();
+        string get_py_filename();
+        
+        // persisted to json, may be reloaded from state def python classes
         vector<CustomTransitionDef> transition_defs;
-    
+        vector<CustomConfigDef> configuration;
+        
     private:
 };

@@ -8,30 +8,37 @@ from models.state import *
 
 class StateFactory(object):
     
-    @classmethod
-    def make_state(cls, machine, state_def):
+    def __init__(self):
+        self._registry = {}
+        self._reset_registry()
+    
+    def _reset_registry(self):
+        self._registry = {
+                StateType.INITIAL: InitialState,
+                StateType.CODE: CodeState,
+                StateType.RETURN: ReturnState,
+                StateType.SPAWN: SpawnState,
+                StateType.JOIN: JoinState,
+            }
+        
+    def load_custom_state_classes(self, custom_state_class_def_list):
+        for csc_def in custom_state_class_def_list:
+            self._registry[csc_def.id] = csc_def.ClassObject
+    
+    def make_state(self, machine, state_def):
         typ = state_def.type
-
-        if typ == StateType.INITIAL:
-            return InitialState(machine, state_def)
-
-        elif typ == StateType.CODE:
-            return CodeState(machine, state_def)
-
-        elif typ == StateType.RETURN:
-            return ReturnState(machine, state_def)
-
-        elif typ == StateType.SPAWN:
-            return SpawnState(machine, state_def)
-
-        elif typ == StateType.JOIN:
-            return JoinState(machine, state_def)
-
-        else:
-            raise Exception("unknown state type")
+        
+        if typ not in self._registry:
+            raise Exception("unknown state type " + str(typ))
+        
+        Class = self._registry[typ]
+        return Class(machine, state_def)
+        
 
 
 class InitialState(State):
+    # NOTE: State.is_initial() checks the __name__ of state.__class__ to see if it's "InitialState"
+    
     def __init__(self, machine, state_def):
         super().__init__(machine, state_def)
 
@@ -58,15 +65,15 @@ class CodeState(State):
         #   - send data in the event for the next state to process via trigger_event, if desired.
 
         event = self.code_func(vars_dict, trigger_event)
-
-        if event is not None:
-            self.machine.feed_event(event)
-
+        srop = self.feed_event(event)
+        
+        if srop is not None:
+            return srop
+        
         return self.srop_if_next()
 
 
 class JoinState(State):
-
     '''
         fire the join event
             this marks this machine as waiting for another machine in the project

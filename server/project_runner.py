@@ -12,7 +12,6 @@ class ProjectRunner(object):
         self.new_project()
 
     def on_broadcast(self, broadcast):
-        print("PROJECTRUNNER GOT BCAST = " + str(broadcast))
         broadcast_dict = broadcast.to_dict()
         self.command_handler.send_broadcast(broadcast_dict)
 

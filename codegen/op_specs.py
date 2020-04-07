@@ -11,7 +11,6 @@ RESOURCE_OP_SPECS = [
 CUSTOM_STATE_CLASS_OP_SPECS = [
     os("path", "string"),
     os("name", "string"),
-    os("transition_defs", "vector<CustomTransitionDef>")
 ]
 
 

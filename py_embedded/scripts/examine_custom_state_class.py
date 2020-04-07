@@ -33,7 +33,8 @@ def execute(custom_state_class_path):
 def analyze_cust_state(CustomStateSubclass):
     jdict = {
         "name": CustomStateSubclass.get_name(),
-        "outgoing_transitions": CustomStateSubclass.get_outgoing_transition_defs()
+        "outgoing_transitions": CustomStateSubclass.get_outgoing_transition_defs(),
+        "configuration_definition": CustomStateSubclass.get_configuration_definition()
     }
     
     return json.dumps(jdict)

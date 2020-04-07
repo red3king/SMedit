@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 
 from utils import Signal
 from broadcasts import StateChangeBroadcast
-from models.states import StateFactory
 from models.transition import TransitionFactory
 from models.transition_def import TransitionType
 from models.srop import *
@@ -10,7 +9,8 @@ from models.srop import *
 
 class Machine(object):
 
-    def __init__(self, machine_def, machine_id, machine_args=None):
+    def __init__(self, state_factory, machine_def, machine_id, machine_args=None):
+        self.state_factory = state_factory
         self.machine_def = machine_def
         self.current_state = None
         self.vars_dict = {} 
@@ -27,7 +27,7 @@ class Machine(object):
         # construct State objects
         id_to_state = {}
         for state_def in machine_def.state_defs:
-            state = StateFactory.make_state(self, state_def)
+            state = self.state_factory.make_state(self, state_def)
             self.states_map[state] = {}
             id_to_state[state.id] = state
 
@@ -91,9 +91,9 @@ class Machine(object):
         for transition in states:
             if transition.match_event(event):
                 state = states[transition]
-                srop = EventRunNextStateROP(self, state)
-                self.run_srop(srop)
-                return
+                return EventRunNextStateROP(self, state)
+
+        return None
 
     def notify_child_returned(self, child_id, return_value):
         child_pid_match = False

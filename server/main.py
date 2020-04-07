@@ -9,6 +9,7 @@ from command_handler import CommandHandler
 from project_runner import ProjectRunner
 from utils import clear
 
+# how to fix broken pip: https://askubuntu.com/a/1026848
 
 
 # https://medium.com/@jtpaasch/the-right-way-to-use-virtual-environments-1bc255a0cba7

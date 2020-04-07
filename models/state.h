@@ -2,12 +2,16 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
-#include "boxentity.h"
-#include "custom_state_class.h"
 #include "models/datatypes/lvov.h"
 #include "models/datatypes/arg.h"
 #include "models/datatypes/argdef.h"
+
+#include "boxentity.h"
+#include "custom_state_class.h"
+#include "custom_config.h"
+
 
 #define STS_INITIAL "Initial"       // list of argument names
 #define STS_CODE "Code"
@@ -23,6 +27,8 @@
 
 using std::string;
 using std::vector;
+using std::map;
+
 
 class Transition;
 
@@ -97,7 +103,17 @@ class State : public BoxEntity
         // Join  done
         string join_pid_variable;
         string join_result_variable; 
+        
+        // Custom
+        map<string, CustomStateConfig> custom_config;
+        
+        void clear_custom_config();
+        void make_default_config(vector<CustomConfigDef>& defs);     // create default param values
+        void set_custom_config(string parameter_name, LVOV value);
+        CustomStateConfig get_custom_config(string parameter_name);
+        vector<CustomStateConfig> get_all_config(); 
 
+        
         vector<Transition*> incoming_transitions, outgoing_transitions;
 
         vector<Transition*> get_all_transitions();

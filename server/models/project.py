@@ -6,6 +6,7 @@ from broadcasts import MachineCreateBroadcast, MachineDeleteBroadcast
 from models.project_def import ProjectDef
 from models.resource import Resource
 from models.machine import Machine
+from models.states import StateFactory
 
 
 class Project(object):
@@ -21,13 +22,13 @@ class Project(object):
         self._loaded = False
         self.broadcast_signal = Signal()
         self.machine_id_counter = 0
+        self.state_factory = None
 
     @property
     def loaded(self):
         return self._loaded
 
     def on_broadcast(self, broadcast):
-        print("PROJECT GOT BCAST = " + str(broadcast))
         self.broadcast_signal(broadcast)
 
     def on_machine_finished(self, machine, return_value):
@@ -56,7 +57,7 @@ class Project(object):
     def create_machine(self, machine_def, machine_args=None):
         # Creates a machine, but does not start running it
         self.machine_id_counter += 1
-        machine = Machine(machine_def, self.machine_id_counter, machine_args)
+        machine = Machine(self.state_factory, machine_def, self.machine_id_counter, machine_args)
 
         machine.broadcast_signal += self.on_broadcast
         machine.finished_signal += self.on_machine_finished
@@ -91,6 +92,10 @@ class Project(object):
             resource = Resource.create(resource_def)
             resource.event_signal += self.on_event
             self.resources.append(resource)
+        
+        # custom state classes
+        self.state_factory = StateFactory()
+        self.state_factory.load_custom_state_classes(self.project_def.get_custom_state_defs())
         
         self._loaded = True
 

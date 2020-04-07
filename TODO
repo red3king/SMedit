@@ -1,4 +1,5 @@
 RIGHT NOW:
+
 x    - custom state class implementation
 x    - my load from custom state def file code works
 x    - now i need to:
@@ -9,9 +10,8 @@ x            VARIABLES ARE "OPTIMIZED OUT" EVEN WHEN I COMPILED WITH -O0! WTF
 x        - test all new operations, all changed operations, all controller buttons
 x        - I think I have written all the code for the client ?? server is next!
 LOH            - nevermind, there is still GUIModel stuff (highlight invalid state)
+                    invalid state? what does that mean?
 
-
-    
     
 x    - implement CustomStateDef class
     
@@ -66,13 +66,13 @@ x            then also delete all instances of this custom state and their trans
 x        reset list of registered custom state clases? (if this data isn't stored in a Proejct object)
 x        modify saveload to handle custom state classes
         
-    net stuff
-        modify project upload to also upload the custom state classes
+x    net stuff
+x        modify project upload to also upload the custom state classes
         
 
                 
-custom state type integration - SERVER
-    modify project load code to exec all custom state files, and register resulting classes in some dict, "StateClasses" or soemthing
+x custom state type integration - SERVER
+x    modify project load code to exec all custom state files, and register resulting classes in some dict,    "StateClasses" or soemthing
 
 
 resourcelock implementation

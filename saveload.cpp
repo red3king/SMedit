@@ -192,7 +192,6 @@ IOResult load_project(Project& project, ProjectInfo& project_info, string load_p
         }
     }
 
-
     return IOResult(true);
 }
 
@@ -233,17 +232,8 @@ uint16_t ProjectInfo::get_hash()
         return hash;
     
     hash = 0;
-    
-    /*
-    for(auto it = filename_to_data.begin(); it != filename_to_data.end(); it++)
-    {
-        boost::crc_32_type crc_comp;
-        crc_comp.process_bytes(it->second.c_str(), it->second.length());
-        hash ^= crc_comp.checksum();
-    }
-    */
 
-    for(int i=0; i<get_num_files(); i++)
+    for(int i = 0; i < get_num_files(); i++)
     {
         boost::crc_32_type crc_comp;
         string data = get_filedata(i);
@@ -259,38 +249,79 @@ uint16_t ProjectInfo::get_hash()
 int ProjectInfo::get_num_files()
 {
     int num_resources = saved_project.resources.size();
-    return filename_to_data.size() + num_resources;
+    int num_csc = saved_project.custom_state_classes.size();
+    return filename_to_data.size() + num_resources + num_csc;
+}
+
+
+int ProjectInfo::get_file_index(ProjectFileType& file_type, int i)
+{
+    int l = filename_to_data.size();
+    
+    if(i < l)
+    {
+        file_type = PFT_CODE_STATE;
+        return i;
+    }
+    
+    int num_resources = saved_project.resources.size();
+    
+    if(i - l < num_resources)
+    {
+        file_type = PFT_RESOURCE;
+        return i - l;
+    }
+    
+    file_type = PFT_CUSTOM_STATE_CLASS;
+    return i - l - num_resources;
 }
 
 
 string ProjectInfo::get_filename(int i)
 {
-    int l = filename_to_data.size();
-    if(i < l)
+    ProjectFileType file_type;
+    i = get_file_index(file_type, i);
+    
+    if(file_type == PFT_CODE_STATE)
     {
         auto it = filename_to_data.begin(); 
         while(i--) it++;    // NOTE: can't simplify to it + i here, iterator does not support addition.
         return it->first;
     }
-
-    return saved_project.resources[i-l]->name;
+    
+    else if(file_type == PFT_RESOURCE)
+        return saved_project.resources[i]->name;            
+    
+    // PFT_CUSTOM_STATE_CLASS
+    return saved_project.custom_state_classes[i]->get_py_filename();
 }
 
 
 string ProjectInfo::get_filedata(int i)
 {
-    int l = filename_to_data.size();
-    if(i < l)
+    ProjectFileType file_type;
+    i = get_file_index(file_type, i);
+    
+    if(file_type == PFT_CODE_STATE)
     {
         auto it = filename_to_data.begin();
         while(i--) it++;
         return it->second;
     }
-
-    Resource *resource = saved_project.resources[i-l];
+    
+    else if(file_type == PFT_RESOURCE)
+    {
+        Resource *resource = saved_project.resources[i];
+        string result;
+        file_to_string(resource->path, result);
+        return result;        
+    }
+    
+    // PFT_CUSTOM_STATE_CLASS
     string result;
-    file_to_string(resource->path, result);
-    return result;
+    auto csc = saved_project.custom_state_classes[i];
+    file_to_string(csc->path, result);
+    return result;   
 }
 
 
@@ -299,9 +330,10 @@ bool ProjectInfo::any_missing_files(string& missing_filenames)
     bool any_missing = false;
     missing_filenames = "";
 
-    for(int i=0; i<saved_project.resources.size(); i++)
+    for(int i = 0; i < saved_project.resources.size(); i++)
     {
-        Resource *resource = saved_project.resources[i];
+        Resource* resource = saved_project.resources[i];
+        
         if(!std::experimental::filesystem::exists(resource->path))
         {
             any_missing = true;
@@ -309,5 +341,16 @@ bool ProjectInfo::any_missing_files(string& missing_filenames)
         }
     }
 
+    for(int i = 0; i < saved_project.custom_state_classes.size(); i++)
+    {
+        CustomStateClass* csc = saved_project.custom_state_classes[i];
+        
+        if(!std::experimental::filesystem::exists(csc->path))
+        {
+            any_missing = true;
+            missing_filenames += "\n" + csc->name + " : " + csc->path;
+        }
+    }    
+    
     return any_missing;
 }

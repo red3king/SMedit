@@ -53,6 +53,9 @@ SelectedState::SelectedState(HistoryManager* history_manager, Glib::RefPtr<Gtk::
     builder->get_widget("join_resultvar_entry", result_variable_entry);
     join_state_ctrl = new JoinStateController(history_manager, pid_var_entry, result_variable_entry);
 
+    // custom state ctrl
+    custom_state_ctrl = new CustomStateController(history_manager, builder);
+    
     name_entry->signal_changed().connect(sigc::mem_fun(this, &SelectedState::on_name_changed));
     type_combobox->signal_changed().connect(sigc::mem_fun(this, &SelectedState::on_type_changed));
     delete_button->signal_clicked().connect(sigc::mem_fun(this, &SelectedState::on_delete_clicked));
@@ -246,6 +249,7 @@ void SelectedState::update()
     spawn_state_ctrl->set_state(owning_machine, selected_state);
     return_state_ctrl->set_state(owning_machine, selected_state);
     join_state_ctrl->set_state(owning_machine, selected_state);
+    custom_state_ctrl->set_state(owning_machine, selected_state);
 
     if(selected_state->type == INITIAL)
         state_types_stack->set_visible_child(STK_INITIAL_ID);

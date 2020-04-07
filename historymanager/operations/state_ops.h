@@ -3,6 +3,7 @@
 #include "historymanager/operation.h"
 #include "models/datatypes/argdef.h"
 #include "models/state.h"
+#include "models/custom_config.h"
 
 
 class StateChgOperation : public Operation  // abc for state modification
@@ -42,7 +43,7 @@ class OpStateDelete : public Operation
 };
 
 
-void delete_state(Machine *machine, State *state);
+void delete_state(Machine* machine, State* state);
 
 
 class OpStateMove : public Operation
@@ -78,6 +79,22 @@ class OpStateType : public StateChgOperation
         int type;
 };
 
+
+
+class OpStateConfig : public StateChgOperation
+{
+    public:
+        OpStateConfig(Machine* machine, State* state, CustomStateConfig config);
+        OpStateConfig* clone();
+        
+        void execute_impl(State* state);
+        bool may_collapse_impl(Operation &other);
+        void collapse(Operation &other);
+        
+    private:
+        string name;
+        LVOV value;
+};
 
 
 

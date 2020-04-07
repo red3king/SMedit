@@ -21,6 +21,7 @@ class LVOV
         LVOV(int int_val);
         LVOV(float float_val);
         LVOV(json jdata);
+        LVOV(ValueType value_type);
 
         void reset();
 

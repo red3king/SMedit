@@ -45,7 +45,7 @@ void CustomStateClassController::_build_preview()
     
     string preview_text = "";
     
-    for(int i=0; i<selected_csc->transition_defs.size(); i++)
+    for(int i = 0; i < selected_csc->transition_defs.size(); i++)
     {
         preview_text += "\r\n";
         auto def = selected_csc->transition_defs[i];
@@ -106,7 +106,7 @@ void CustomStateClassController::on_reload_clicked()
         return;
     }
     
-    auto op = OpCustomStateClassTransitionDefs(selected_csc, loaded_class.transition_defs);
+    auto op = OpCustomStateClassReload(selected_csc, loaded_class);
     history_manager->submit_operation(op);
 }
 
@@ -116,11 +116,11 @@ int count_dependent_states(vector<Machine*>& machines, unsigned int selected_csc
     // Count and/or delete all states of given custom state class
     int csc_count = 0;
 
-    for(int i=0; i<machines.size(); i++)
+    for(int i = 0; i < machines.size(); i++)
     {
-        Machine *machine = machines[i];
+        Machine* machine = machines[i];
         
-        for(int j=0; j<machine->states.size(); j++)
+        for(int j = 0; j < machine->states.size(); j++)
         {
             auto state = machine->states[j];
             
@@ -218,7 +218,7 @@ void CustomStateClassController::on_model_changed(EntityType entity_type, Signal
         if(selected_csc != nullptr && selected_csc->id == entity_id)
             on_selection_changed(entity_id);
         
-        CustomStateClass *changed = history_manager->current_project.get_custom_state_class_by_id(entity_id);
+        CustomStateClass* changed = history_manager->current_project.get_custom_state_class_by_id(entity_id);
         list_view_controller->change_item(changed->name, entity_id);        
         return;
     }
@@ -245,7 +245,7 @@ void CustomStateClassController::_rebuild_treeview(unsigned int deleted_id)
     auto cscs = history_manager->current_project.custom_state_classes;
     num_items = cscs.size();
 
-    for(int i=0; i<num_items; i++)
+    for(int i = 0; i < num_items; i++)
     {
         if(cscs[i]->id != deleted_id)
             list_view_controller->add_item(cscs[i]->name, cscs[i]->id);

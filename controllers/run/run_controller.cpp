@@ -239,7 +239,7 @@ void RunController::on_deploy_click()
 
     auto new_project = new NewProjectAction();
 
-    for(int i=0; i<project_info->get_num_files(); i++)
+    for(int i = 0; i < project_info->get_num_files(); i++)
     {
         string filename = project_info->get_filename(i);
         string data = project_info->get_filedata(i);

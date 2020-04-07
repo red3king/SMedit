@@ -6,11 +6,26 @@ from models.datatypes.arg import Arg
 
 
 class StateType(object):
-    INITIAL = 0
-    CODE = 1
-    RETURN = 2
-    SPAWN = 3
-    JOIN = 4
+    INITIAL = -5
+    CODE = -4
+    RETURN = -3
+    SPAWN = -2
+    JOIN = -1
+    
+    @staticmethod
+    def is_custom(state_type):
+        return state_type >= 0
+
+
+class CustomStateConfigDef(object):
+    
+    def __init__(self, config_def):
+        self.lvov = LVOV(config_def["lvov"])
+        self.name = config_def["name"]
+
+    @property
+    def value(self):
+        return self.lvov.value
 
 
 class StateDef(ABC):
@@ -36,6 +51,8 @@ class StateDef(ABC):
         self.incoming_transition_defs = []
         self.outgoing_transition_defs = []
 
+        self.custom_configuration = {}
+
         # initial_args
         for arg_def_json in state_json["initial_args"]:
             self.initial_args.append(ArgDef(arg_def_json))
@@ -47,6 +64,12 @@ class StateDef(ABC):
         # if code, look up python file from file_name_to_data
         if self.type == StateType.CODE:
             self.code = file_name_to_data[self.get_code_filename()]
+            
+        # load custom state configuration
+        if StateType.is_custom(self.type):
+            for cdef in state_json["custom_config"]:
+                config_def = CustomStateConfigDef(cdef)
+                self.custom_configuration[config_def.name] = config_def
 
     def get_code_filename(self):
         # only used for Code states. return name of py file containing execute_impl
@@ -58,3 +81,5 @@ class StateDef(ABC):
     def add_outgoing_tdef(self, transition_def):
         self.outgoing_transition_defs.append(transition_def)
 
+    def get_custom_config_value(self, name):
+        return self.custom_configuration[name].value
