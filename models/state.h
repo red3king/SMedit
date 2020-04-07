@@ -120,7 +120,7 @@ class State : public BoxEntity
         void add_transition(Transition* transition, bool incoming);
         void remove_transition(Transition* transition, bool incoming);
         void update_transition_positions();
-
+        
     private:
 };
 

@@ -62,8 +62,8 @@ bool string_to_float(float& result, string input);
 
 // UI Helpers
 extern Gtk::Window* main_window;
-void display_error(/*Gtk::Window& parent,*/ string message);
-void display_action_error(/*Gtk::Window& parent,*/ Action* failed_action);
+void display_error(string message);
+void display_action_error(Action* failed_action);
 
 // add value types to combo box
 void prepare_value_type_combobox(Gtk::ComboBoxText* combo_box);

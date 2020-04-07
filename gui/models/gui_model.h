@@ -69,5 +69,8 @@ class GUIModel
         DrawContext *ctx;
         bool selected, mouse_over;
         vector<GMNotification> notifications;
+        
+        int add_notification(GMNotification note);  // returns notification id
+        void remove_notification(int note_id);      // remove note by id
 };
 

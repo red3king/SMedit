@@ -107,7 +107,7 @@ void GMNotification::draw_message()
     nvgBeginPath(vg);
     nvgMoveTo(vg, coords[0], coords[1]);
 
-    for(int i=1; i<8; i++)    
+    for(int i = 1; i < 8; i++)    
         nvgLineTo(vg, coords[2*i], coords[2*i+1]); 
 
     nvgClosePath(vg);
@@ -131,9 +131,6 @@ GUIModel::GUIModel(DrawContext* ctx, EntityType type)
 
     selected = false;
     mouse_over = false;
-
-    // notifications.push_back(GMNotification(ctx, ctx->notif_icon_lock, "locked!"));
-    // notifications.push_back(GMNotification(ctx, ctx->notif_icon_error, "help! i got stuck in a blender and I am dead! oh no! help! aaauuuughhhhhhhhhhsadasdasdljasdofiajsdfoiajsdofaijsd"));
 }
 
 
@@ -165,7 +162,7 @@ void GUIModel::draw_notifications()
 {
     NVGcontext *vg = ctx->vg;
 
-    for(int i=0; i<notifications.size(); i++)
+    for(int i = 0; i < notifications.size(); i++)
         notifications[i].draw();
 }
 
@@ -175,12 +172,36 @@ void GUIModel::update_notifications(CurrentEvents& current_events)
     float wx, wy;
     get_notification_coordinates(wx, wy);
 
-    for(int i=0; i<notifications.size(); i++)
+    for(int i = 0; i < notifications.size(); i++)
     {
         notifications[i].set_coordinates(wx, wy);
         notifications[i].check_mouse_within(current_events.mouse_x, current_events.mouse_y);
         wy += ctx->screen_dist_to_world(NOTIF_GAP + NOTIF_HEIGHT);        
     } 
+}
+
+
+int GUIModel::add_notification(GMNotification note)
+{
+    notifications.push_back(note);
+    return note.id;
+}
+
+
+void GUIModel::remove_notification(int id)
+{
+    auto it = notifications.begin();
+    
+    while(it != notifications.end())
+    {
+        if(it->id == id)
+        {
+            notifications.erase(it);
+            return;
+        }
+        
+        it++;
+    }
 }
 
 

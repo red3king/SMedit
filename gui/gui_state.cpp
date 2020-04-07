@@ -1,6 +1,7 @@
 #include "log.h"
 #include "gui_state.h"
 #include "colors.h"
+#include "signals.h"
 #include "gui/models/gui_transition.h"
 #include "gui/models/gui_resourcelock.h"
 #include "gui/models/gui_state.h"
@@ -10,15 +11,18 @@ GUIState::GUIState(GUIAreaMode execution_mode, RunningState* running_state, Bann
         Gtk::GLArea* gl_area) : draw_context(gl_area)
 {
     mode = execution_mode;
+    current_machine = nullptr;
 
     this->running_state = running_state; // only  for GAM_RUN
     this->banner_displayer = banner_displayer;
+    
+    signals.model_changed.connect(sigc::mem_fun(this, &GUIState::on_model_changed));
 }
 
 
 void GUIState::rs_state_select(int state_def_id)
 {
-    for(int i=0; i<gui_models.size(); i++)
+    for(int i = 0; i < gui_models.size(); i++)
     {
         auto model = gui_models[i];
 
@@ -34,7 +38,7 @@ void GUIState::rs_state_select(int state_def_id)
 
 GUIModel* GUIState::get_model_by_id(unsigned int id)
 {
-    for(int i=0; i<gui_models.size(); i++)
+    for(int i = 0; i < gui_models.size(); i++)
     {
         GUIModel* model = gui_models[i];
         if(model->get_id() == id)
@@ -56,24 +60,25 @@ void GUIState::set_machine(Machine* current_machine)
     this->current_machine = current_machine;
     draw_context.reset();
     create_models();
+    update_lock_notifications();
 }
 
 
 void GUIState::create_models()
 {
-    for(int i=0; i<current_machine->states.size(); i++)
+    for(int i = 0; i < current_machine->states.size(); i++)
     {
         State* state = current_machine->states[i];
         gui_models.push_back(new GMState(&draw_context, state));
     }
 
-    for(int i=0; i<current_machine->transitions.size(); i++)
+    for(int i = 0; i < current_machine->transitions.size(); i++)
     {
         Transition* transition = current_machine->transitions[i];
         gui_models.push_back(new GMTransition(&draw_context, transition));
     }
 
-    for(int i=0; i<current_machine->resourcelocks.size(); i++)
+    for(int i = 0; i < current_machine->resourcelocks.size(); i++)
     {
         ResourceLock* lock = current_machine->resourcelocks[i];
         gui_models.push_back(new GMResourceLock(&draw_context, lock));
@@ -90,7 +95,7 @@ void GUIState::unset_machine()
 
 void GUIState::delete_models()
 {
-    for(int i=0; i<gui_models.size(); i++)
+    for(int i = 0; i < gui_models.size(); i++)
         delete gui_models[i];
 
     gui_models.clear();
@@ -99,7 +104,7 @@ void GUIState::delete_models()
 
 void GUIState::draw()
 {
-    for(int i=0; i<gui_models.size(); i++)
+    for(int i = 0; i < gui_models.size(); i++)
         gui_models[i]->draw();
 
 
@@ -126,7 +131,7 @@ CursorType _filterupdate(vector<GUIModel*>& models, CurrentEvents& current_event
     CursorType result = CT_DEFAULT;
     CursorType res;
 
-    for(int i=0; i<models.size(); i++)
+    for(int i = 0; i < models.size(); i++)
     {
         if(models[i]->type == type)
         {
@@ -149,7 +154,7 @@ CursorType GUIState::update_models(CurrentEvents& current_events, GUIModel*& jus
     just_selected = nullptr;
     clear_selected = false;
 
-    for(int i=0; i<gui_update_order.size(); i++)
+    for(int i = 0; i < gui_update_order.size(); i++)
     {
         EntityType to_update = gui_update_order[i];
         current = _filterupdate(gui_models, current_events, to_update, just_selected);
@@ -164,7 +169,7 @@ CursorType GUIState::update_models(CurrentEvents& current_events, GUIModel*& jus
 
     // GUI models can't tell when they have been deselected
     // they must be told when something else gets clicked
-    for(int i=0; i<gui_models.size(); i++)
+    for(int i = 0; i < gui_models.size(); i++)
     {
         GUIModel* model = gui_models[i];
         if(clear_selected || (just_selected != nullptr && just_selected != model))
@@ -177,7 +182,7 @@ CursorType GUIState::update_models(CurrentEvents& current_events, GUIModel*& jus
 
 void GUIState::restore_selected_entity(Entity* entity)
 {
-    for(int i=0; i<gui_models.size(); i++)
+    for(int i = 0; i < gui_models.size(); i++)
     {
         if(gui_models[i]->get_entity() == entity)
             gui_models[i]->set_selected(true);
@@ -236,7 +241,7 @@ void GUIState::remove_gui_model(unsigned int entity_id)
 {
     int index = -1;
 
-    for(int i=0; i<gui_models.size(); i++)
+    for(int i = 0; i < gui_models.size(); i++)
     {
         if(gui_models[i]->get_id() == entity_id)
         {
@@ -253,3 +258,40 @@ void GUIState::remove_gui_model(unsigned int entity_id)
 }
 
 
+void GUIState::update_lock_notifications()
+{
+    if(!has_machine())
+        return;
+    
+    for(int i = 0; i < current_machine->states.size(); i++)
+    {
+        State* state = current_machine->states[i];
+        GMState* state_gmodel = (GMState*) get_model_by_id(state->id);
+        
+        for(int j = 0; j < current_machine->resourcelocks.size(); j++)
+        {
+            ResourceLock* lock = current_machine->resourcelocks[j];
+            bool contained = lock->contains_state(state);
+            state_gmodel->set_resourcelock_contained(lock, contained);
+        }
+    }
+}
+
+
+void GUIState::on_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id)
+{
+    if(entity_type == STATE)
+    {
+        if(signal_type == MODIFY || signal_type == CREATE)
+            update_lock_notifications();
+    }
+    
+    else if(entity_type == RESOURCELOCK)
+        update_lock_notifications();
+}
+
+
+bool GUIState::has_machine()
+{
+    return current_machine != nullptr;
+}

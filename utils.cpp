@@ -118,11 +118,11 @@ bool is_number(Glib::ustring text, bool allow_float)
     string allowed = allow_float ? "1234567890." : "1234567890";
     bool ok;
 
-    for(int i=0; i<text.size(); i++)
+    for(int i = 0; i < text.size(); i++)
     {
         ok = false;
 
-        for(int j=0; j<allowed.size(); j++)
+        for(int j = 0; j < allowed.size(); j++)
         {
             if(text.at(i) == allowed.at(j))
             {
@@ -191,7 +191,7 @@ void display_action_error(Action* failed_action)
 
 void prepare_value_type_combobox(Gtk::ComboBoxText* combo_box)
 {
-    for(int i=0; i<NUM_VALUE_TYPES; i++)
+    for(int i = 0; i < NUM_VALUE_TYPES; i++)
     {
         ValueType vt = AllValueTypes[i];
         string str = value_type_to_string(vt);

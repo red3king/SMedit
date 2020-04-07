@@ -153,6 +153,7 @@ unsigned int OpStateMove::execute(Project& project)
     state->x = x;
     state->y = y;
     state->update_transition_positions();
+    signals.fire_model_changed(STATE, MODIFY, state->id);
     return state->id;
 }
 

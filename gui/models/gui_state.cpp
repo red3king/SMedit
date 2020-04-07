@@ -101,7 +101,7 @@ void GMState::draw_interior_initial(float x, float y, float w, float h)
         return;
     }
 
-    for(int i=0; i<len; i++)
+    for(int i = 0; i < len; i++)
     {
         ArgDef def = state->initial_args[i];
         auto vtstr = value_type_to_string(def.value_type);
@@ -121,7 +121,7 @@ void GMState::draw_interior_code(float x, float y, float w, float h)
     }
 
     int j = 0;
-    for(int i=0; i<len; i++)
+    for(int i = 0; i < len; i++)
     {
         if(state->code[i] == '\n' || i == len - 1)
         {
@@ -130,7 +130,7 @@ void GMState::draw_interior_code(float x, float y, float w, float h)
             if(!text(line, WHITE))
                 return;
 
-            j = i+1;
+            j = i + 1;
         }
     }
 }
@@ -168,7 +168,7 @@ void GMState::draw_interior_spawn(float x, float y, float w, float h)
 
     else
     {
-        for(int i=0; i<len; i++)
+        for(int i = 0; i < len; i++)
             text("  " + state->launch_args[i].describe(), WHITE);
     }    
 }
@@ -205,5 +205,37 @@ bool GMState::get_icon(int& icon_image)
     }
 
     return true;
+}
+
+
+bool GMState::has_lock_notification(int rlock_id)
+{
+    return rlock_to_note.find(rlock_id) != rlock_to_note.end();
+}
+
+
+void GMState::set_resourcelock_contained(ResourceLock* rlock, bool contained)
+{
+    unsigned int rlock_id = rlock->id;
+    bool old = has_lock_notification(rlock_id);
+    
+    if(old == contained)
+        return;
+    
+    if(contained)
+    {
+        string name = rlock->resource->name;
+        GMNotification note = GMNotification(ctx, ctx->notif_icon_lock, name);
+        add_notification(note);
+        rlock_to_note[rlock_id] = note.id;
+    }
+    
+    else
+    {
+        int note_id = rlock_to_note[rlock_id];
+        remove_notification(note_id);
+        auto it = rlock_to_note.find(rlock_id);
+        rlock_to_note.erase(it);
+    }
 }
 

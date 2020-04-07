@@ -2,6 +2,7 @@
 
 #include "boxentity.h"
 #include "resource.h"
+#include "state.h"
 
 
 class ResourceLock : public BoxEntity
@@ -41,5 +42,7 @@ class ResourceLock : public BoxEntity
 
         Resource* resource;
 
+        bool contains_state(State* state);
+        
     private:  
 };

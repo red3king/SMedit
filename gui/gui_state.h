@@ -43,11 +43,16 @@ class GUIState
         void rs_state_select(int state_def_id);
 
     private:
-        BannerDisplayer* banner_displayer;
+        BannerDisplayer* banner_displayer;  // GAM_RUN text displayer thingy
 
         void delete_models();
         void create_models();
+        
+        void update_lock_notifications();
+        void on_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id);
 
         GUIModel* get_model_by_id(unsigned int id);
+        
+        bool has_machine();
 };
 

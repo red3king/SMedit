@@ -19,5 +19,7 @@ class BoxEntity : public Entity
         
         bool new_border_valid(BorderType border, float world_mouse_position);
 
+        void get_center(float& x, float& y);
+        
     private:  
 };

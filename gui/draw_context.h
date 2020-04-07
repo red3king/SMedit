@@ -51,6 +51,7 @@ class DrawContext
         Gtk::GLArea* get_gl_area();
 
         float zoom_factor, woffset_x, woffset_y;
+        
     private:
         Gtk::GLArea* gl_area;  // to get screen size
 };

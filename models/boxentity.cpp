@@ -47,3 +47,11 @@ bool BoxEntity::new_border_valid(BorderType border, float world_mouse_position)
 
     throw std::invalid_argument("BT_NONE not valid here");
 }
+
+
+void BoxEntity::get_center(float& x, float& y)
+{
+    x = this->x + (w / 2);
+    y = this->y + (h / 2);
+}
+
