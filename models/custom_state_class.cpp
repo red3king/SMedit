@@ -131,3 +131,9 @@ string CustomStateClass::get_py_filename()
 {
     return "csc_" + std::to_string(id) + ".py";
 }
+
+
+EntityType CustomStateClass::get_entity_type()
+{
+    return CUSTOM_STATE_CLASS;
+}

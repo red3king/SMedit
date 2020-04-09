@@ -147,7 +147,7 @@ void ResourcesController::load_from(Project& current_project, bool reload)
 }
 
 
-void ResourcesController::on_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id)
+void ResourcesController::on_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id, ChangeType change_type)
 {
     if(entity_type != RESOURCE)
         return;

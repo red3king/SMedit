@@ -1,6 +1,17 @@
 RIGHT NOW:
 
+RESOURCE LOCK SERVER IMPLEMENTATION!!!
 
+xjust added code scan notifications
+x    they scan for get_resource() calls and notify if you aren't in a lock
+x        working!
+x    i need to add a new type of notification - for when you get_resource on something
+x        which isn't even defined
+x        
+x        should I implement it as i have been doing for the first 2 types of notificataion?
+x            or implement a system which streamlines some of the common parts of the code between all 3??
+x               (this would go into the gui model base class)
+                
 
 x    - custom state class implementation
 x    - my load from custom state def file code works

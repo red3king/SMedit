@@ -1,11 +1,12 @@
 
 
 class OperationSpec(object):
-    def __init__(self, field_name, field_type):
+    def __init__(self, field_name, field_type, change_type=None):
         self.op_name = None
         self.field_name = field_name
         self.field_type = field_type
         self.allow_collapse = True
+        self.change_type = change_type
 
     def make_op_name(self, entity_type_name):
         # "Resource", "name" -> "OpResourceName"
@@ -18,6 +19,10 @@ class OperationSpec(object):
             rest += part[0].upper() + part[1:]
 
         self.op_name = "Op" + entity_type_name + rest
+
+    @property
+    def should_signal(self):
+        return self.change_type != None
 
 
 class OperationGenerator(object):
@@ -89,6 +94,10 @@ class OperationGenerator(object):
             cpp.append(f"void {spec.op_name}::execute_impl({self.entity_type_name}* {self.entity_type_name.lower()})")
             cpp.append("{")
             cpp.append(f"    {self.entity_type_name.lower()}->{spec.field_name} = {spec.field_name};")
+            
+            if spec.should_signal:
+                cpp.append(f"    signals.fire_model_changed({self.entity_type_name.upper()}, MODIFY, {self.entity_type_name.lower()}->id, {spec.change_type});")
+                
             cpp.append("}")
             cpp.append("")
             cpp.append("")

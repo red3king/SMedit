@@ -48,7 +48,7 @@ class MachinesController : public TopController
 
         // signal handlers
         void on_model_selected(Machine* machine, EntityType entity_type, Entity* entity);
-        void on_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id);
+        void on_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id, ChangeType change_type);
         void on_selection_changed(unsigned int machine_id, bool user_generated);
         void _populate_ui_from_selected();
 

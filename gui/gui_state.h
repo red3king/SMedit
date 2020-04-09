@@ -25,12 +25,13 @@ class GUIState
         DrawContext draw_context;
         RunningState* running_state;
         Machine* current_machine;
+        Project* current_project;
         vector<GUIModel*> gui_models;
         
         void set_nvg_context(NVGcontext* vg);
         void restore_selected_entity(Entity* entity);
 
-        void set_machine(Machine* current_machine);
+        void set_machine(Project* current_project, Machine* current_machine);
         void unset_machine();
 
         void add_gui_model(EntityType entity_type, unsigned int entity_id);
@@ -49,7 +50,7 @@ class GUIState
         void create_models();
         
         void update_lock_notifications();
-        void on_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id);
+        void on_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id, ChangeType change_type);
 
         GUIModel* get_model_by_id(unsigned int id);
         

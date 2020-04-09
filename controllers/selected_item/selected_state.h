@@ -51,7 +51,7 @@ class SelectedState : public SelectedItemController
         string state_type_to_string(int type);
         int string_to_state_type(string input);
         
-        void on_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id);
+        void on_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id, ChangeType change_type);
         void on_initial_state_changed(vector<ArgDef> arguments);
         void on_code_changed(string code);
         void _rebuild_dropdown();

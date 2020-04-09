@@ -22,5 +22,5 @@ class SelectedItemController
         virtual Entity* get_entity()=0;
 
     private:
-        void on_model_changed(EntityType type, SignalType signal_type, unsigned int entity_id);
+        void on_model_changed(EntityType type, SignalType signal_type, unsigned int entity_id, ChangeType change_type);
 };

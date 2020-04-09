@@ -38,6 +38,8 @@ enum StateType { INITIAL=-5, CODE=-4, RETURN=-3, SPAWN=-2, JOIN=-1, StateType_si
 
 bool state_type_is_custom(int type);
 
+vector<string> find_resources_in_code(string code);
+
 
 class State : public BoxEntity
 {
@@ -76,6 +78,8 @@ class State : public BoxEntity
         State(const State &other);
 
         json to_json();
+        
+        EntityType get_entity_type();
 
         string name;
         

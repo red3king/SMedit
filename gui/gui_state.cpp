@@ -12,6 +12,7 @@ GUIState::GUIState(GUIAreaMode execution_mode, RunningState* running_state, Bann
 {
     mode = execution_mode;
     current_machine = nullptr;
+    current_project = nullptr;
 
     this->running_state = running_state; // only  for GAM_RUN
     this->banner_displayer = banner_displayer;
@@ -55,9 +56,11 @@ void GUIState::set_nvg_context(NVGcontext* vg)
 }
 
 
-void GUIState::set_machine(Machine* current_machine)
+void GUIState::set_machine(Project* current_project, Machine* current_machine)
 {
     this->current_machine = current_machine;
+    this->current_project = current_project;
+    
     draw_context.reset();
     create_models();
     update_lock_notifications();
@@ -266,28 +269,71 @@ void GUIState::update_lock_notifications()
     for(int i = 0; i < current_machine->states.size(); i++)
     {
         State* state = current_machine->states[i];
+        
+        if(state->type != CODE)
+            continue;
+        
+        vector<string> used_resource_names = find_resources_in_code(state->code);
+        vector<string> missing_resource_names;
+        vector<Resource*> used_resources;
+        
+        for(int i = 0; i < used_resource_names.size(); i++)
+        {
+            string resname = used_resource_names[i];
+            Resource* found = current_project->get_resource_by_name(resname);
+            
+            if(found != nullptr)
+                used_resources.push_back(found);
+            else
+                missing_resource_names.push_back(resname);
+        }
+        
         GMState* state_gmodel = (GMState*) get_model_by_id(state->id);
+        map<ResourceLock*, bool> contained_locks;
         
         for(int j = 0; j < current_machine->resourcelocks.size(); j++)
         {
             ResourceLock* lock = current_machine->resourcelocks[j];
             bool contained = lock->contains_state(state);
-            state_gmodel->set_resourcelock_contained(lock, contained);
+            contained_locks[lock] = contained;
         }
+        
+        state_gmodel->set_resources_used(used_resources, missing_resource_names, contained_locks);
     }
 }
 
 
-void GUIState::on_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id)
+void GUIState::on_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id, ChangeType change_type)
 {
+    if(!has_machine())
+        return;
+    
+    // handle create / delete
+    if(signal_type == CREATE)
+        add_gui_model(entity_type, entity_id);
+
+    if(signal_type == PRE_DELETE)
+        remove_gui_model(entity_id);
+    
+    
+    // Update lock icon notifications displayed when code states are within resourcelocks
+    
     if(entity_type == STATE)
     {
-        if(signal_type == MODIFY || signal_type == CREATE)
+        State* state = current_machine->get_state_by_id(entity_id);
+        
+        if(state->type != CODE)
+            return;
+        
+        if(signal_type == CREATE || (signal_type == MODIFY && (change_type == CG_LOCATION || change_type == CG_CODE)))
             update_lock_notifications();
     }
     
     else if(entity_type == RESOURCELOCK)
-        update_lock_notifications();
+    {
+        if(!(signal_type == MODIFY && change_type != CG_LOCATION))
+            update_lock_notifications();
+    }
 }
 
 

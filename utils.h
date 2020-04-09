@@ -71,3 +71,18 @@ void set_margins(Gtk::Widget* widget, int margins);
 void left_align(Gtk::Widget* widget);
 void right_align(Gtk::Widget* widget);
 void center_align(Gtk::Widget* widget);
+
+
+
+
+
+template<typename T, typename A>
+bool vector_contains(std::vector<T,A> const& vector, T element) 
+{
+    for(int i = 0; i < vector.size(); i++)
+        if(vector[i] == element)
+            return true;
+        
+    return false;
+}
+

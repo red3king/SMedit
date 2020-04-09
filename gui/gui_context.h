@@ -25,7 +25,7 @@ class GUIContext
 
         unsigned int current_machine_id;
 
-        void set_machine(Machine* current_machine, int running_machine_id = -1);
+        void set_machine(Project* current_project, Machine* current_machine, int running_machine_id = -1);
         void unset_machine();
         
         void reset(bool reload);
@@ -44,10 +44,10 @@ class GUIContext
         bool handle_motion_notify_event(GdkEventMotion* motion_event);
 
         // smedit signal handlers
-        void handle_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id);
+        void handle_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id, ChangeType change_type);
 
         // RunningState signals
-        void rs_hndl_select_machine(int machine_id, Machine* machine_def);
+        void rs_hndl_select_machine(int machine_id, Project* project, Machine* machine_def);
         void rs_hndl_select_state(int state_def_id);
           
         void update();
@@ -61,6 +61,7 @@ class GUIContext
         GUIState gui_state;
         GUIOperation* current_operation;
         Machine* current_machine;
+        Project* current_project;
 
         CursorType current_cursor_type;
 

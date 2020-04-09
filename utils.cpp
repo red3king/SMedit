@@ -228,3 +228,4 @@ void center_align(Gtk::Widget* widget)
     widget->set_halign(Gtk::ALIGN_CENTER);
     widget->set_valign(Gtk::ALIGN_CENTER);
 }
+

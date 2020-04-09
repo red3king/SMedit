@@ -49,6 +49,8 @@ class CustomStateClass : public Entity
         bool has_config();
         string get_py_filename();
         
+        EntityType get_entity_type();
+        
         // persisted to json, may be reloaded from state def python classes
         vector<CustomTransitionDef> transition_defs;
         vector<CustomConfigDef> configuration;

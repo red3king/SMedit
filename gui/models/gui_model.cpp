@@ -37,6 +37,7 @@ void GMNotification::check_mouse_within(float mouse_x, float mouse_y)
 }
 
 
+
 void GMNotification::draw()
 {
     auto vg = ctx->vg;
@@ -169,21 +170,30 @@ void GUIModel::draw_notifications()
 
 void GUIModel::update_notifications(CurrentEvents& current_events)
 {
+    update_notification_locations();
+
+    for(int i = 0; i < notifications.size(); i++)
+        notifications[i].check_mouse_within(current_events.mouse_x, current_events.mouse_y);
+}
+
+
+void GUIModel::update_notification_locations()
+{
     float wx, wy;
     get_notification_coordinates(wx, wy);
 
     for(int i = 0; i < notifications.size(); i++)
     {
         notifications[i].set_coordinates(wx, wy);
-        notifications[i].check_mouse_within(current_events.mouse_x, current_events.mouse_y);
         wy += ctx->screen_dist_to_world(NOTIF_GAP + NOTIF_HEIGHT);        
-    } 
+    }     
 }
 
 
 int GUIModel::add_notification(GMNotification note)
 {
     notifications.push_back(note);
+    update_notification_locations();
     return note.id;
 }
 
@@ -197,12 +207,21 @@ void GUIModel::remove_notification(int id)
         if(it->id == id)
         {
             notifications.erase(it);
+            update_notification_locations();
             return;
         }
         
         it++;
     }
 }
+
+
+void GUIModel::set_notifications(vector<GMNotification>& notifications)
+{
+    this->notifications = notifications;
+    update_notification_locations();
+}
+
 
 
 CursorType GUIModel::update(CurrentEvents& current_events, GUIModel*& just_selected)

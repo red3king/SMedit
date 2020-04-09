@@ -12,6 +12,7 @@ class GUIContext;
 
 enum SignalType { CREATE, PRE_DELETE, MODIFY };
 enum CursorType { CT_DEFAULT, CT_MOVE, CT_RS_EW, CT_RS_NS, CT_RS_NW_SE, CT_RS_NE_SW };
+enum ChangeType { CG_OTHER, CG_LOCATION, CG_CODE };
 
 typedef void(*SetCursorHandler)(CursorType);
 
@@ -26,7 +27,7 @@ class Signals
         sigc::signal<void> project_open, project_close;
         sigc::signal<void> project_save, project_load;
         
-        sigc::signal<void, EntityType, SignalType, unsigned int> model_changed;
+        sigc::signal<void, EntityType, SignalType, unsigned int, ChangeType> model_changed;
         sigc::signal<void, Machine*, EntityType, Entity*> model_selected;
         
         sigc::signal<void> pre_gui_rebuild, gui_rebuild;
@@ -35,7 +36,7 @@ class Signals
         void register_set_cursor_handler(SetCursorHandler handler);
         void fire_set_cursor(CursorType cursor_type);
 
-        void fire_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id);
+        void fire_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id, ChangeType change_type=CG_OTHER);
 
         void enable_gui_signals();
         void disable_gui_signals();

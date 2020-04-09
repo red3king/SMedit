@@ -1,5 +1,6 @@
 #include "boxentity_ops.h"
 #include "models/machine.h"
+#include "signals.h"
 
 
 OpBoxEntityResize::OpBoxEntityResize(Machine* machine, BoxEntity* entity, BorderType resize_border, float new_position)
@@ -50,6 +51,7 @@ unsigned int OpBoxEntityResize::execute(Project& project)
     if(state != nullptr)// TODO - this feels hacky because this class is for boxentities. should i subclass this and put this in an _impl() method?
         state->update_transition_positions();
 
+    signals.fire_model_changed(box_entity->get_entity_type(), MODIFY, entity_id, CG_LOCATION);
     return entity_id;
 }
 

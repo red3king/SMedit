@@ -22,3 +22,9 @@ bool ResourceLock::contains_state(State* state)
     state->get_center(state_ctx, state_cty);
     return point_in_box(state_ctx, state_cty, x, y, w, h);
 }
+
+
+EntityType ResourceLock::get_entity_type()
+{
+    return RESOURCELOCK;
+}

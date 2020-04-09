@@ -98,7 +98,7 @@ unsigned int OpResourceLockMove::execute(Project& project)
     ResourceLock* lock = machine->get_resourcelock_by_id(resourcelock_id);
     lock->x = x;
     lock->y = y;
-    signals.fire_model_changed(RESOURCELOCK, MODIFY, lock->id);
+    signals.fire_model_changed(RESOURCELOCK, MODIFY, lock->id, CG_LOCATION);
     return resourcelock_id;
 }
 

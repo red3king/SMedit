@@ -75,6 +75,12 @@ json Transition::to_json()
 }
 
 
+EntityType Transition::get_entity_type()
+{
+    return TRANSITION;
+}
+
+
 float Transition::get_length()
 {
     return sqrt(pow(x1 - x0, 2) + pow(y1 - y0, 2));

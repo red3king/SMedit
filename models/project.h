@@ -32,24 +32,25 @@ class Project
         
         unsigned int get_next_id();
 
-        Machine *get_machine_by_id(unsigned int id);
+        Machine* get_machine_by_id(unsigned int id);
         int get_mindex_by_id(unsigned int id);
 
-        Resource *get_resource_by_id(unsigned int id);
+        Resource* get_resource_by_id(unsigned int id);
+        Resource* get_resource_by_name(string name);
         int get_rindex_by_id(unsigned int id);
         
-        CustomStateClass *get_custom_state_class_by_id(unsigned int id);
-        CustomStateClass *get_custom_state_class_by_index(int index);
+        CustomStateClass* get_custom_state_class_by_id(unsigned int id);
+        CustomStateClass* get_custom_state_class_by_index(int index);
         int get_cindex_by_id(unsigned int id);
 
-        Entity *get_entity_by_id(unsigned int id);  //inefficient
+        Entity* get_entity_by_id(unsigned int id);  //inefficient
 
     private:
         unsigned int id_ctr;
         void _copy_from(const Project& other);
-        void fix_machine_pointers(Machine *other_machine, Machine *new_machine);
-        void fix_machine_pointers(json other_json, Machine *new_machine);
-        void fix_transition_pointers(Machine *new_machine);
+        void fix_machine_pointers(Machine* other_machine, Machine* new_machine);
+        void fix_machine_pointers(json other_json, Machine* new_machine);
+        void fix_transition_pointers(Machine* new_machine);
 };
 
 

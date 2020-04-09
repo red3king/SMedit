@@ -22,7 +22,7 @@ MACHINE_OP_SPECS = [
 
 STATE_OP_SPECS = [
     os("name", "string"),
-    os("code", "string"),
+    os("code", "string", "CG_CODE"),
     os("join_pid_variable", "string"),
     os("join_result_variable", "string"),
     os("return_value", "LVOV"),

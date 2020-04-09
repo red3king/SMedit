@@ -38,7 +38,7 @@ void RunningState::set_project(Project* current_project)
 
 RunningMachine& RunningState::get_running_machine(int machine_id)
 {
-    for(int i=0; i<running_machines.size(); i++)
+    for(int i = 0; i < running_machines.size(); i++)
     {
         if(running_machines[i].id == machine_id)
             return running_machines.at(i);
@@ -50,7 +50,7 @@ RunningMachine& RunningState::get_running_machine(int machine_id)
 
 void RunningState::user_select_machine(int machine_id)
 {
-    for(int i=0; i<running_machines.size(); i++)
+    for(int i = 0; i < running_machines.size(); i++)
     {
         auto rm = running_machines[i];
         
@@ -77,7 +77,7 @@ void RunningState::initial_state_synch(json machines_list)
     running_machines.clear();
     current_machine_id = -1;
 
-    for(int i=0; i<machines_list.size(); i++)
+    for(int i = 0; i < machines_list.size(); i++)
     {
         json machine = machines_list[i];
         int id = machine["id"];
@@ -158,7 +158,7 @@ void RunningState::on_machine_deleted(int machine_id)
 {
     _finish_timer_if_active();
     
-    for(int i=0; i<running_machines.size(); i++)
+    for(int i = 0; i < running_machines.size(); i++)
     {
         if(running_machines[i].id == machine_id)
             running_machines[i].terminated = true;
@@ -173,10 +173,11 @@ bool RunningState::on_terminated_timer_tick()
     terminated_timer_running = false;
 
     // find the terminated machine
-    int i=0;
+    int i = 0;
     int machine_id = 0;
     bool created;
-    for(; i<running_machines.size(); i++)
+    
+    for(; i < running_machines.size(); i++)
     {
         if(running_machines[i].terminated || running_machines[i].created)
         {
@@ -227,7 +228,7 @@ bool RunningState::on_terminated_timer_tick()
 
 void RunningState::on_machine_state_changed(int machine_id, int state_def_id, json state_vars)
 {
-    for(int i=0; i<running_machines.size(); i++)
+    for(int i = 0; i < running_machines.size(); i++)
     {
         if(running_machines[i].id == machine_id)
         {
@@ -245,9 +246,9 @@ void RunningState::on_machine_state_changed(int machine_id, int state_def_id, js
 void RunningState::fire_machine_selected(int id, Machine* machine)
 {
     if(current_machine_id != -1)
-       select_machine.emit(-1, nullptr);
+       select_machine.emit(-1, nullptr, nullptr);
 
-    select_machine.emit(id, machine);
+    select_machine.emit(id, current_project, machine);
     current_machine_id = id;
 }
 

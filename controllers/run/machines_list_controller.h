@@ -31,7 +31,7 @@ class MachinesListController
         ListViewController* list_view_controller;
         RunningState* running_state;
 
-        void on_machine_select(int machine_id, Machine* machine_def);
+        void on_machine_select(int machine_id, Project* project, Machine* machine_def);
         void on_selection_changed(unsigned int machine_id, bool from_user);
 
         void _update_list(int machine_id = -1);

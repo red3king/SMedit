@@ -28,6 +28,8 @@ class Machine : public Entity
 
         string name;
         bool run_on_start;
+        
+        EntityType get_entity_type();
 
         vector<State*> states;
         vector<Transition*> transitions;

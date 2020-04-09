@@ -34,13 +34,13 @@ GUIContext::GUIContext(Gtk::GLArea* gl_area, HistoryManager* history_manager, GU
 }
 
 
-void GUIContext::rs_hndl_select_machine(int machine_id, Machine* machine_def)
+void GUIContext::rs_hndl_select_machine(int machine_id, Project* project, Machine* machine_def)
 {
     // RUN mode only
     if(machine_def == nullptr)
         unset_machine();
     else
-        set_machine(machine_def, machine_id);
+        set_machine(project, machine_def, machine_id);
 }
 
 
@@ -73,9 +73,10 @@ void GUIContext::calc_to_state_zoom(State* state, float& target_x, float& target
     float longest_transition = 0;
     vector<Transition*> all_transitions = state->get_all_transitions();
 
-    for(int i=0; i<all_transitions.size(); i++)
+    for(int i = 0; i < all_transitions.size(); i++)
     {
         float length = all_transitions[i]->get_length();
+        
         if(length > longest_transition)
             longest_transition = length;
     }
@@ -98,7 +99,7 @@ void GUIContext::calc_to_state_zoom(State* state, float& target_x, float& target
 }
 
 
-void GUIContext::set_machine(Machine* current_machine, int running_machine_id)
+void GUIContext::set_machine(Project* current_project, Machine* current_machine, int running_machine_id)
 {
     
     // disable auto pan when changing machines, we should only smoothly
@@ -106,8 +107,10 @@ void GUIContext::set_machine(Machine* current_machine, int running_machine_id)
     current_events.disable_ap();   
     
     this->current_machine = current_machine;
+    this->current_project = current_project;
     current_machine_id = current_machine->id;
-    gui_state.set_machine(current_machine);
+    
+    gui_state.set_machine(current_project, current_machine);
 
 
     State* state = nullptr;
@@ -146,6 +149,7 @@ void GUIContext::set_machine(Machine* current_machine, int running_machine_id)
 void GUIContext::unset_machine()
 {
     current_machine = nullptr;
+    current_project = nullptr;
     current_machine_id = 0;
     gui_state.unset_machine();
 }
@@ -181,20 +185,13 @@ void GUIContext::register_gtk_signal_handlers()
 }
 
 
-void GUIContext::handle_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id)
+void GUIContext::handle_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id, ChangeType change_type)
 {
     if(signal_type == PRE_DELETE && entity_type == MACHINE && entity_id == current_machine_id)
         current_machine_id = 0;
     
     if(entity_type != STATE && entity_type != TRANSITION && entity_type != RESOURCELOCK)
         return;
-
-    if(signal_type == CREATE)
-        gui_state.add_gui_model(entity_type, entity_id);
-
-
-    if(signal_type == PRE_DELETE)
-        gui_state.remove_gui_model(entity_id);
 
     gl_area->queue_draw();
 }
@@ -216,7 +213,7 @@ void GUIContext::load_from(Project& current_project, bool reload)
         Machine* current_machine = current_project.get_machine_by_id(current_machine_id);
 
         if(current_machine != nullptr)
-            gui_state.set_machine(current_machine);
+            gui_state.set_machine(&current_project, current_machine);
     }
 }
 

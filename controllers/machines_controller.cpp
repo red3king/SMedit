@@ -109,11 +109,12 @@ void MachinesController::on_selection_changed(unsigned int machine_id, bool user
 
     else
     {
-        selected_machine = history_manager->current_project.get_machine_by_id(machine_id);
+        auto current_project = &history_manager->current_project;
+        selected_machine = current_project->get_machine_by_id(machine_id);
         _populate_ui_from_selected();
 
         if(user_generated)
-            gui_context->set_machine(selected_machine);
+            gui_context->set_machine(current_project, selected_machine);
     }
 
     if(user_generated)
@@ -208,8 +209,9 @@ void MachinesController::on_create_clicked()
     unsigned int new_id = history_manager->submit_operation(op);
     selected_machine_id = new_id;
     list_view_controller->select_item(new_id);
-    Machine* machine = history_manager->current_project.get_machine_by_id(selected_machine_id);
-    gui_context->set_machine(machine);
+    auto current_project = &history_manager->current_project;
+    Machine* machine = current_project->get_machine_by_id(selected_machine_id);
+    gui_context->set_machine(current_project, machine);
 }
 
 
@@ -298,7 +300,7 @@ void MachinesController::on_create_resourcelock_clicked()
 }
 
 
-void MachinesController::on_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id)
+void MachinesController::on_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id, ChangeType change_type)
 {
     if(entity_type != MACHINE)
     {

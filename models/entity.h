@@ -25,7 +25,8 @@ class Entity
         Entity(json jdata);
         Entity(const Entity& other);
 
-        virtual ~Entity() = 0;        
+        virtual ~Entity() = 0;       
+        virtual EntityType get_entity_type()=0;
         json to_json();
 
         unsigned int id;  // ids start at 1, 0 is reserved for representing null to functions        

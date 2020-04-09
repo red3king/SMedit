@@ -77,7 +77,7 @@ int SelectedState::string_to_state_type(string input)
 }
 
 
-void SelectedState::on_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id)
+void SelectedState::on_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id, ChangeType change_type)
 {
     if(entity_type != CUSTOM_STATE_CLASS)
         return;

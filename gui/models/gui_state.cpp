@@ -1,4 +1,5 @@
 #include "gui_state.h"
+#include "utils.h"
 #include "gui/colors.h"
 
 
@@ -208,34 +209,44 @@ bool GMState::get_icon(int& icon_image)
 }
 
 
-bool GMState::has_lock_notification(int rlock_id)
+void GMState::set_resources_used(vector<Resource*> resources_used, vector<string> missing_resource_names, map<ResourceLock*, bool> contained_locks)
 {
-    return rlock_to_note.find(rlock_id) != rlock_to_note.end();
-}
-
-
-void GMState::set_resourcelock_contained(ResourceLock* rlock, bool contained)
-{
-    unsigned int rlock_id = rlock->id;
-    bool old = has_lock_notification(rlock_id);
+    vector<GMNotification> notifications;
+    vector<Resource*> resources_locked;
     
-    if(old == contained)
-        return;
-    
-    if(contained)
+    // lock notification for each resource locked
+    for(auto it = contained_locks.begin(); it != contained_locks.end(); it++)
     {
-        string name = rlock->resource->name;
-        GMNotification note = GMNotification(ctx, ctx->notif_icon_lock, name);
-        add_notification(note);
-        rlock_to_note[rlock_id] = note.id;
+        ResourceLock* rlock = it->first;
+        Resource* resource = rlock->resource;
+        bool contained = it->second;
+        
+        if(!contained)
+            continue;
+        
+        string message = resource->name;
+        resources_locked.push_back(resource);
+        notifications.push_back(GMNotification(ctx, ctx->notif_icon_lock, message));
     }
     
-    else
+    // error notification for each resource we are using for which we don't have a lock
+    for(int i = 0; i < resources_used.size(); i++)
     {
-        int note_id = rlock_to_note[rlock_id];
-        remove_notification(note_id);
-        auto it = rlock_to_note.find(rlock_id);
-        rlock_to_note.erase(it);
+        Resource* used = resources_used[i];
+        
+        if(!vector_contains(resources_locked, used))
+        {
+            string message = "resource " + used->name + " not locked";
+            notifications.push_back(GMNotification(ctx, ctx->notif_icon_error, message));
+        }
     }
+    
+    // error notification for each resource which is used but doesn't exist
+    for(int i = 0; i < missing_resource_names.size(); i++)
+    {
+        string message = "resource " + missing_resource_names[i] + " not defined";
+        notifications.push_back(GMNotification(ctx, ctx->notif_icon_error, message));
+    }
+    
+    set_notifications(notifications);
 }
-

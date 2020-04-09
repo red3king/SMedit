@@ -8,6 +8,48 @@ bool state_type_is_custom(int type)
 }
 
 
+vector<string> find_resources_in_code(string code)
+{
+    // return list of resource names passed as string literals
+    // to get_resource() function
+    
+    vector<string> result;
+    int last = 0;
+    string get_resource = "get_resource(";
+    
+    while(true)
+    {
+        int pos = code.find(get_resource, last);
+        
+        if(pos == string::npos)
+            break;
+        
+        int rpos = code.find(")", pos);
+        
+        if(rpos == string::npos)
+            break;
+        
+        if(rpos - pos - get_resource.length() < 3)
+            continue;
+        
+        char el = code[pos + get_resource.length()];
+        
+        if(el != '\'' && el != '\"')
+            continue;
+        
+        string resource_name = code.substr(pos + get_resource.length() + 1, rpos - 2 - pos - get_resource.length());
+        result.push_back(resource_name);
+        
+        last = pos + 1;
+    }
+        
+    return result;
+}
+
+
+
+////// State
+
 bool State::is_custom()
 {
     return state_type_is_custom(type);
@@ -111,6 +153,12 @@ json State::to_json()
     }
     
     return jdata;
+}
+
+
+EntityType State::get_entity_type()
+{
+    return STATE;
 }
 
 

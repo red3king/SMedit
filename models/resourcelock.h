@@ -44,5 +44,7 @@ class ResourceLock : public BoxEntity
 
         bool contains_state(State* state);
         
+        EntityType get_entity_type();
+        
     private:  
 };

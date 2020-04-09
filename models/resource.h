@@ -16,6 +16,8 @@ class Resource : public Entity
         Resource(json jdata);
 
         json to_json();
+        
+        EntityType get_entity_type();
 
         string path;
         string name;

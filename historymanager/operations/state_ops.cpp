@@ -153,7 +153,7 @@ unsigned int OpStateMove::execute(Project& project)
     state->x = x;
     state->y = y;
     state->update_transition_positions();
-    signals.fire_model_changed(STATE, MODIFY, state->id);
+    signals.fire_model_changed(STATE, MODIFY, state->id, CG_LOCATION);
     return state->id;
 }
 
@@ -369,6 +369,7 @@ OpStateCode* OpStateCode::clone()
 void OpStateCode::execute_impl(State* state)
 {
     state->code = code;
+    signals.fire_model_changed(STATE, MODIFY, state->id, CG_CODE);
 }
 
 

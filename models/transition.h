@@ -55,6 +55,8 @@ class Transition : public Entity
         Transition(json jdata);
         Transition(const Transition &other);
 
+        EntityType get_entity_type();
+        
         bool is_child_transition;
         TransitionType type;
         string event_name;  // only used for EVENT type

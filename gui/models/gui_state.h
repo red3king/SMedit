@@ -23,17 +23,15 @@ class GMState : public GMBox
 
         State* state;
         
-        void set_resourcelock_contained(ResourceLock* rlock, bool contained);
-
+        // for determining which notifications to display
+        void set_resources_used(vector<Resource*> resources_used, vector<string> missing_resource_names, map<ResourceLock*, bool> contained_locks);
+        
         bool is_custom();
         int get_state_def_id();
         void set_is_current(bool is_current);   // only used when the gui is in RUN mode
 
     private:
         bool is_current_state;
-        map<int, int> rlock_to_note;  // maps resource lock ids to lock notification ids
-    
-        bool has_lock_notification(int rlock_id);
         
         void draw_interior_initial(float x, float y, float w, float h);
         void draw_interior_code(float x, float y, float w, float h);

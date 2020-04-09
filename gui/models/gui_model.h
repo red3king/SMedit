@@ -59,6 +59,8 @@ class GUIModel
 
         CursorType update(CurrentEvents& current_events, GUIModel*& just_selected);
         void update_notifications(CurrentEvents& current_events);
+        void update_notification_locations();
+
         unsigned int get_id();
 
         void set_selected(bool selected);
@@ -70,6 +72,9 @@ class GUIModel
         bool selected, mouse_over;
         vector<GMNotification> notifications;
         
+        // either use add_notification/remove_notification, or use set_notifications
+        // depending on the application
+        void set_notifications(vector<GMNotification>& notifications);
         int add_notification(GMNotification note);  // returns notification id
         void remove_notification(int note_id);      // remove note by id
 };

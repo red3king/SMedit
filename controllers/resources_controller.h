@@ -34,7 +34,7 @@ class ResourcesController : public TopController
         void reset(bool reload);
         void load_from(Project& current_project, bool reload);
 
-        void on_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id);
+        void on_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id, ChangeType change_type);
         void on_selection_changed(unsigned int entity_id);
 
         void on_name_changed();

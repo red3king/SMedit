@@ -18,3 +18,9 @@ json Resource::to_json()
     jdata["path"] = path;
     return jdata;
 }
+
+
+EntityType Resource::get_entity_type()
+{
+    return RESOURCE;
+}

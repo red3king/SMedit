@@ -53,7 +53,7 @@ class RunningState
         // signals for the GUIContext & GUIState
         // these signals are delayed compared to the ones from broadcaststatus,
         // giving the user time to see things instead of immediately cutting the camera away.
-        sigc::signal<void, int, Machine*> select_machine;    // int is running maching id. mach def may be nullptr to un-select
+        sigc::signal<void, int, Project*, Machine*> select_machine;    // int is running maching id. mach def may be nullptr to un-select
         sigc::signal<void, int> select_state;
 
     private:

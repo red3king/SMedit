@@ -23,7 +23,7 @@ void SelectedItemController::set_selected(Machine* owning_machine, Entity* entit
 }
 
 
-void SelectedItemController::on_model_changed(EntityType type, SignalType signal_type, unsigned int entity_id)
+void SelectedItemController::on_model_changed(EntityType type, SignalType signal_type, unsigned int entity_id, ChangeType change_type)
 {
     Entity* my_selected = get_entity();
 

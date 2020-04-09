@@ -14,7 +14,7 @@ MachinesListController::MachinesListController(Glib::RefPtr<Gtk::Builder> const&
 }
 
 
-void MachinesListController::on_machine_select(int machine_id, Machine* machine_def)
+void MachinesListController::on_machine_select(int machine_id, Project* project, Machine* machine_def)
 {
     _update_list(machine_id);
 }
@@ -34,7 +34,7 @@ void MachinesListController::_update_list(int machine_id)
     vector<RunningMachine>& running_machines = running_state->get_running_machines();
     list_view_controller->clear();
 
-    for(int i=0; i<running_machines.size(); i++)
+    for(int i = 0; i < running_machines.size(); i++)
     {
         auto rm = running_machines[i];
         list_view_controller->add_item(rm.name, rm.id);

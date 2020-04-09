@@ -16,17 +16,17 @@ void Signals::register_set_cursor_handler(SetCursorHandler handler)
 
 void Signals::fire_set_cursor(CursorType cursor_type)
 {
-    for(int i=0; i<set_cursor_handlers.size(); i++)
+    for(int i = 0; i < set_cursor_handlers.size(); i++)
         set_cursor_handlers[i](cursor_type);
 }
 
 
-void Signals::fire_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id)
+void Signals::fire_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id, ChangeType change_type)
 {
     if(!gui_signals_enabled)
         return;
 
-    model_changed.emit(entity_type, signal_type, entity_id);
+    model_changed.emit(entity_type, signal_type, entity_id, change_type);
 }
 
 
