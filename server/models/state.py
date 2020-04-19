@@ -40,6 +40,10 @@ class State(ABC):
 
         return None
     
+    @property
+    def required_resource_ids(self):
+        return self.state_def.required_resource_ids
+
 
 class CustomState(State):
 

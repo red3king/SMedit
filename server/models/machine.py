@@ -20,9 +20,11 @@ class Machine(object):
         self.id = machine_id
         self.child_results = {}  # dict<int, object> mapping pid to return value
 
-        self.broadcast_signal = Signal()      # (Broadcast)
-        self.finished_signal = Signal()          # (Machine (self), object return val)
-        self.spawn_request_signal = Signal()  # (machine (self), string name of task, dict<str, object> args)
+        self.broadcast_signal = Signal()              # (Broadcast)
+        self.finished_signal = Signal()               # (Machine (self), object return val)
+        self.spawn_request_signal = Signal()          # (machine (self), string name of task, dict<str, object> args)
+        self.attempt_acquire_locks_signal = Signal()  # (list<resource ids>)
+        self.release_locks_signal = Signal()          # (list<resource ids>)
         
         # construct State objects
         id_to_state = {}
@@ -49,8 +51,6 @@ class Machine(object):
             for var_name in machine_args:
                 val = machine_args[var_name]
                 self.set_variable(var_name, val)
-
-        # TODO - support resourcelocks
 
     def dump_state(self):
         return {
@@ -110,6 +110,11 @@ class Machine(object):
         else:
             # otherwise, save the return value for the eventual join later.
             self.child_results[child_id] = return_value
+
+    def notify_pending_locks_acquired(self):
+        # if we are waiting for locks, the current operation is a run next state operation
+        # which should be notified
+        self.current_operation.notify_pending_locks_acquired()
 
     def get_child_result(self, child_id):
         if child_id in self.child_results:
@@ -217,3 +222,12 @@ class Machine(object):
     def send_finished_signal(self, return_value):
         self.log("send_finished_signal()")
         self.finished_signal(self, return_value)
+
+    def send_lock_request_signal(self, resource_ids_list):
+        self.log("send_lock_request_signal()")
+        return self.attempt_acquire_locks_signal(self, resource_ids_list)
+    
+    def send_release_locks_signal(self, resource_ids_list):
+        self.log("send_release_locks_signal()")
+        self.release_locks_signal(self, resource_ids_list)
+    

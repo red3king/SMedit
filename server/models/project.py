@@ -17,8 +17,11 @@ class Project(object):
 
         self.running_machines = []
         self.child_to_parent = {}       # dict<machine, machine> who launched who
+        
+        self.held_locks = {}            # dict<resource, machine> which machines have which locks
+        self.pending_locks = []         # list<tuple<machine, list<resource>> which machines are waiting for which locks
 
-        self.resources = []
+        self.resources = {}             # dict<resource id, resource>
         self._loaded = False
         self.broadcast_signal = Signal()
         self.machine_id_counter = 0
@@ -50,6 +53,55 @@ class Project(object):
         child.start()
         return child.id
 
+    def on_machine_attempt_locks(self, machine, resource_ids_list):
+        # acquire as many of the requested locks as possible
+        # if all are acquired, return true, machine may proceed
+        # otherwise, it must wait
+        
+        acquire_later = []
+        
+        for id in resource_ids_list:
+            resource = self.resources[id]
+            
+            if resource in self.held_locks:
+                acquire_later.append(resource)
+                continue
+            
+            self.held_locks[resource] = machine
+        
+        all_acquired = len(acquire_later) == 0
+        
+        if not all_acquired:
+            self.pending_locks.append((machine, acquire_later))
+        
+        return all_acquired
+    
+    def on_machine_release_locks(self, machine, resource_ids_list):
+        self._on_machine_release_locks(machine, resource_ids_list)
+    
+    def _on_machine_release_locks(self, machine, resource_ids_list):
+        # release locks
+        for rid in resource_ids_list:
+            resource = self.resources[rid]
+            del self.held_locks[resource]
+        
+        # let next machine(s) in line acquire locks until we run out
+        all_acquired = True
+        
+        while len(self.pending_locks) > 0 and all_acquired:
+            next_machine, resource_list = self.pending_locks[0]
+            
+            for resource in resource_list:
+                if resource in self.held_locks:
+                    all_acquired = False
+                    continue
+                
+                self.held_locks[resource] = next_machine
+            
+            if all_acquired:
+                self.pending_locks = self.pending_locks[1:]
+                next_machine.notify_pending_locks_acquired()
+
     def on_event(self, event):
         for machine in self.running_machines:
             machine.feed_event(event)
@@ -62,6 +114,8 @@ class Project(object):
         machine.broadcast_signal += self.on_broadcast
         machine.finished_signal += self.on_machine_finished
         machine.spawn_request_signal += self.on_machine_spawn_request
+        machine.attempt_acquire_locks_signal += self.on_machine_attempt_locks
+        machine.release_locks_signal += self.on_machine_release_locks
 
         broadcast = MachineCreateBroadcast(machine.id, machine_def.id)
         self.broadcast_signal(broadcast)
@@ -72,10 +126,20 @@ class Project(object):
         machine.broadcast_signal -= self.on_broadcast
         machine.finished_signal -= self.on_machine_finished
         machine.spawn_request_signal -= self.on_machine_spawn_request
+        machine.attempt_acquire_locks_signal -= self.on_machine_attempt_locks
+        machine.release_locks_signal -= self.on_machine_release_locks        
 
         broadcast = MachineDeleteBroadcast(machine.id)
         self.broadcast_signal(broadcast)
         self.running_machines.remove(machine)
+        
+        # release any held locks
+        to_release = []
+        for k,v in self.held_locks.items():
+            if v == machine:
+                to_release.append(k.id)
+                
+        self._on_machine_release_locks(machine, to_release)
 
     def create_initial_machines(self):
         for machine_def in self.project_def.machine_defs:
@@ -91,7 +155,7 @@ class Project(object):
         for resource_def in project_def.resource_defs:
             resource = Resource.create(resource_def)
             resource.event_signal += self.on_event
-            self.resources.append(resource)
+            self.resources[resource.id] = resource
         
         # custom state classes
         self.state_factory = StateFactory()
@@ -119,7 +183,7 @@ class Project(object):
         for machine in self.running_machines:
             machine.pause()
 
-        for resource in self.resources:
+        for resource in self.resources.values():
             resource.pause()
 
     def unpause(self):
@@ -127,7 +191,7 @@ class Project(object):
         for machine in self.running_machines:
             machine.unpause()
 
-        for resource in self.resources:
+        for resource in self.resources.values():
             resource.unpause()
 
     def start(self):
@@ -136,7 +200,7 @@ class Project(object):
         for machine in self.running_machines:
             machine.start()
 
-        for resource in self.resources:
+        for resource in self.resources.values():
             resource.start()
 
     def stop(self):
@@ -144,7 +208,7 @@ class Project(object):
             machine.stop()
             self.delete_machine(machine)
 
-        for resource in self.resources:
+        for resource in self.resources.values():
             resource.stop()
 
     def dump_state(self):

@@ -48,10 +48,8 @@ class StateDef(ABC):
         self.join_pid_variable = state_json["join_pid_variable"]                # str
         self.join_result_variable = state_json["join_result_variable"]          # str
 
-        self.incoming_transition_defs = []
-        self.outgoing_transition_defs = []
-
         self.custom_configuration = {}
+        self.required_resource_ids = []
 
         # initial_args
         for arg_def_json in state_json["initial_args"]:
@@ -71,15 +69,18 @@ class StateDef(ABC):
                 config_def = CustomStateConfigDef(cdef)
                 self.custom_configuration[config_def.name] = config_def
 
+        # positioning, for determining which resources to lock
+        self.x = state_json["x"]
+        self.y = state_json["y"]
+        self.w = state_json["w"]
+        self.h = state_json["h"]
+
+    def set_required_resources(self, resource_ids):
+        self.required_resource_ids = resource_ids
+
     def get_code_filename(self):
         # only used for Code states. return name of py file containing execute_impl
         return self.name + "_" + str(self.id) + ".py"
-
-    def add_incoming_tdef(self, transition_def):
-        self.incoming_transition_defs.append(transition_def)
-
-    def add_outgoing_tdef(self, transition_def):
-        self.outgoing_transition_defs.append(transition_def)
 
     def get_custom_config_value(self, name):
         return self.custom_configuration[name].value

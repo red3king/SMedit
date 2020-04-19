@@ -1,7 +1,9 @@
 RIGHT NOW:
 
-RESOURCE LOCK SERVER IMPLEMENTATION!!!
+x RESOURCE LOCK SERVER IMPLEMENTATION!!!
+x    done!
 
+    
 xjust added code scan notifications
 x    they scan for get_resource() calls and notify if you aren't in a lock
 x        working!

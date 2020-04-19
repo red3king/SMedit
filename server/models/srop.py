@@ -251,7 +251,7 @@ class ResourceTRLCAOP(TwistedRLCAOP):
     def describe(self):
         return "resource-trlcaop"
 
-
+'''
 class RunNextStateROP(StateResultOperation, TwistedRLCAOP):
 
     def __init__(self, machine, next_state, timeout=0):
@@ -278,8 +278,79 @@ class RunNextStateROP(StateResultOperation, TwistedRLCAOP):
     @property
     def priority(self):
         return Priority.RUN_STATE_IMMEDIATE if self.timeout == 0.0 else Priority.RUN_STATE_TIMEOUT
+'''
 
 
+
+class RunNextStateROP(StateResultOperation, RunLaterCancelAOP):
+    '''
+    RunLaterCancelAOP for running/scheduling code inside Twisted's reactor
+    '''
+
+    def __init__(self, machine, next_state, timeout=0):
+        RunLaterCancelAOP.__init__(self)
+        StateResultOperation.__init__(self, machine)
+        
+        self.next_state = next_state
+        self.timeout = timeout
+        self.call_id = None
+
+    def launch_task(self, seconds_wait):
+        if self.call_id is not None:
+            raise Exception("wtf")
+
+        self.call_id = reactor.callLater(seconds_wait, self.callback)
+
+    def cancel_task(self):
+        self.call_id.cancel()
+        self.call_id = None
+
+    def callback(self):
+        current_state = self.machine.current_state
+        
+        if current_state is None:
+            current_lock_ids = set([])
+            
+        else:
+            current_lock_ids = set(current_state.required_resource_ids)
+        
+        next_lock_ids = set(self.next_state.required_resource_ids)
+        
+        release_lock_ids = list(current_lock_ids - next_lock_ids)
+        acquire_lock_ids = list(next_lock_ids - current_lock_ids)
+        
+        self.machine.send_release_locks_signal(release_lock_ids)
+        can_proceed = self.machine.send_lock_request_signal(acquire_lock_ids)
+        
+        if not can_proceed:
+            return
+        
+        self.go_next_state()
+    
+    def go_next_state(self):
+        self.machine.set_next_state(self.next_state)
+        next_srop = self.machine.update()
+        
+        self.set_task_finished()
+
+        if next_srop is not None:
+            self.machine.run_srop(next_srop)
+
+    def get_delay(self):
+        return self.timeout
+
+    def describe(self):
+        return "srop-next-state" + "->" + self.next_state.describe()
+
+    @property
+    def priority(self):
+        return Priority.RUN_STATE_IMMEDIATE if self.timeout == 0.0 else Priority.RUN_STATE_TIMEOUT
+
+    def notify_pending_locks_acquired(self):
+        # all locks have finally been acquired, time to run the next state
+        self.go_next_state()
+        
+        
 class EventRunNextStateROP(RunNextStateROP):
     @property
     def priority(self):
@@ -288,3 +359,4 @@ class EventRunNextStateROP(RunNextStateROP):
         # through
         return Priority.EVENT
 
+        
