@@ -1,0 +1,13 @@
+BUGS
+    undo / redo is completely messed up and ends up in a crash
+    
+    handmade makefile:
+        - does not realize header files have been changed
+        - I don't think it captures that cogging needs to happen before compiling, they may be running as tasks at the same time!
+    
+    make a 2x wider state and a normal size one, then...
+        connect the 2 states,
+        zoom out a bunch (may not be necessary),
+        rotate the smamll one around the big one,
+            ...and the transition doesnt always stay stuck to both, it disconnects (visually only) from the small one sometimes.
+
