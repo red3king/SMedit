@@ -6,27 +6,27 @@ TODO
         - enable/disable autopan
         - minimum state transition time on server 
 
+    - implement box entity corner resize
+    
+    - refactor the move state/resourcelock operations into a single move box entity operation class for consistency's sake
+    
+    - find a way to catch errors in the functions sent into the twisted event loop, 
+        and display those on the client.
 
-at some point, find a way to catch errors in the functions sent into the twisted event loop, 
-    and display those on the client.
-
+    - fix drawing order to be same as click event handling order
+        (resourcelocks last, either states or transitions first, i think transitions?)
+ 
 
 BUGS
     undo / redo is completely messed up and ends up in a crash
-    make a 2x wider state and a normal size one
-    connect the 2 states
-    zoom out a bunch (may not be necessary)
-    rotate the smamll one around the big one
-        the transition doesnt always stay stuck to both, it disconnects from the small one sometimes.
-
-
-box entity stuff
-    then do the double resize operation (corner drag)
-    then possibly refactor the move state/rlock ops into a single move box entity operation to be consistent
     
-    fix drawing order to be same as click event handling order
-        (resourcelocks last, either states or transitions first, i think transitions?)
- 
+    make a 2x wider state and a normal size one, then...
+        connect the 2 states,
+        zoom out a bunch (may not be necessary),
+        rotate the smamll one around the big one,
+            ...and the transition doesnt always stay stuck to both, it disconnects (visually only) from the small one sometimes.
+
+
 
 === for later === 
 

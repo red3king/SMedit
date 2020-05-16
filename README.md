@@ -1,6 +1,11 @@
 # SMedit
 
-Graphical python state machine builder and runner. 
+SMEdit is two programs: a graphical state machine builder, and a headless runner program. You create a project consisting of state machine prototypes in the builder, which can be uploaded to a remote runner with one click. The builder has a view for watching the execution of your machines in real time, with support for pausing and restarting.
+
+The goal of this software package is to allow you to build complicated flowchart logic which can be visually inspected for correct operation. It's kind of like Scratch except for advanced users with python experience.
+
+For more detailed information, see documentation.txt in the "example projects and documentation" directory.
+
 
 **Creating a demo FSM:**
 ![Builder, building](doc/img/build.gif)
@@ -57,6 +62,10 @@ cd server/
 source venv/bin/activate   # assumes you have venv set up in the server dir
 ./main.py
 ```
+
+## Building your first state machines
+See documentation.txt in the "example projects and documentation" directory. After that try modifying some of the examples.
+
 
 ## Built With / Acknowledgments
 * Nanovg - Mikko Mononen [https://github.com/memononen/nanovg](https://github.com/memononen/nanovg)
