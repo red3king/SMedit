@@ -1,0 +1,7 @@
+ 
+This project is a demonstration of custom state classes. The custom state class defined here is RandomChooser. It has two outgoing transitions, A and B, and picks between them with a user configurable percentage weighting.
+
+Custom state classes are motivated by doing more interesting things like async web requests, but this was my simple test case and the only example for now.
+
+
+

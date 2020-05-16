@@ -1,0 +1,5 @@
+This project demonstrates doing a synchronous state machine spawn, which blocks the parent until the child returns a value. In this case, the child machine accepts an integer, doubles it, and returns the result.
+
+The parent machine also demonstrates how to define and manipulate machine variables in the vars_dict.
+
+The only issue with this example is there is no print to screen function in SMEdit, so to see the doubled value for yourself, you have to pick out the result ( "value returned = 4" ) printed on the server amongst all the other log messages.

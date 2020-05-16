@@ -1,0 +1,9 @@
+ 
+This project consists of two state machines which start at launch, and then fight over a resource lock.
+
+The resource does nothing.
+
+Each state machine cycles between 3 states with timeout transitions. One of the 3 states is contained in a resource lock.
+
+One state machine moves between its states quickly, the other moves slowly. Watch the quick one, every few seconds it will pause as it is waiting for the lock.
+

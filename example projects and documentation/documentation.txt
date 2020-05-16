@@ -1,0 +1,103 @@
+ === Introduction ===
+
+SMEdit is two programs: a graphical state machine builder, and a headless runner program. You create a project consisting of state machine prototypes in the builder, which can be uploaded to a remote runner with one click. The builder has a view for watching the execution of your machines in real time, with support for pausing and restarting.
+
+The goal of this software package is to allow you to build complicated flowchart logic which can be visually inspected for correct operation. It's kind of like Scratch except for advanced users with python experience.
+
+When running, a state machine's execution is controlled by the events it receives. State machines can also emit events for other concurrently executing state machines. (TODO - have I implemented this yet?) In SMEdit, state machines are kind of analagous to programs - they can spawn each other, communicate through events, and wait for each other to finish ("join").
+
+Since this ended up being far more complicated than I anticipated, I have skipped adding validation checks in the GUI to save time. Therefore, it's up to you the user to ensure your state machines are valid. Otherwise, things crash.
+
+This document intends to be an introduction to the program and a list of things you have to keep in mind to build valid state machines that won't crash the runner. 
+
+(As this is early alpha software, a crash may often end up not being your fault. Please report bugs if you find any.)
+
+WARNING: I also haven't added any user authentication to the runner. Currently it's a giant RCE vulnerability by design. Another thing for the TODO list.
+
+DANGER: Speaking of bugs, undo/redo is broken. Don't do that.
+
+
+ === Projects ===
+
+Just like in your favorite IDE, you start by defining a project. A project consists of: one or more state machine prototypes, optional resource definitions, and a list of custom state class types. 
+
+Resources let you define external functionality for your state machines to access. For instance, if you were developing state machines to control your robot, you could define a resource representing your motor contorller. Resources are protected by locks, to ensure only one state machine may use a resource at a time. (Soon, I will make the locking functionality be optional.) 
+
+Custom state classes let you define new types of states. More on custom states and resources later.
+
+
+ === State Machines ===
+
+Each state machine is essentially a python program, except with the code chopped up in boxes with arrows drawn between each snippet. State machine prototypes are defined in the "Machines" tab. Each state machine consists of a number of states connected by state transitions, and possibly some resource locks. Resource locks must go around any state(s) which use the functionality provided by a resource. They serve as a visual reminder that you are acquiring a lock, and tell the backend to acquire the lock when execution crosses the resource lock border.
+
+Just like with normal programs, state machines may accept launch arguments. This lets you define a state machine to handle common logic, and essentially use it as a subroutine, calling it from other state machines. For instance, you could define a navigation (move to location) state machine for your robot, and call it from various higher level behavior state machines.
+
+This robot example also highlights the motivation for the novel resource locking concept. If two state machines are both trying to drive the motors, proper positioning and sizing of resourcelocks will ensure that one machine gets the lock first, allowing its navigation to complete entirely before releasing control of the motors for the second task.
+
+To have an instance of a state machine prototype launch when you click run, select "launch on start". Currently, launch arguments are not supported for launch on start state machines.
+
+
+ === States ===
+There are different types of states. The most commonly used is the code state, where you enter python code. The rest of the state types manage execution and synchronization with other machines.
+
+Code - a box where you can type python code. This code is run once, when the incoming transition brings execution in. This code must return quickly, because blocking here will stop all running machines.
+
+Initial - This is the starting point of execution. If your machine accepts arguments, you define them here.
+
+Return - When execution gets here, this state machine is done. You may return values with a return state.
+
+Spawn - Launches another state machine. You can define what values to pass into the new child state machine. If you select the "block" option, execution of this machine will pause until the child returns. Otherwise, this state machine is free to continue.
+
+Join - Waits for another state machine to finish, it it hasn't already. Lets you gather up any value returned from the child.
+
+
+
+ === Transitions === 
+Transitions define when execution goes from the current state to the next. There are three types of transition:
+
+- Event: an event transition means execution will go to the pointed-at state when a specified event is received. This corresponds to the ususal labeled arrow you see in normal state machines diagrams on the internet.
+
+- Timeout: a timeout transition means execution will go to the pointed-at state if nothing else happens before a specified time period.
+
+- Catchall: this means go immediately to the pointed-at state. The only exception to this is certain state types may not even attempt to look at their outgoing transitions until some condition is met. For instance, a machine in a Join state with an outgoing catchall transition won't go to the next state until the child state machine returns.
+
+
+ === Resources === 
+Resources have two duties: to bring events in from the outside world, and to provide a lock-protected interface to manipulate the outside world.
+
+Resources can be used to periodically run code which may generate events which get sent to all running state machines. For instance, you could define a resource for your robot which uses computer vision to scan the surroundings every second, producing events corresponding to potential targets for your robot's nerf gun.
+
+As mentioned earlier, resources also can provide a lock-protected API for interfacing with the world. By placing resource locks around your states, you can visually lock out an area where a state machine gets access to the corresponding resource. An example of this is creating a resource for your robot's motor driver circuit. By placing resource locks appropriately around states which use the motor driver resource, two running machines won't fight for control and cause the robot to have a seizure.
+
+
+ === Custom State Classes === 
+While code states are great, I quickly realized that they aren't enough. All code states let you do is define code that runs on state entry. Since we can't block, we must use async methods for long running subroutines. But how can we handle user defined success and failure callbacks in a clean visual manner?
+
+Here's a motivating example:
+Suppose your robot needs to speak to the internet, perhaps to download beer-grabbing orders from a central server. Using code states, you have two equally terrible options:
+a) make a blocking GET request.
+b) make an async GET request
+
+The problem with a) is that it gums up all other state machines. You can't block in code states!
+The problem with b) is that you have to take your request handle, store it in a state machine local variable... and then what? You have to move into a state which uses a loopback timeout transition to poll the request handle every blah seconds to see if it completed. What an ugly mess! Visual clarity is required.
+
+This is the motivation for custom state classes. 
+
+Here is option c), the correct way to do it:
+
+c) Define a network request custom state type in a python file. In python, define how to use the requests library to make the request. Define that there are two possible outcomes, success or failure. Define that your request state accepts a floating point timeout, in seconds, and a url. Import this python file into SMEdit. Now you can create GET request states, each of which comes with two outgoing transitions, labeled success and failure. Connect these to your states as you see fit. And each of these can be configured with a different URL and timeout from within the GUI.
+
+Since SMEdit is all about visual definition of code, custom state classes let you bring async operations into this state machine universe in a nice-looking way.
+
+
+
+
+ === Invariants and gotchas you must be aware of ===
+- names of spawned machines must be valid
+- only one initial state per machine
+- no hanging transitions
+- currently there is no support for your code crashing and exception handling (other than printing the exception usually). If stuff crashes, just restart the runner for now.
+
+
+ === Known Bugs === 
+- undo / redo system is broken, don't use!!!

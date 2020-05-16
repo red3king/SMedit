@@ -1,0 +1,118 @@
+{
+    "custom_state_classes": [],
+    "id_ctr": 6,
+    "machines": [
+        {
+            "id": 1,
+            "name": "main machine",
+            "resourcelocks": [],
+            "run_on_start": true,
+            "states": [
+                {
+                    "custom_config": [],
+                    "h": 125.0,
+                    "has_return_value": false,
+                    "id": 2,
+                    "initial_args": [],
+                    "join_pid_variable": "",
+                    "join_result_variable": "",
+                    "launch_args": [],
+                    "launch_result_variable": "",
+                    "launch_synchronous": true,
+                    "launch_task_name": {
+                        "type": 1,
+                        "value": ""
+                    },
+                    "name": "start",
+                    "return_value": {
+                        "type": 0,
+                        "value": ""
+                    },
+                    "type": -5,
+                    "w": 177.29534912109375,
+                    "x": 57.66571044921875,
+                    "y": 33.436859130859375
+                },
+                {
+                    "custom_config": [],
+                    "h": 125.0,
+                    "has_return_value": false,
+                    "id": 3,
+                    "initial_args": [],
+                    "join_pid_variable": "",
+                    "join_result_variable": "",
+                    "launch_args": [],
+                    "launch_result_variable": "",
+                    "launch_synchronous": true,
+                    "launch_task_name": {
+                        "type": 1,
+                        "value": ""
+                    },
+                    "name": "hello",
+                    "return_value": {
+                        "type": 0,
+                        "value": ""
+                    },
+                    "type": -4,
+                    "w": 274.88330078125,
+                    "x": 737.7991333007813,
+                    "y": 233.68304443359375
+                },
+                {
+                    "custom_config": [],
+                    "h": 194.498779296875,
+                    "has_return_value": false,
+                    "id": 6,
+                    "initial_args": [],
+                    "join_pid_variable": "",
+                    "join_result_variable": "",
+                    "launch_args": [],
+                    "launch_result_variable": "",
+                    "launch_synchronous": true,
+                    "launch_task_name": {
+                        "type": 1,
+                        "value": ""
+                    },
+                    "name": "new state",
+                    "return_value": {
+                        "type": 0,
+                        "value": ""
+                    },
+                    "type": -3,
+                    "w": 254.26748657226563,
+                    "x": 173.71527099609375,
+                    "y": 684.7820434570313
+                }
+            ],
+            "transitions": [
+                {
+                    "event_name": "",
+                    "from_state": 2,
+                    "id": 4,
+                    "is_child_transition": false,
+                    "timeout": 2.0,
+                    "to_state": 3,
+                    "type": 1,
+                    "x0": 234.9610595703125,
+                    "x1": 737.7991333007813,
+                    "y0": 158.43685913085938,
+                    "y1": 233.68304443359375
+                },
+                {
+                    "event_name": "",
+                    "from_state": 3,
+                    "id": 5,
+                    "is_child_transition": false,
+                    "timeout": 4.0,
+                    "to_state": 6,
+                    "type": 1,
+                    "x0": 737.7991333007813,
+                    "x1": 427.9827575683594,
+                    "y0": 358.68304443359375,
+                    "y1": 684.7820434570313
+                }
+            ]
+        }
+    ],
+    "resources": []
+}

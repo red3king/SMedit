@@ -1,0 +1,7 @@
+
+A simple example, a single state machine demonstrating how to have a state ("random chooser") choose its successor state.
+
+This is accomplished by having a set of outgoing event transitions. The state chooses its successor state by emitting an event corresponding to its sucessor.
+
+
+Note that as of this writing, the "random chooser" state never appears highlighted, since it immediately goes to either state A or B. 

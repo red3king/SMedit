@@ -1,0 +1,2 @@
+ 
+This implements the same thing as the spawn subroutine example: launching a child state machine to calculate something. But this time, we continue executing while the child is working, allowing us to join later when we need the result value.

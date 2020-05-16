@@ -1,0 +1,214 @@
+{
+    "custom_state_classes": [
+        {
+            "configuration_definition": [
+                {
+                    "name": "percent A",
+                    "type": 2
+                }
+            ],
+            "id": 1,
+            "name": "Random Chooser",
+            "outgoing_transitions": [
+                {
+                    "event_name": "A",
+                    "timeout": 0.0,
+                    "type": 0
+                },
+                {
+                    "event_name": "B",
+                    "timeout": 0.0,
+                    "type": 0
+                }
+            ],
+            "path": "/home/rory/code/less_old_tmp/smedit/examples docs explanations/custom state class/random_chooser_csc.py"
+        }
+    ],
+    "id_ctr": 11,
+    "machines": [
+        {
+            "id": 2,
+            "name": "new machine",
+            "resourcelocks": [],
+            "run_on_start": true,
+            "states": [
+                {
+                    "custom_config": [],
+                    "h": 125.0,
+                    "has_return_value": false,
+                    "id": 3,
+                    "initial_args": [],
+                    "join_pid_variable": "",
+                    "join_result_variable": "",
+                    "launch_args": [],
+                    "launch_result_variable": "",
+                    "launch_synchronous": true,
+                    "launch_task_name": {
+                        "type": 1,
+                        "value": ""
+                    },
+                    "name": "initial",
+                    "return_value": {
+                        "type": 0,
+                        "value": ""
+                    },
+                    "type": -5,
+                    "w": 150.0,
+                    "x": -205.1090087890625,
+                    "y": 283.1423034667969
+                },
+                {
+                    "custom_config": [
+                        {
+                            "lvov": {
+                                "type": 2,
+                                "value": "20"
+                            },
+                            "name": "percent A"
+                        }
+                    ],
+                    "h": 122.66049194335938,
+                    "has_return_value": false,
+                    "id": 4,
+                    "initial_args": [],
+                    "join_pid_variable": "",
+                    "join_result_variable": "",
+                    "launch_args": [],
+                    "launch_result_variable": "",
+                    "launch_synchronous": true,
+                    "launch_task_name": {
+                        "type": 1,
+                        "value": ""
+                    },
+                    "name": "random chooser",
+                    "return_value": {
+                        "type": 0,
+                        "value": ""
+                    },
+                    "type": 1,
+                    "w": 216.29400634765625,
+                    "x": 436.72735595703125,
+                    "y": 281.7719421386719
+                },
+                {
+                    "custom_config": [],
+                    "h": 125.0,
+                    "has_return_value": false,
+                    "id": 8,
+                    "initial_args": [],
+                    "join_pid_variable": "",
+                    "join_result_variable": "",
+                    "launch_args": [],
+                    "launch_result_variable": "",
+                    "launch_synchronous": true,
+                    "launch_task_name": {
+                        "type": 1,
+                        "value": ""
+                    },
+                    "name": "bbbb",
+                    "return_value": {
+                        "type": 0,
+                        "value": ""
+                    },
+                    "type": -4,
+                    "w": 150.0,
+                    "x": 113.36053466796875,
+                    "y": 21.48406982421875
+                },
+                {
+                    "custom_config": [],
+                    "h": 125.0,
+                    "has_return_value": false,
+                    "id": 10,
+                    "initial_args": [],
+                    "join_pid_variable": "",
+                    "join_result_variable": "",
+                    "launch_args": [],
+                    "launch_result_variable": "",
+                    "launch_synchronous": true,
+                    "launch_task_name": {
+                        "type": 1,
+                        "value": ""
+                    },
+                    "name": "aaaa",
+                    "return_value": {
+                        "type": 0,
+                        "value": ""
+                    },
+                    "type": -4,
+                    "w": 150.0,
+                    "x": 105.71963500976563,
+                    "y": 514.2069091796875
+                }
+            ],
+            "transitions": [
+                {
+                    "event_name": "A",
+                    "from_state": 4,
+                    "id": 5,
+                    "is_child_transition": true,
+                    "timeout": 0.0,
+                    "to_state": 10,
+                    "type": 0,
+                    "x0": 436.72735595703125,
+                    "x1": 255.71963500976563,
+                    "y0": 404.43243408203125,
+                    "y1": 514.2069091796875
+                },
+                {
+                    "event_name": "B",
+                    "from_state": 4,
+                    "id": 6,
+                    "is_child_transition": true,
+                    "timeout": 0.0,
+                    "to_state": 8,
+                    "type": 0,
+                    "x0": 436.72735595703125,
+                    "x1": 263.36053466796875,
+                    "y0": 281.7719421386719,
+                    "y1": 146.48406982421875
+                },
+                {
+                    "event_name": "",
+                    "from_state": 3,
+                    "id": 7,
+                    "is_child_transition": false,
+                    "timeout": 1.0,
+                    "to_state": 4,
+                    "type": 1,
+                    "x0": -55.1090087890625,
+                    "x1": 436.72735595703125,
+                    "y0": 339.5458068847656,
+                    "y1": 339.5458068847656
+                },
+                {
+                    "event_name": "",
+                    "from_state": 8,
+                    "id": 9,
+                    "is_child_transition": false,
+                    "timeout": 2.0,
+                    "to_state": 3,
+                    "type": 1,
+                    "x0": 113.36053466796875,
+                    "x1": -55.1090087890625,
+                    "y0": 146.48406982421875,
+                    "y1": 283.1423034667969
+                },
+                {
+                    "event_name": "",
+                    "from_state": 10,
+                    "id": 11,
+                    "is_child_transition": false,
+                    "timeout": 1.0,
+                    "to_state": 3,
+                    "type": 1,
+                    "x0": 105.71963500976563,
+                    "x1": -55.1090087890625,
+                    "y0": 514.2069091796875,
+                    "y1": 408.1423034667969
+                }
+            ]
+        }
+    ],
+    "resources": []
+}

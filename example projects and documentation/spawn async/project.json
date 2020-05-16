@@ -1,0 +1,394 @@
+{
+    "custom_state_classes": [],
+    "id_ctr": 20,
+    "machines": [
+        {
+            "id": 1,
+            "name": "main machine",
+            "resourcelocks": [],
+            "run_on_start": true,
+            "states": [
+                {
+                    "custom_config": [],
+                    "h": 125.0,
+                    "has_return_value": false,
+                    "id": 2,
+                    "initial_args": [],
+                    "join_pid_variable": "",
+                    "join_result_variable": "",
+                    "launch_args": [],
+                    "launch_result_variable": "",
+                    "launch_synchronous": true,
+                    "launch_task_name": {
+                        "type": 1,
+                        "value": ""
+                    },
+                    "name": "initial",
+                    "return_value": {
+                        "type": 0,
+                        "value": ""
+                    },
+                    "type": -5,
+                    "w": 150.0,
+                    "x": 90.947265625,
+                    "y": 326.65283203125
+                },
+                {
+                    "custom_config": [],
+                    "h": 125.0,
+                    "has_return_value": false,
+                    "id": 4,
+                    "initial_args": [],
+                    "join_pid_variable": "",
+                    "join_result_variable": "",
+                    "launch_args": [],
+                    "launch_result_variable": "",
+                    "launch_synchronous": true,
+                    "launch_task_name": {
+                        "type": 1,
+                        "value": ""
+                    },
+                    "name": "set var",
+                    "return_value": {
+                        "type": 0,
+                        "value": ""
+                    },
+                    "type": -4,
+                    "w": 342.2960205078125,
+                    "x": 562.4691772460938,
+                    "y": 281.2430114746094
+                },
+                {
+                    "custom_config": [],
+                    "h": 192.6685791015625,
+                    "has_return_value": false,
+                    "id": 6,
+                    "initial_args": [],
+                    "join_pid_variable": "",
+                    "join_result_variable": "",
+                    "launch_args": [
+                        {
+                            "argument_value": {
+                                "type": 4,
+                                "value": "arg"
+                            },
+                            "variable_name": "input_val"
+                        }
+                    ],
+                    "launch_result_variable": "my_pid",
+                    "launch_synchronous": false,
+                    "launch_task_name": {
+                        "type": 1,
+                        "value": "doubler"
+                    },
+                    "name": "async spawn",
+                    "return_value": {
+                        "type": 0,
+                        "value": ""
+                    },
+                    "type": -2,
+                    "w": 294.52325439453125,
+                    "x": 117.1822509765625,
+                    "y": 613.1644287109375
+                },
+                {
+                    "custom_config": [],
+                    "h": 179.64239501953125,
+                    "has_return_value": false,
+                    "id": 8,
+                    "initial_args": [],
+                    "join_pid_variable": "",
+                    "join_result_variable": "",
+                    "launch_args": [],
+                    "launch_result_variable": "",
+                    "launch_synchronous": false,
+                    "launch_task_name": {
+                        "type": 1,
+                        "value": ""
+                    },
+                    "name": "do other stuff meanwhile",
+                    "return_value": {
+                        "type": 0,
+                        "value": ""
+                    },
+                    "type": -4,
+                    "w": 801.82421875,
+                    "x": 804.2901611328125,
+                    "y": 643.7957153320313
+                },
+                {
+                    "custom_config": [],
+                    "h": 219.36962890625,
+                    "has_return_value": false,
+                    "id": 10,
+                    "initial_args": [],
+                    "join_pid_variable": "my_pid",
+                    "join_result_variable": "my_result",
+                    "launch_args": [],
+                    "launch_result_variable": "",
+                    "launch_synchronous": false,
+                    "launch_task_name": {
+                        "type": 1,
+                        "value": ""
+                    },
+                    "name": "join child",
+                    "return_value": {
+                        "type": 0,
+                        "value": ""
+                    },
+                    "type": -1,
+                    "w": 277.75372314453125,
+                    "x": 179.49932861328125,
+                    "y": 1001.665283203125
+                },
+                {
+                    "custom_config": [],
+                    "h": 180.17919921875,
+                    "has_return_value": false,
+                    "id": 11,
+                    "initial_args": [],
+                    "join_pid_variable": "",
+                    "join_result_variable": "",
+                    "launch_args": [],
+                    "launch_result_variable": "",
+                    "launch_synchronous": false,
+                    "launch_task_name": {
+                        "type": 1,
+                        "value": ""
+                    },
+                    "name": "print child output",
+                    "return_value": {
+                        "type": 0,
+                        "value": ""
+                    },
+                    "type": -4,
+                    "w": 618.4066772460938,
+                    "x": 908.7422485351563,
+                    "y": 1147.6168212890625
+                },
+                {
+                    "custom_config": [],
+                    "h": 125.0,
+                    "has_return_value": false,
+                    "id": 13,
+                    "initial_args": [],
+                    "join_pid_variable": "",
+                    "join_result_variable": "",
+                    "launch_args": [],
+                    "launch_result_variable": "",
+                    "launch_synchronous": false,
+                    "launch_task_name": {
+                        "type": 1,
+                        "value": ""
+                    },
+                    "name": "ret",
+                    "return_value": {
+                        "type": 0,
+                        "value": ""
+                    },
+                    "type": -3,
+                    "w": 150.0,
+                    "x": 1863.82421875,
+                    "y": 1193.644775390625
+                }
+            ],
+            "transitions": [
+                {
+                    "event_name": "",
+                    "from_state": 2,
+                    "id": 3,
+                    "is_child_transition": false,
+                    "timeout": 1.0,
+                    "to_state": 4,
+                    "type": 1,
+                    "x0": 240.947265625,
+                    "x1": 562.4691772460938,
+                    "y0": 339.13653564453125,
+                    "y1": 339.13653564453125
+                },
+                {
+                    "event_name": "",
+                    "from_state": 4,
+                    "id": 5,
+                    "is_child_transition": false,
+                    "timeout": 1.0,
+                    "to_state": 6,
+                    "type": 1,
+                    "x0": 562.4691772460938,
+                    "x1": 411.70550537109375,
+                    "y0": 406.2430114746094,
+                    "y1": 613.1644287109375
+                },
+                {
+                    "event_name": "",
+                    "from_state": 6,
+                    "id": 7,
+                    "is_child_transition": false,
+                    "timeout": 1.0,
+                    "to_state": 8,
+                    "type": 1,
+                    "x0": 411.70550537109375,
+                    "x1": 804.2901611328125,
+                    "y0": 698.0964965820313,
+                    "y1": 698.0964965820313
+                },
+                {
+                    "event_name": "",
+                    "from_state": 8,
+                    "id": 9,
+                    "is_child_transition": false,
+                    "timeout": 1.0,
+                    "to_state": 10,
+                    "type": 1,
+                    "x0": 804.2901611328125,
+                    "x1": 457.2530517578125,
+                    "y0": 823.4381103515625,
+                    "y1": 1001.665283203125
+                },
+                {
+                    "event_name": "",
+                    "from_state": 10,
+                    "id": 12,
+                    "is_child_transition": false,
+                    "timeout": 1.0,
+                    "to_state": 11,
+                    "type": 1,
+                    "x0": 457.2530517578125,
+                    "x1": 908.7422485351563,
+                    "y0": 1190.8680419921875,
+                    "y1": 1190.8680419921875
+                },
+                {
+                    "event_name": "",
+                    "from_state": 11,
+                    "id": 14,
+                    "is_child_transition": false,
+                    "timeout": 1.0,
+                    "to_state": 13,
+                    "type": 1,
+                    "x0": 1527.14892578125,
+                    "x1": 1863.82421875,
+                    "y0": 1243.8717041015625,
+                    "y1": 1243.8717041015625
+                }
+            ]
+        },
+        {
+            "id": 15,
+            "name": "doubler",
+            "resourcelocks": [],
+            "run_on_start": false,
+            "states": [
+                {
+                    "custom_config": [],
+                    "h": 125.0,
+                    "has_return_value": false,
+                    "id": 16,
+                    "initial_args": [
+                        {
+                            "value_type": 2,
+                            "variable_name": "input_val"
+                        }
+                    ],
+                    "join_pid_variable": "",
+                    "join_result_variable": "",
+                    "launch_args": [],
+                    "launch_result_variable": "",
+                    "launch_synchronous": true,
+                    "launch_task_name": {
+                        "type": 1,
+                        "value": ""
+                    },
+                    "name": "init",
+                    "return_value": {
+                        "type": 0,
+                        "value": ""
+                    },
+                    "type": -5,
+                    "w": 150.0,
+                    "x": 439.59771728515625,
+                    "y": 209.28846740722656
+                },
+                {
+                    "custom_config": [],
+                    "h": 125.0,
+                    "has_return_value": false,
+                    "id": 17,
+                    "initial_args": [],
+                    "join_pid_variable": "",
+                    "join_result_variable": "",
+                    "launch_args": [],
+                    "launch_result_variable": "",
+                    "launch_synchronous": false,
+                    "launch_task_name": {
+                        "type": 1,
+                        "value": ""
+                    },
+                    "name": "double it",
+                    "return_value": {
+                        "type": 0,
+                        "value": ""
+                    },
+                    "type": -4,
+                    "w": 290.0751953125,
+                    "x": 833.1961669921875,
+                    "y": 239.84585571289063
+                },
+                {
+                    "custom_config": [],
+                    "h": 125.0,
+                    "has_return_value": true,
+                    "id": 20,
+                    "initial_args": [],
+                    "join_pid_variable": "",
+                    "join_result_variable": "",
+                    "launch_args": [],
+                    "launch_result_variable": "",
+                    "launch_synchronous": true,
+                    "launch_task_name": {
+                        "type": 1,
+                        "value": ""
+                    },
+                    "name": "return",
+                    "return_value": {
+                        "type": 4,
+                        "value": "result"
+                    },
+                    "type": -3,
+                    "w": 150.0,
+                    "x": 1396.7144775390625,
+                    "y": 205.69760131835938
+                }
+            ],
+            "transitions": [
+                {
+                    "event_name": "",
+                    "from_state": 16,
+                    "id": 18,
+                    "is_child_transition": false,
+                    "timeout": 3.0,
+                    "to_state": 17,
+                    "type": 1,
+                    "x0": 589.5977172851563,
+                    "x1": 833.1961669921875,
+                    "y0": 286.1748046875,
+                    "y1": 286.1748046875
+                },
+                {
+                    "event_name": "",
+                    "from_state": 17,
+                    "id": 19,
+                    "is_child_transition": false,
+                    "timeout": 3.0,
+                    "to_state": 20,
+                    "type": 1,
+                    "x0": 1123.2713623046875,
+                    "x1": 1396.7144775390625,
+                    "y0": 262.0059814453125,
+                    "y1": 262.0059814453125
+                }
+            ]
+        }
+    ],
+    "resources": []
+}

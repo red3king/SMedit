@@ -1,0 +1,2 @@
+ 
+This is a simple example: one machine that prints hello world, and exits.
