@@ -5,6 +5,7 @@
 #include "models/entity.h"
 #include "signals.h"
 #include "historymanager/historymanager.h"
+#include "saveload.h"
 
 
 class ResourcesController : public TopController
@@ -15,12 +16,15 @@ class ResourcesController : public TopController
         
     private:
         Gtk::TreeView* resource_tree_view;
-        Gtk::Button *create_button, *delete_button;
-        Gtk::Label *name_label, *path_label;
+        Gtk::Button* create_button;
+        Gtk::Button* delete_button;
+        Gtk::Label* name_label;
+        Gtk::Label* path_label;
         Gtk::Entry* name_entry;
         Gtk::FileChooserButton* path_file_chooser;
 
         Gtk::Window* main_window;
+        ProjectInfo* current_project_info;
 
         ListViewController* list_view_controller;
 
@@ -34,6 +38,7 @@ class ResourcesController : public TopController
         void reset(bool reload);
         void load_from(Project& current_project, bool reload);
 
+        void on_project_path_set();
         void on_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id, ChangeType change_type);
         void on_selection_changed(unsigned int entity_id);
 
@@ -45,4 +50,5 @@ class ResourcesController : public TopController
 
         void _rebuild_treeview(unsigned int deleted_id);
         void _update_enabled();
+        void _reset_file_path();
 };

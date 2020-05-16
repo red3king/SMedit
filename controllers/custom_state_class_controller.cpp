@@ -2,6 +2,7 @@
 
 #include "custom_state_class_controller.h"
 #include "historymanager/operations/custom_state_ops.h"
+#include "main.h"
 
 using std::string;
 
@@ -10,6 +11,7 @@ CustomStateClassController::CustomStateClassController(HistoryManager* history_m
 {
     is_setting = false;
     this->main_window = main_window;
+    current_project_info = &((MainWindow*)main_window)->project_info;
 
     builder->get_widget("csc_tree_view", csc_tree_view);
     builder->get_widget("create_csc_button", create_button);
@@ -32,6 +34,8 @@ CustomStateClassController::CustomStateClassController(HistoryManager* history_m
     reload_button->signal_clicked().connect(sigc::mem_fun(this, &CustomStateClassController::on_reload_clicked));
     
     signals.model_changed.connect(sigc::mem_fun(this, &CustomStateClassController::on_model_changed));
+    signals.project_save.connect(sigc::mem_fun(this, &CustomStateClassController::on_project_path_set));
+    signals.project_load.connect(sigc::mem_fun(this, &CustomStateClassController::on_project_path_set));
 }
 
 
@@ -71,7 +75,9 @@ void CustomStateClassController::on_path_changed()
         return;
 
     string path = string(path_file_chooser->get_filename());
-    auto op = OpCustomStateClassPath(selected_csc, path);
+    string project_folder = current_project_info->project_directory;
+    string relative = make_relative_path(project_folder, path);
+    auto op = OpCustomStateClassPath(selected_csc, relative);
     history_manager->submit_operation(op);
 }
 
@@ -99,8 +105,10 @@ void CustomStateClassController::on_reload_clicked()
 {
     CustomStateClass loaded_class;
     string error_msg;
+    string project_folder = current_project_info->project_directory;
+    string absolute_path = make_absolute_path(project_folder, selected_csc->path);
     
-    if(!load_csc_from_file(loaded_class, selected_csc->path, error_msg))
+    if(!load_csc_from_file(loaded_class, absolute_path, error_msg))
     {
         display_error("could not load / execute given file:\r\n" + error_msg);
         return;
@@ -172,7 +180,9 @@ void CustomStateClassController::on_selection_changed(unsigned int entity_id)
     else
     {
         name_entry->set_text(selected_csc->name);
-        path_file_chooser->set_filename(selected_csc->path);
+        string project_folder = current_project_info->project_directory;
+        string full_path = make_absolute_path(project_folder, selected_csc->path);
+        path_file_chooser->set_filename(full_path);
     }
 
     is_setting = false;
@@ -204,6 +214,16 @@ void CustomStateClassController::load_from(Project& current_project, bool reload
 
     if(selected_csc_id != 0)
         list_view_controller->select_item(selected_csc_id);
+}
+
+
+void CustomStateClassController::on_project_path_set()
+{
+    if(selected_csc != nullptr && selected_csc->path != "")
+        return;
+    
+    string folder = current_project_info->project_directory;
+    path_file_chooser->set_filename(folder);
 }
 
 

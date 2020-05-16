@@ -10,7 +10,10 @@
 
 using std::string;
 
+// file stuff
 bool file_to_string(string filename, string& output);
+string make_relative_path(string project_folder, string path);  // return path, relative to project_folder. assumes path is contained within project_folder.
+string make_absolute_path(string project_folder, string path);
 
 // Return true if point within box
 bool point_in_box(float pt_x, float pt_y, float box_x, float box_y, float box_w, float box_h);

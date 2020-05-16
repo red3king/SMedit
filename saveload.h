@@ -18,6 +18,7 @@ class ProjectInfo
         ProjectInfo();
 
         Project saved_project;
+        string project_directory;
 
         bool has_project();
         void reset();

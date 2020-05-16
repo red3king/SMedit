@@ -34,6 +34,8 @@ Install Prequesites:
 
 (Tested on Kubuntu 19.10)
 
+Note: building the client requires c++ 17 features, so a recent compiler is needed.
+
 Install python3 pip, libraries:
 
 ```

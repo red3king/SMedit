@@ -349,7 +349,7 @@
         {
             "id": 4,
             "name": "resource one",
-            "path": "/home/rory/smedit_test_projects/test_resource_locks_blocked/resource_one.py"
+            "path": "resource_one.py"
         }
     ]
 }

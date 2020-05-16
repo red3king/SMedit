@@ -71,8 +71,9 @@ IOResult save_project(Project& project, ProjectInfo& project_info, string save_p
 
         // save code state python files
         vector<string> saved_code_files;
-        for(int i=0; i<project.machines.size(); i++)
-            for(int j=0; j<project.machines[i]->states.size(); j++)
+        
+        for(int i = 0; i < project.machines.size(); i++)
+            for(int j = 0; j < project.machines[i]->states.size(); j++)
             {
                 State* state = project.machines[i]->states[j];
                 
@@ -86,6 +87,7 @@ IOResult save_project(Project& project, ProjectInfo& project_info, string save_p
         // delete unneeded python files from renamed or deleted code states
         vector<filesystem::path> to_delete;
         unsigned int found_id;
+        
         for (const auto& entry : filesystem::directory_iterator(save_path))
         {
             auto path = entry.path();
@@ -99,7 +101,7 @@ IOResult save_project(Project& project, ProjectInfo& project_info, string save_p
                 to_delete.push_back(path);
         }
 
-        for(int i=0; i<to_delete.size(); i++)
+        for(int i = 0; i < to_delete.size(); i++)
             filesystem::remove(to_delete[i]);
 
     }
@@ -111,6 +113,7 @@ IOResult save_project(Project& project, ProjectInfo& project_info, string save_p
     }
 
     project_info.saved_project = project;
+    project_info.project_directory = save_path;
     return IOResult(true);
 }
 
@@ -181,10 +184,10 @@ IOResult load_project(Project& project, ProjectInfo& project_info, string load_p
     }   
   
     // Code states with nothing saved should get the default function stub 
-    for(int i=0; i<project.machines.size(); i++)
+    for(int i = 0; i < project.machines.size(); i++)
     {
         auto mach = project.machines[i];
-        for(int j=0; j<mach->states.size(); j++)
+        for(int j = 0; j < mach->states.size(); j++)
         {
             auto state = mach->states[j];
             if(state->code == "")
@@ -192,6 +195,7 @@ IOResult load_project(Project& project, ProjectInfo& project_info, string load_p
         }
     }
 
+    project_info.project_directory = load_path;
     return IOResult(true);
 }
 
@@ -216,6 +220,7 @@ void ProjectInfo::reset()
     hash = 0;
     filename_to_data.clear();
     saved_project = Project();
+    project_directory = "";
 }
 
 
@@ -313,14 +318,16 @@ string ProjectInfo::get_filedata(int i)
     {
         Resource *resource = saved_project.resources[i];
         string result;
-        file_to_string(resource->path, result);
+        string absolute_path = make_absolute_path(project_directory, resource->path);
+        file_to_string(absolute_path, result);
         return result;        
     }
     
     // PFT_CUSTOM_STATE_CLASS
     string result;
     auto csc = saved_project.custom_state_classes[i];
-    file_to_string(csc->path, result);
+    string absolute_path = make_absolute_path(project_directory, csc->path);
+    file_to_string(absolute_path, result);
     return result;   
 }
 
@@ -333,22 +340,24 @@ bool ProjectInfo::any_missing_files(string& missing_filenames)
     for(int i = 0; i < saved_project.resources.size(); i++)
     {
         Resource* resource = saved_project.resources[i];
+        string absolute_path = make_absolute_path(project_directory, resource->path);
         
-        if(!std::experimental::filesystem::exists(resource->path))
+        if(!std::experimental::filesystem::exists(absolute_path))
         {
             any_missing = true;
-            missing_filenames += "\n" + resource->name + " : " + resource->path;
+            missing_filenames += "\n" + resource->name + " : " + absolute_path;
         }
     }
 
     for(int i = 0; i < saved_project.custom_state_classes.size(); i++)
     {
         CustomStateClass* csc = saved_project.custom_state_classes[i];
+        string absolute_path = make_absolute_path(project_directory, csc->path);
         
-        if(!std::experimental::filesystem::exists(csc->path))
+        if(!std::experimental::filesystem::exists(absolute_path))
         {
             any_missing = true;
-            missing_filenames += "\n" + csc->name + " : " + csc->path;
+            missing_filenames += "\n" + csc->name + " : " + absolute_path;
         }
     }    
     

@@ -5,10 +5,13 @@
 #include <fstream>
 #include <string>
 #include <iostream>
+#include <filesystem>
 
 
 Gtk::Window* main_window;
 
+
+// file stuff
 
 bool file_to_string(string filename, string& output)
 {   
@@ -24,6 +27,20 @@ bool file_to_string(string filename, string& output)
     }
 
     return true;
+}
+
+
+string make_relative_path(string project_folder, string path)
+{
+    // TODO actually do relative path
+    // right now we just get the filename, assuming all projects have flat structure structure.
+    return std::filesystem::path(path).filename();  
+}
+
+
+string make_absolute_path(string project_folder, string path)
+{
+    return project_folder + "/" + path; // TODO refactor when make_relative_path is actually properly implemented
 }
 
 
