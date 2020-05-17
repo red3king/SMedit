@@ -28,43 +28,48 @@ Note: SMedit is just a placeholder name and I will probably rename it once I can
 How to build and run SMedit.
 
 
-### Building SMedit Client
+### Building SMedit Client (Debian-based systems)
 
 Install Prequesites:  
 
-(Tested on Kubuntu 19.10)
+(Tested on Ubuntu 20.04)
 
-Note: building the client requires c++ 17 features, so a recent compiler is needed.
-
-Install python3 pip, libraries:
+Install python3 pip, build tools and development libraries:
 
 ```
-sudo apt-get install python3-pip python3-venv libgtkmm-3.0-dev libgtksourceviewmm-3.0-dev libboost-all-dev
+sudo apt-get install make python3-pip libgtkmm-3.0-dev libboost-all-dev libgtksourceviewmm-3.0-dev
 ```
+The client includes an embedded python interpreter, so you also need libpython3.8-dev and probably python3.8-dev. However, when testing on a fresh ubuntu 20.04 vm, it appears they already were either preinstalled or pulled in by one of the above packages.
 
-Install cog with the python 3 pip:
+
+Install the cog templating program with the python 3 pip:
 ```
 sudo pip3 install cogapp
 ```
 
-Once the prerequisites are installed, use make to build the server:
+Once the prerequisites are installed, use make to build the client:
 
 ```
-make
+make -j8  # replace with number of cores
+          # if your system locks up and the compiler gets killed,
+          # you need more ram or a lower j value
 ```
 
 There is no install target for make for now. 
-There is currently a bug in the makefile, it doesn't always realize it needs to recompile when headers or certain files are changed. To fix this, run make clean and then make again.
+There are a couple bugs in my makefile; if you are developing, see the bugs file.
 
 
-### Preparing the Runner
+### Preparing the Server
+The cleanest way to set up the server is to install the server's dependencies in a virtualenv. First, install venv:
+```
+sudo apt-get install python3-venv
+```
 
-The easiest way to set up the server is to install the server's dependencies in a virtualenv. 
-To do this, 
+Then, set up your venv:
 
 ```
 cd SMedit/server
-pyvenv-3.7 venv
+python3.8 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
