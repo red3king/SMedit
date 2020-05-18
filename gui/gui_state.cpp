@@ -322,7 +322,7 @@ void GUIState::on_model_changed(EntityType entity_type, SignalType signal_type, 
     {
         State* state = current_machine->get_state_by_id(entity_id);
         
-        if(state->type != CODE)
+        if(state == nullptr || state->type != CODE)
             return;
         
         if(signal_type == CREATE || (signal_type == MODIFY && (change_type == CG_LOCATION || change_type == CG_CODE)))

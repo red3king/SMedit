@@ -103,6 +103,7 @@ void MachinesController::on_selection_changed(unsigned int machine_id, bool user
     if(machine_id == 0)
     {
         selected_machine = nullptr;
+        selected_machine_id = 0;
         name_entry->set_text("");
         launch_on_start_switch->set_state(false);
     }
