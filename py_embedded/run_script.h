@@ -331,7 +331,8 @@ class PYScripts
         void initialize()
         {
             Py_Initialize();
-            add_to_path("."); // for scripts
+            // TODO  existence check!
+            add_to_path("./resources/pyscripts"); // for scripts
             add_to_path("./server/"); // for definitions
         }
         

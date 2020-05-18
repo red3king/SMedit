@@ -1,0 +1,15 @@
+Source: smedit
+Section: devel
+Priority: optional
+Maintainer: rory <red3king@gmail.com>
+Build-Depends: libgtkmm-3.0-1v5, libgtksourceviewmm-3.0-0v5, python3.8, libpython3.8
+Standards-Version: 4.4.0
+Homepage: http://www.zombo.com
+#Vcs-Browser: https://salsa.debian.org/debian/smedit
+#Vcs-Git: https://salsa.debian.org/debian/smedit.git
+
+Package: smedit
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Visual state machine programming environment. (client)
+ See the readme.

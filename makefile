@@ -61,6 +61,21 @@ test: code-gen test-compile
 test-compile: $(testobj)
 	$(CXX) -o smtest $^ $(LDFLAGS)
 
+	
+# install / uninstall stuff:
+prefix=/usr/local
+    
+.PHONY: install
+install: smedit
+	install -m 0755 smedit $(prefix)/bin
+	# left off here, gotta add add those resources	
+	#install -m 0644 *.png $(prefix)/share/our_program/icons
+
+.PHONY: uninstall
+uninstall:
+	rm -f $(prefix)/bin/smedit
+
+
 
 ifeq ($(MAKECMDGOALS),smedit)
 -include $(dep)   # include all dep files in the makefile
