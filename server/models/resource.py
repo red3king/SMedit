@@ -70,7 +70,7 @@ class PeriodicScanResource(Resource):
     
     def __init__(self, resource_def):
         super().__init__(resource_def)
-        self.aop = ResourceTRLCAOP(self.duration_milliseconds/1000.0)
+        self.aop = ResourceTRLCAOP(self.duration_milliseconds / 1000.0)
         self.aop.tick += self.on_tick
 
     def on_tick(self):

@@ -251,36 +251,6 @@ class ResourceTRLCAOP(TwistedRLCAOP):
     def describe(self):
         return "resource-trlcaop"
 
-'''
-class RunNextStateROP(StateResultOperation, TwistedRLCAOP):
-
-    def __init__(self, machine, next_state, timeout=0):
-        TwistedRLCAOP.__init__(self)
-        StateResultOperation.__init__(self, machine)
-        
-        self.next_state = next_state
-        self.timeout = timeout
-
-    def callback_impl(self):
-        self.machine.set_next_state(self.next_state)
-        self.next_srop = self.machine.update()
-
-    def post_finished(self):
-        if self.next_srop is not None:
-            self.machine.run_srop(self.next_srop)
-
-    def get_delay(self):
-        return self.timeout
-
-    def describe(self):
-        return "srop-next-state" + "->" + self.next_state.describe()
-
-    @property
-    def priority(self):
-        return Priority.RUN_STATE_IMMEDIATE if self.timeout == 0.0 else Priority.RUN_STATE_TIMEOUT
-'''
-
-
 
 class RunNextStateROP(StateResultOperation, RunLaterCancelAOP):
     '''

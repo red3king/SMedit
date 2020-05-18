@@ -1,0 +1,1 @@
+This demonstrates a resource which generates events. Here, the resource generates either event A or event B randomly every 1.7 seconds.

@@ -104,7 +104,7 @@ class Project(object):
 
     def on_event(self, event):
         for machine in self.running_machines:
-            machine.feed_event(event)
+            machine.do_feed_event(event)
 
     def create_machine(self, machine_def, machine_args=None):
         # Creates a machine, but does not start running it
@@ -199,7 +199,7 @@ class Project(object):
 
         for machine in self.running_machines:
             machine.start()
-
+        
         for resource in self.resources.values():
             resource.start()
 

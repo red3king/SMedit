@@ -95,6 +95,12 @@ class Machine(object):
 
         return None
 
+    def do_feed_event(self, event):
+        # TODO better naming of this vs. feed event
+        srop = self.feed_event(event)
+        if srop is not None:
+            self.run_srop(srop)
+
     def notify_child_returned(self, child_id, return_value):
         child_pid_match = False
 

@@ -1,4 +1,4 @@
-#!./venv/bin/python3.8
+#!/usr/bin/python3
 from twisted.protocols.basic import LineReceiver
 from twisted.internet.protocol import Factory
 from twisted.internet import reactor, protocol
