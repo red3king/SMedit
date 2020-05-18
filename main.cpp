@@ -10,7 +10,6 @@
 #include "py_embedded/run_script.h"
 
 
-PYScripts scripts;
 
 
 MainWindow::MainWindow(BaseObjectType* obj, Glib::RefPtr<Gtk::Builder> const& builder) : Gtk::ApplicationWindow(obj) , builder{builder}
