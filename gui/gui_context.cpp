@@ -117,7 +117,7 @@ void GUIContext::set_machine(Project* current_project, Machine* current_machine,
     
     if(mode == GAM_BUILD)
     {
-        for(int i=0; i<current_machine->states.size(); i++)
+        for(int i = 0; i < current_machine->states.size(); i++)
         {
             if(current_machine->states[i]->type == INITIAL)
                 state = current_machine->states[i];
@@ -127,7 +127,7 @@ void GUIContext::set_machine(Project* current_project, Machine* current_machine,
     else
     {
         auto running_machine = running_state->get_running_machine(running_machine_id);
-        for(int i=0; i<current_machine->states.size(); i++)
+        for(int i = 0; i < current_machine->states.size(); i++)
         {
             if(current_machine->states[i]->id == running_machine.current_state_def_id)
                 state = current_machine->states[i];        

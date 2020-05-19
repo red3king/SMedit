@@ -34,4 +34,4 @@ class AnimationTimer
 
 
 
-extern AnimationTimer *animation_timer;
+extern AnimationTimer* animation_timer;

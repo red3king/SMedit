@@ -25,8 +25,8 @@ int AnimationTimer::add_request()
 
 void AnimationTimer::remove_request(int submission_id)
 {
-    int i=0;
-    for(; i<requests.size(); i++)
+    int i = 0;
+    for(; i < requests.size(); i++)
     {
         if(requests[i] == submission_id)
             break;
