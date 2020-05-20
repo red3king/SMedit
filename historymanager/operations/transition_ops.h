@@ -4,22 +4,27 @@
 #include "models/transition.h"
 
 
-class TransitionChgOperation : public Operation  // abstract
+class TransitionOperation : public MachineRelatedOperation
+{
+    public:
+        TransitionOperation(Machine* machine, Transition* transition);
+        unsigned int transition_id;
+};
+
+
+class TransitionChgOperation : public TransitionOperation  // abstract
 {
     public:
         TransitionChgOperation(Machine* machine, Transition* transition);
         unsigned int execute(Project& project);
         virtual void execute_impl(Transition* transition)=0;
-
-    protected:
-        unsigned int machine_id, transition_id;
 };
 
 
 Transition *create_transition(Project& project, unsigned int machine_id, bool is_child, float x0, float y0, float x1, float y1, int type);
 
 
-class OpTransitionCreate : public Operation
+class OpTransitionCreate : public TransitionOperation
 {
     public:
         OpTransitionCreate(Machine* machine, float x0, float y0, float x1, float y1);
@@ -27,28 +32,24 @@ class OpTransitionCreate : public Operation
         OpTransitionCreate* clone();
 
     private:
-        unsigned int machine_id;
         float x0, y0, x1, y1;
 };
 
 
 
-class OpTransitionDelete : public Operation
+class OpTransitionDelete : public TransitionOperation
 {
     public:
         OpTransitionDelete(Machine* machine, Transition* transition);
         unsigned int execute(Project& project);
         OpTransitionDelete* clone();
-
-    private:
-        unsigned int machine_id, transition_id;
 };
 
 
 void delete_transition(Machine *machine, Transition *transition);
 
 
-class OpTransitionMove : public Operation
+class OpTransitionMove : public TransitionOperation
 {
     public:
         OpTransitionMove(Machine* machine, Transition* transition, float x0_new, float y0_new);
@@ -59,12 +60,11 @@ class OpTransitionMove : public Operation
         void collapse(Operation& other);
 
     private:
-        unsigned int machine_id, transition_id;
         float x0_new, y0_new;
 };
 
 
-class OpTransitionEndpointMove : public Operation
+class OpTransitionEndpointMove : public TransitionOperation
 {
     public:
         OpTransitionEndpointMove(Machine* machine, Transition* transition, bool is_endpoint_0, float x_new, float y_new);
@@ -76,7 +76,7 @@ class OpTransitionEndpointMove : public Operation
         void collapse(Operation& other);
 
     private:
-        unsigned int machine_id, transition_id, new_state_id;
+        unsigned int new_state_id;
         bool is_endpoint_0;
         float x_new, y_new;
 };  

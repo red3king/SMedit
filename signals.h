@@ -4,6 +4,7 @@
 #include <sigc++/sigc++.h>
 
 #include "models/entity.h"
+#include "historymanager/operation.h"
 
 using std::vector;
 
@@ -32,10 +33,12 @@ class Signals
         
         sigc::signal<void> pre_gui_rebuild, gui_rebuild;
 
+        sigc::signal<void, Operation*, unsigned int> focus_operation;  // UI listens to this to focus to the element corresponding to the undone / redone operation
 
         void register_set_cursor_handler(SetCursorHandler handler);
         void fire_set_cursor(CursorType cursor_type);
 
+        void fire_focus_operation(Operation* operation, unsigned int result);
         void fire_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id, ChangeType change_type=CG_OTHER);
 
         void enable_gui_signals();

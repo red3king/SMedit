@@ -5,7 +5,7 @@
 #include "const.h"
 
 
-class OpBoxEntityResize : public Operation
+class OpBoxEntityResize : public MachineRelatedOperation
 {
     public:
         OpBoxEntityResize(Machine* machine, BoxEntity* entity, BorderType resize_border, float new_position);

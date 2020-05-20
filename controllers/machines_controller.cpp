@@ -42,6 +42,7 @@ MachinesController::MachinesController(HistoryManager* history_manager, Glib::Re
     selected_transition_ctrl = new SelectedTransition(history_manager, builder);
     selected_state_ctrl = new SelectedState(history_manager, builder);
 
+    signals.focus_operation.connect(sigc::mem_fun(this, &MachinesController::on_focus_operation));
     signals.model_changed.connect(sigc::mem_fun(this, &MachinesController::on_model_changed));
     signals.model_selected.connect(sigc::mem_fun(this, &MachinesController::on_model_selected));
 
@@ -53,6 +54,30 @@ MachinesController::MachinesController(HistoryManager* history_manager, Glib::Re
 
     name_entry->signal_changed().connect(sigc::mem_fun(this, &MachinesController::on_name_changed));
     launch_on_start_switch->property_active().signal_changed().connect(sigc::mem_fun(this, &MachinesController::on_launch_on_start_changed));
+}
+
+
+void MachinesController::on_focus_operation(Operation* operation, unsigned int result)
+{
+    int id = -1;
+    
+    if(is_instance<MachineChgOperation>(operation))
+    {
+        auto op = (MachineChgOperation*) operation;
+        id = op->machine_id;
+    }
+    
+    if(is_instance<OpMachineCreate>(operation))
+        id = result;
+    
+    if(id == -1)
+        return;
+    
+    if(selected_machine_id == id)
+        return;
+    
+    list_view_controller->select_item(id);
+    on_selection_changed(id, true);
 }
 
 
@@ -156,7 +181,8 @@ void MachinesController::_rebuild_list(unsigned deleted_id)
 {
     list_view_controller->clear();
     auto machines = history_manager->current_project.machines;
-    for(int i=0; i<machines.size(); i++)
+    
+    for(int i = 0; i < machines.size(); i++)
     {
         if(machines[i]->id != deleted_id)
             list_view_controller->add_item(machines[i]->name, machines[i]->id);
@@ -258,13 +284,15 @@ void MachinesController::on_create_resourcelock_clicked()
 
     Gtk::ComboBoxText combobox;
     string first_resource;
-    for(int i=0; i<history_manager->current_project.resources.size(); i++)
+    
+    for(int i = 0; i < history_manager->current_project.resources.size(); i++)
     {
         Resource* res = history_manager->current_project.resources[i];
         combobox.append(res->name);
         if(i == 0)
             first_resource = res->name;
     }
+    
     combobox.set_active_text(first_resource); 
     set_margins(&combobox, 4);
     combobox.set_margin_bottom(0);
@@ -285,7 +313,7 @@ void MachinesController::on_create_resourcelock_clicked()
     
 
     Resource* resource; 
-    for(int i=0; i<history_manager->current_project.resources.size(); i++)
+    for(int i = 0; i < history_manager->current_project.resources.size(); i++)
     {
         resource = history_manager->current_project.resources[i];
         if(resource->name == chosen)

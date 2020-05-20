@@ -7,19 +7,25 @@
 #include "models/project.h"
 
 
-class MachineChgOperation : public Operation
+class MachineOperation : public MachineRelatedOperation
+{
+    public:
+        MachineOperation(Machine* machine);
+};
+
+
+class MachineChgOperation : public MachineOperation
 {
     public:
         MachineChgOperation(Machine* machine);
         unsigned int execute(Project& project);
         virtual void execute_impl(Machine* machine)=0;
-
+ 
     protected:
-        unsigned int machine_id;    
 };
 
 
-class OpMachineCreate : public Operation
+class OpMachineCreate : public MachineOperation
 {
     public:
         OpMachineCreate(string name);
@@ -31,16 +37,13 @@ class OpMachineCreate : public Operation
 };
 
 
-class OpMachineDelete : public Operation
+class OpMachineDelete : public MachineOperation
 {
     public:
         OpMachineDelete(Machine* machine);
         OpMachineDelete* clone();
         
-        unsigned int execute(Project& project);
-
-    private:
-        unsigned int id;        
+        unsigned int execute(Project& project);      
 };
 
 

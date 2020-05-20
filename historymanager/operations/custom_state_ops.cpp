@@ -3,17 +3,25 @@
 #include "signals.h"
 
 
+// Generic
+
+CustomStateClassOperation::CustomStateClassOperation(CustomStateClass* custom_state_class)
+{
+    if(custom_state_class != nullptr)
+        customstateclass_id = custom_state_class->id;
+    else
+        customstateclass_id = 0;
+}
+
+
 // Abstract change
 
-CustomStateClassChgOperation::CustomStateClassChgOperation(CustomStateClass *custom_state_class)
-{
-    customstateclass_id = custom_state_class->id;
-}
+CustomStateClassChgOperation::CustomStateClassChgOperation(CustomStateClass* custom_state_class) : CustomStateClassOperation(custom_state_class) { }
 
 
 unsigned int CustomStateClassChgOperation::execute(Project& project)
 {
-    CustomStateClass *custom_state_class = project.get_custom_state_class_by_id(customstateclass_id);
+    CustomStateClass* custom_state_class = project.get_custom_state_class_by_id(customstateclass_id);
     execute_impl(custom_state_class);
     signals.fire_model_changed(CUSTOM_STATE_CLASS, MODIFY, customstateclass_id);
     return customstateclass_id;
@@ -22,7 +30,7 @@ unsigned int CustomStateClassChgOperation::execute(Project& project)
 
 // Create
 
-OpCustStateCreate::OpCustStateCreate(string name, string path)
+OpCustStateCreate::OpCustStateCreate(string name, string path) : CustomStateClassOperation(nullptr)
 {
     this->name = name;
     this->path = path;
@@ -31,7 +39,7 @@ OpCustStateCreate::OpCustStateCreate(string name, string path)
 
 unsigned int OpCustStateCreate::execute(Project& project)
 {
-    CustomStateClass *custom_state_class = new CustomStateClass(project.get_next_id());
+    CustomStateClass* custom_state_class = new CustomStateClass(project.get_next_id());
     custom_state_class->name = name;
     custom_state_class->path = path;
     project.custom_state_classes.push_back(custom_state_class);
@@ -41,7 +49,7 @@ unsigned int OpCustStateCreate::execute(Project& project)
 }
 
 
-OpCustStateCreate *OpCustStateCreate::clone()
+OpCustStateCreate* OpCustStateCreate::clone()
 {
     return new OpCustStateCreate(*this);
 }
@@ -49,17 +57,14 @@ OpCustStateCreate *OpCustStateCreate::clone()
 
 // Delete
 
-OpCustStateDelete::OpCustStateDelete(CustomStateClass *to_delete)
-{
-    to_delete_id = to_delete->id;
-}
+OpCustStateDelete::OpCustStateDelete(CustomStateClass* to_delete) : CustomStateClassOperation(to_delete) { }
 
-
-bool delete_next_state(Machine *machine, unsigned int custom_state_class_id)
+bool delete_next_state(Machine* machine, unsigned int custom_state_class_id)
 {
-    for(int i=0; i<machine->states.size(); i++)
+    for(int i = 0; i < machine->states.size(); i++)
     {
-        State *state = machine->states[i];
+        State* state = machine->states[i];
+        
         if(state->type == custom_state_class_id)
         {
             delete_state(machine, state);
@@ -72,24 +77,24 @@ bool delete_next_state(Machine *machine, unsigned int custom_state_class_id)
 
 unsigned int OpCustStateDelete::execute(Project& project)
 {
-    int cindex = project.get_cindex_by_id(to_delete_id);
+    int cindex = project.get_cindex_by_id(customstateclass_id);
 
     // delete all states of this type first (user has confirmed)
-    for(int i=0; i<project.machines.size(); i++)
+    for(int i = 0; i < project.machines.size(); i++)
     {
         Machine* machine = project.machines[i];
-        while(delete_next_state(machine, to_delete_id));
+        while(delete_next_state(machine, customstateclass_id));
     }
 
-    signals.fire_model_changed(CUSTOM_STATE_CLASS, PRE_DELETE, to_delete_id);
+    signals.fire_model_changed(CUSTOM_STATE_CLASS, PRE_DELETE, customstateclass_id);
 
     delete project.custom_state_classes[cindex];
     project.custom_state_classes.erase(project.custom_state_classes.begin() + cindex);
-    return to_delete_id;
+    return customstateclass_id;
 }
 
 
-OpCustStateDelete *OpCustStateDelete::clone()
+OpCustStateDelete* OpCustStateDelete::clone()
 {
     return new OpCustStateDelete(*this);
 }

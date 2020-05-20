@@ -4,19 +4,30 @@
 #include "models/custom_state_class.h"
 
 
-class CustomStateClassChgOperation : public Operation
+class CustomStateClassOperation : public Operation
 {
     public:
-        CustomStateClassChgOperation(CustomStateClass *custom_state_class);
-        unsigned int execute(Project& project);
-        virtual void execute_impl(CustomStateClass *resource)=0;
-
-    protected:
+        CustomStateClassOperation(CustomStateClass* custom_state_class);
         unsigned int customstateclass_id;
 };
 
 
-class OpCustStateCreate : public Operation
+inline bool is_csc_operation(Operation* operation)
+{
+    return is_instance<CustomStateClassOperation>(operation);
+}
+
+
+class CustomStateClassChgOperation : public CustomStateClassOperation
+{
+    public:
+        CustomStateClassChgOperation(CustomStateClass *custom_state_class);
+        unsigned int execute(Project& project);
+        virtual void execute_impl(CustomStateClass *resource) = 0;
+};
+
+
+class OpCustStateCreate : public CustomStateClassOperation
 {
     public:
         OpCustStateCreate(string name, string path);
@@ -28,15 +39,12 @@ class OpCustStateCreate : public Operation
 };
 
 
-class OpCustStateDelete : public Operation
+class OpCustStateDelete : public CustomStateClassOperation
 {
     public: 
-        OpCustStateDelete(CustomStateClass *to_delete);
-        OpCustStateDelete *clone();
+        OpCustStateDelete(CustomStateClass* to_delete);
+        OpCustStateDelete* clone();
         unsigned int execute(Project& project);
-
-    private:
-        unsigned int to_delete_id;
 };
 
 

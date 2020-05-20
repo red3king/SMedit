@@ -394,7 +394,7 @@ etc...
                 </child>
               </object>
               <packing>
-                <property name="name">page3</property>
+                <property name="name">custom_state_types</property>
                 <property name="title" translatable="yes">Custom State Types</property>
               </packing>
             </child>
@@ -539,7 +539,7 @@ etc...
                 </child>
               </object>
               <packing>
-                <property name="name">page0</property>
+                <property name="name">resources</property>
                 <property name="title" translatable="yes">Resources</property>
                 <property name="position">1</property>
               </packing>
@@ -1563,7 +1563,7 @@ etc...
                 </child>
               </object>
               <packing>
-                <property name="name">page1</property>
+                <property name="name">machines</property>
                 <property name="title" translatable="yes">Machines</property>
                 <property name="position">2</property>
               </packing>
@@ -1676,7 +1676,7 @@ etc...
                         <child>
                           <object class="GtkGLArea" id="run_gl_area">
                             <property name="width_request">640</property>
-                            <property name="height_request">480</property>
+                            <property name="height_request">750</property>
                             <property name="visible">True</property>
                             <property name="app_paintable">True</property>
                             <property name="can_focus">False</property>
@@ -2191,7 +2191,7 @@ etc...
                 </child>
               </object>
               <packing>
-                <property name="name">page2</property>
+                <property name="name">run</property>
                 <property name="title" translatable="yes">Run</property>
                 <property name="position">3</property>
               </packing>

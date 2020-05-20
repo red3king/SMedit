@@ -19,3 +19,25 @@ class Operation
 
     private:    
 };
+
+
+class MachineRelatedOperation : public Operation
+{
+    public:
+        
+        MachineRelatedOperation(Machine* machine);
+        unsigned int machine_id;
+};
+
+
+template<typename T> inline bool is_instance(Operation* operation)
+{
+    return dynamic_cast<T*>(operation);
+}
+
+
+inline bool is_machine_related_operation(Operation* operation)
+{
+    return is_instance<MachineRelatedOperation>(operation);
+}
+

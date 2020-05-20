@@ -4,7 +4,15 @@
 #include "models/resourcelock.h"
 
 
-class OpResourceLockCreate : public Operation
+class ResourceLockOperation : public MachineRelatedOperation
+{
+    public:
+        ResourceLockOperation(Machine* machine, ResourceLock* resource_lock);
+        unsigned int resourcelock_id;
+};
+
+
+class OpResourceLockCreate : public ResourceLockOperation
 {
     public:
         OpResourceLockCreate(Machine* machine, Resource* resource, float x, float y);
@@ -13,11 +21,11 @@ class OpResourceLockCreate : public Operation
 
     private:
         float x, y;
-        unsigned int machine_id, resource_id;         
+        unsigned int resource_id;         
 };
 
 
-class OpResourceLockDelete : public Operation
+class OpResourceLockDelete : public ResourceLockOperation
 {
     public:
         OpResourceLockDelete(Machine* machine, ResourceLock* lock);
@@ -25,11 +33,11 @@ class OpResourceLockDelete : public Operation
         unsigned int execute(Project& project);
     
     private:
-        unsigned int machine_id, resourcelock_id;
+        unsigned int resourcelock_id;
 };
 
 
-class OpResourceLockMove : public Operation
+class OpResourceLockMove : public ResourceLockOperation
 {
     public:
         OpResourceLockMove(Machine* machine, ResourceLock* resourcelock, float x, float y);
@@ -40,6 +48,6 @@ class OpResourceLockMove : public Operation
         void collapse(Operation& other);
 
     private:
-        unsigned int machine_id, resourcelock_id;
+        unsigned int resourcelock_id;
         float x, y;
 };

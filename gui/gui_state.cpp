@@ -11,12 +11,14 @@ GUIState::GUIState(GUIAreaMode execution_mode, RunningState* running_state, Bann
         Gtk::GLArea* gl_area) : draw_context(gl_area)
 {
     mode = execution_mode;
+    this->gl_area = gl_area;
     current_machine = nullptr;
     current_project = nullptr;
 
     this->running_state = running_state; // only  for GAM_RUN
     this->banner_displayer = banner_displayer;
     
+    signals.focus_operation.connect(sigc::mem_fun(this, &GUIState::on_focus_operation));    
     signals.model_changed.connect(sigc::mem_fun(this, &GUIState::on_model_changed));
 }
 
@@ -300,6 +302,12 @@ void GUIState::update_lock_notifications()
         
         state_gmodel->set_resources_used(used_resources, missing_resource_names, contained_locks);
     }
+}
+
+
+void GUIState::on_focus_operation(Operation* operation, unsigned int result)
+{
+    gl_area->queue_render();
 }
 
 

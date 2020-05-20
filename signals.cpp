@@ -21,6 +21,12 @@ void Signals::fire_set_cursor(CursorType cursor_type)
 }
 
 
+void Signals::fire_focus_operation(Operation* operation, unsigned int result)
+{
+    focus_operation.emit(operation, result);
+}
+
+
 void Signals::fire_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id, ChangeType change_type)
 {
     if(!gui_signals_enabled)

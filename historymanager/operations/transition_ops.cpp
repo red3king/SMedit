@@ -2,15 +2,25 @@
 #include "signals.h"
 
 
+// Generic
+
+TransitionOperation::TransitionOperation(Machine* machine, Transition* transition) : MachineRelatedOperation(machine)
+{
+    if(transition != nullptr)
+        transition_id = transition->id;
+    else
+        transition_id = 0;
+}
+
+
 // Create
 
-OpTransitionCreate::OpTransitionCreate(Machine* machine, float x0, float y0, float x1, float y1)
+OpTransitionCreate::OpTransitionCreate(Machine* machine, float x0, float y0, float x1, float y1) : TransitionOperation(machine, nullptr)
 {
     this->x0 = x0;
     this->y0 = y0;
     this->x1 = x1;
     this->y1 = y1;
-    machine_id = machine->id;
 }
 
 
@@ -49,20 +59,16 @@ OpTransitionCreate* OpTransitionCreate::clone()
 
 // Delete
 
-OpTransitionDelete::OpTransitionDelete(Machine* machine, Transition* transition)
-{
-    machine_id = machine->id;
-    transition_id = transition->id;
-}
+OpTransitionDelete::OpTransitionDelete(Machine* machine, Transition* transition) : TransitionOperation(machine, transition) { }
 
 
 unsigned int OpTransitionDelete::execute(Project& project)
 {
-    Machine* machine = project.get_machine_by_id(machine_id);
-
     int i;
+    Machine* machine = project.get_machine_by_id(machine_id);
     Transition* transition;
-    for(i=0; i<machine->transitions.size(); i++)
+    
+    for(i = 0; i < machine->transitions.size(); i++)
     {
         transition = machine->transitions[i];
         if(transition->id == transition_id)
@@ -102,10 +108,8 @@ OpTransitionDelete* OpTransitionDelete::clone()
 
 // Move
 
-OpTransitionMove::OpTransitionMove(Machine* machine, Transition* transition, float x0_new, float y0_new)
+OpTransitionMove::OpTransitionMove(Machine* machine, Transition* transition, float x0_new, float y0_new) : TransitionOperation(machine, transition)
 {
-    machine_id = machine->id;
-    transition_id = transition->id;
     this->x0_new = x0_new;
     this->y0_new = y0_new;
 }
@@ -151,10 +155,8 @@ void OpTransitionMove::collapse(Operation& other)
 
 // Endpoint Move
 
-OpTransitionEndpointMove::OpTransitionEndpointMove(Machine* machine, Transition* transition, bool is_endpoint_0, float x_new, float y_new)
+OpTransitionEndpointMove::OpTransitionEndpointMove(Machine* machine, Transition* transition, bool is_endpoint_0, float x_new, float y_new) : TransitionOperation(machine, transition)
 {
-    machine_id = machine->id;
-    transition_id = transition->id;
     this->is_endpoint_0 = is_endpoint_0;
     this->x_new = x_new;
     this->y_new = y_new;
@@ -162,10 +164,8 @@ OpTransitionEndpointMove::OpTransitionEndpointMove(Machine* machine, Transition*
 }
 
 
-OpTransitionEndpointMove::OpTransitionEndpointMove(Machine* machine, Transition* transition, bool is_endpoint_0, State* new_state)
+OpTransitionEndpointMove::OpTransitionEndpointMove(Machine* machine, Transition* transition, bool is_endpoint_0, State* new_state) : TransitionOperation(machine, transition)
 {
-    machine_id = machine->id;
-    transition_id = transition->id;
     this->is_endpoint_0 = is_endpoint_0;
     new_state_id = new_state->id;
     this->x_new = 0;
@@ -245,11 +245,7 @@ void OpTransitionEndpointMove::collapse(Operation& other)
 
 // TransitionChgOperation
 
-TransitionChgOperation::TransitionChgOperation(Machine* machine, Transition* transition)
-{
-    machine_id = machine->id;
-    transition_id = transition->id;
-}
+TransitionChgOperation::TransitionChgOperation(Machine* machine, Transition* transition) : TransitionOperation(machine, transition) { }
 
 
 unsigned int TransitionChgOperation::execute(Project& project)

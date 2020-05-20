@@ -51,30 +51,41 @@ void HistoryManager::undo()
     unsaved_changes = true;
     current_project = initial_project; 
 
-    for(int i=0; i < operations.size() - undo_position - 1; i++)
-        operations[i]->execute(current_project);
+    Operation* op = nullptr;
+    unsigned int result;
+    
+    for(int i = 0; i < operations.size() - undo_position - 1; i++)
+    {
+        op = operations[i];
+        result = op->execute(current_project);
+    }
 
     undo_position++;
     
     signals.enable_gui_signals();
     signals.fire_gui_rebuild_signal();
     _update_last();
+    
+    if(op != nullptr)
+        signals.fire_focus_operation(op, result);
 }
 
 
 void HistoryManager::redo()
 {
     int i = operations.size() - undo_position;
-    operations[i]->execute(current_project);
+    auto op = operations[i];
+    unsigned int result = op->execute(current_project);
     undo_position--;
     unsaved_changes = true;
     _update_last();
+    signals.fire_focus_operation(op, result);
 }
 
 
 bool HistoryManager::may_undo()
 {
-    return operations.size() > 0 && undo_position < operations.size();// - 1;
+    return operations.size() > 0 && undo_position < operations.size();
 }
 
 

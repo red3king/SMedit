@@ -3,10 +3,9 @@
 #include "signals.h"
 
 
-OpBoxEntityResize::OpBoxEntityResize(Machine* machine, BoxEntity* entity, BorderType resize_border, float new_position)
+OpBoxEntityResize::OpBoxEntityResize(Machine* machine, BoxEntity* entity, BorderType resize_border, float new_position) : MachineRelatedOperation(machine)
 {
     entity_id = entity->id;
-    machine_id = machine->id;
     this->resize_border = resize_border;
     this->new_position = new_position;
 }

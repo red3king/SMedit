@@ -2,14 +2,25 @@
 #include "signals.h"
 
 
+// Generic
+
+ResourceLockOperation::ResourceLockOperation(Machine* machine, ResourceLock* resource_lock) : MachineRelatedOperation(machine) 
+{
+    if(resource_lock != nullptr)
+        resourcelock_id = resource_lock->id;
+    else
+        resourcelock_id = 0;
+}
+
+
+
 // Create
 
-OpResourceLockCreate::OpResourceLockCreate(Machine* machine, Resource* resource, float x, float y)
+OpResourceLockCreate::OpResourceLockCreate(Machine* machine, Resource* resource, float x, float y) : ResourceLockOperation(machine, nullptr)
 {
     this->x = x;
     this->y = y;
     resource_id = resource->id;
-    machine_id = machine->id;
 }
 
 
@@ -39,11 +50,7 @@ OpResourceLockCreate* OpResourceLockCreate::clone()
 
 // Delete
 
-OpResourceLockDelete::OpResourceLockDelete(Machine* machine, ResourceLock* lock)
-{
-    machine_id = machine->id;
-    resourcelock_id = lock->id;
-}
+OpResourceLockDelete::OpResourceLockDelete(Machine* machine, ResourceLock* lock) : ResourceLockOperation(machine, lock) { }
 
 
 unsigned int OpResourceLockDelete::execute(Project& project)
@@ -53,7 +60,7 @@ unsigned int OpResourceLockDelete::execute(Project& project)
     int i;
     ResourceLock* lock;
 
-    for(i=0; i<machine->resourcelocks.size(); i++)
+    for(i = 0; i < machine->resourcelocks.size(); i++)
     {
         lock = machine->resourcelocks[i];
 
@@ -77,10 +84,8 @@ OpResourceLockDelete* OpResourceLockDelete::clone()
 
 // Move
 
-OpResourceLockMove::OpResourceLockMove(Machine* machine, ResourceLock* resourcelock, float x, float y)
+OpResourceLockMove::OpResourceLockMove(Machine* machine, ResourceLock* resourcelock, float x, float y) : ResourceLockOperation(machine, resourcelock)
 {
-    machine_id = machine->id;
-    resourcelock_id = resourcelock->id;
     this->x = x;
     this->y = y;
 }

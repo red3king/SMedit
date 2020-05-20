@@ -4,19 +4,30 @@
 #include "models/resource.h"
 
 
-class ResourceChgOperation : public Operation
-{
+class ResourceOperation : public Operation 
+{ 
     public:
-        ResourceChgOperation(Resource* resource);
-        unsigned int execute(Project& project);
-        virtual void execute_impl(Resource* resource)=0;
-
-    protected:
+        ResourceOperation(Resource* resource);
         unsigned int resource_id;
 };
 
 
-class OpResourceCreate : public Operation
+inline bool is_resource_operation(Operation* operation)
+{
+    return is_instance<ResourceOperation>(operation);
+}
+
+
+class ResourceChgOperation : public ResourceOperation
+{
+    public:
+        ResourceChgOperation(Resource* resource);
+        unsigned int execute(Project& project);
+        virtual void execute_impl(Resource* resource) = 0;
+};
+
+
+class OpResourceCreate : public ResourceOperation
 {
     public:
         OpResourceCreate(string name, string path);
@@ -28,7 +39,7 @@ class OpResourceCreate : public Operation
 };
 
 
-class OpResourceDelete : public Operation
+class OpResourceDelete : public ResourceOperation
 {
     public: 
         OpResourceDelete(Resource* to_delete);

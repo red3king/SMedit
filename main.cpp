@@ -2,14 +2,14 @@
 
 #include "log.h"
 #include "utils.h"
+#include "historymanager/operation.h"
 #include "historymanager/operations/machine_ops.h"
 #include "historymanager/operations/state_ops.h"
 #include "historymanager/operations/resource_ops.h"
 #include "historymanager/operations/resourcelock_ops.h"
 #include "historymanager/operations/transition_ops.h"
+#include "historymanager/operations/custom_state_ops.h"
 #include "py_embedded/run_script.h"
-
-
 
 
 MainWindow::MainWindow(BaseObjectType* obj, Glib::RefPtr<Gtk::Builder> const& builder) : Gtk::ApplicationWindow(obj) , builder{builder}
@@ -79,6 +79,7 @@ void MainWindow::prepare_signals()
     // smedit signals
     signals.project_close.connect(sigc::mem_fun(this, &MainWindow::on_project_close));
     signals.project_open.connect(sigc::mem_fun(this, &MainWindow::on_project_open));
+    signals.focus_operation.connect(sigc::mem_fun(this, &MainWindow::on_focus_operation));
 
     history_manager->signal_changed.connect(sigc::mem_fun(this, &MainWindow::on_history_changed)); 
     history_manager->signal_unsaved_changes.connect(sigc::mem_fun(this, &MainWindow::on_unsaved_changes_changed));
@@ -92,6 +93,19 @@ void MainWindow::prepare_signals()
     edit_undo->signal_activate().connect(sigc::mem_fun(this, &MainWindow::on_undo_click));
     edit_redo->signal_activate().connect(sigc::mem_fun(this, &MainWindow::on_redo_click));    
     about_licenses->signal_activate().connect(sigc::mem_fun(this, &MainWindow::on_about_click));
+}
+
+
+void MainWindow::on_focus_operation(Operation* operation, unsigned int result)
+{
+    if(is_resource_operation(operation))
+        main_stack->set_visible_child(RESOURCE_PAGE_NAME);
+    
+    else if(is_csc_operation(operation))
+        main_stack->set_visible_child(CSC_PAGE_NAME);
+    
+    else if(is_machine_related_operation(operation))
+        main_stack->set_visible_child(MACHINE_PAGE_NAME);
 }
 
 

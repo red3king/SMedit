@@ -33,6 +33,7 @@ CustomStateClassController::CustomStateClassController(HistoryManager* history_m
     delete_button->signal_clicked().connect(sigc::mem_fun(this, &CustomStateClassController::on_delete_clicked));
     reload_button->signal_clicked().connect(sigc::mem_fun(this, &CustomStateClassController::on_reload_clicked));
     
+    signals.focus_operation.connect(sigc::mem_fun(this, &CustomStateClassController::on_focus_operation));
     signals.model_changed.connect(sigc::mem_fun(this, &CustomStateClassController::on_model_changed));
     signals.project_save.connect(sigc::mem_fun(this, &CustomStateClassController::on_project_path_set));
     signals.project_load.connect(sigc::mem_fun(this, &CustomStateClassController::on_project_path_set));
@@ -67,6 +68,15 @@ void CustomStateClassController::_build_preview()
     preview_label->set_text(preview_text);
 }
 
+
+void CustomStateClassController::on_focus_operation(Operation* operation, unsigned int result)
+{
+    if(!is_instance<OpCustStateCreate>(operation))
+        return;
+    
+    list_view_controller->select_item(result);
+    on_selection_changed(result);
+}
 
 
 void CustomStateClassController::on_path_changed()

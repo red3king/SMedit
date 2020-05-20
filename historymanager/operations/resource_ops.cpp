@@ -2,12 +2,20 @@
 #include "signals.h"
 
 
+// Generic
+
+ResourceOperation::ResourceOperation(Resource* resource)
+{
+    if(resource != nullptr)
+        resource_id = resource->id;
+    else
+        resource_id = 0;
+}
+
+
 // Abstract change
 
-ResourceChgOperation::ResourceChgOperation(Resource* resource)
-{
-    resource_id = resource->id;
-}
+ResourceChgOperation::ResourceChgOperation(Resource* resource) : ResourceOperation(resource) { }
 
 
 unsigned int ResourceChgOperation::execute(Project& project)
@@ -21,7 +29,7 @@ unsigned int ResourceChgOperation::execute(Project& project)
 
 // Create
 
-OpResourceCreate::OpResourceCreate(string name, string path)
+OpResourceCreate::OpResourceCreate(string name, string path) : ResourceOperation(nullptr)
 {
     this->name = name;
     this->path = path;
@@ -48,15 +56,12 @@ OpResourceCreate* OpResourceCreate::clone()
 
 // Delete
 
-OpResourceDelete::OpResourceDelete(Resource* to_delete)
-{
-    to_delete_id = to_delete->id;
-}
+OpResourceDelete::OpResourceDelete(Resource* to_delete) : ResourceOperation(to_delete) { }
 
 
 bool delete_next_resourcelock(vector<ResourceLock*>& resourcelocks, unsigned int resource_id)
 {
-    for(int i=0; i<resourcelocks.size(); i++)
+    for(int i = 0; i < resourcelocks.size(); i++)
     {
         ResourceLock* lock = resourcelocks[i];
         if(lock->resource->id == resource_id)
@@ -73,16 +78,16 @@ bool delete_next_resourcelock(vector<ResourceLock*>& resourcelocks, unsigned int
 
 unsigned int OpResourceDelete::execute(Project& project)
 {
-    int rindex = project.get_rindex_by_id(to_delete_id);
+    int rindex = project.get_rindex_by_id(resource_id);
 
     // delete all resourcelocks using this first (user has confirmed)
-    for(int i=0; i<project.machines.size(); i++)
+    for(int i = 0; i < project.machines.size(); i++)
     {
         Machine* machine = project.machines[i];
-        while(delete_next_resourcelock(machine->resourcelocks, to_delete_id));
+        while(delete_next_resourcelock(machine->resourcelocks, resource_id));
     }
 
-    signals.fire_model_changed(RESOURCE, PRE_DELETE, to_delete_id);
+    signals.fire_model_changed(RESOURCE, PRE_DELETE, resource_id);
 
     delete project.resources[rindex];
     project.resources.erase(project.resources.begin() + rindex);

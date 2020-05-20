@@ -1,7 +1,10 @@
 #include <typeinfo>
 
 #include "operation.h"
+#include "models/machine.h"
 
+
+// Operation 
 
 Operation::Operation()
 {
@@ -25,3 +28,15 @@ void Operation::collapse(Operation& other) { }
 
 
 Operation::~Operation(){ }
+
+
+
+// MachineRelatedOperation
+
+MachineRelatedOperation::MachineRelatedOperation(Machine* machine)
+{
+    if(machine != nullptr)
+        machine_id = machine->id;
+    else
+        machine_id = 0;
+}

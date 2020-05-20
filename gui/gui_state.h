@@ -21,6 +21,7 @@ class GUIState
                 BannerDisplayer* banner_displayer, Gtk::GLArea* gl_area);
 
         GUIAreaMode mode;
+        Gtk::GLArea* gl_area;
 
         DrawContext draw_context;
         RunningState* running_state;
@@ -50,6 +51,8 @@ class GUIState
         void create_models();
         
         void update_lock_notifications();
+        
+        void on_focus_operation(Operation* operation, unsigned int result);
         void on_model_changed(EntityType entity_type, SignalType signal_type, unsigned int entity_id, ChangeType change_type);
 
         GUIModel* get_model_by_id(unsigned int id);

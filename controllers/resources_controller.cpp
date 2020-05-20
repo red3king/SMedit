@@ -32,9 +32,20 @@ ResourcesController::ResourcesController(HistoryManager* history_manager, Glib::
     create_button->signal_clicked().connect(sigc::mem_fun(this, &ResourcesController::on_create_clicked));
     delete_button->signal_clicked().connect(sigc::mem_fun(this, &ResourcesController::on_delete_clicked));
 
+    signals.focus_operation.connect(sigc::mem_fun(this, &ResourcesController::on_focus_operation));
     signals.model_changed.connect(sigc::mem_fun(this, &ResourcesController::on_model_changed));
     signals.project_load.connect(sigc::mem_fun(this, &ResourcesController::on_project_path_set));
     signals.project_save.connect(sigc::mem_fun(this, &ResourcesController::on_project_path_set));
+}
+
+
+void ResourcesController::on_focus_operation(Operation* operation, unsigned int result)
+{
+    if(!is_instance<OpResourceCreate>(operation))
+        return;
+    
+    list_view_controller->select_item(result);
+    on_selection_changed(result);
 }
 
 

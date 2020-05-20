@@ -6,19 +6,24 @@
 #include "models/custom_config.h"
 
 
-class StateChgOperation : public Operation  // abc for state modification
+class StateOperation : public MachineRelatedOperation
+{
+    public:
+        StateOperation(Machine* machine, State* state);
+        unsigned int state_id;
+};
+
+
+class StateChgOperation : public StateOperation  // abc for state modification
 {
     public:
         StateChgOperation(Machine* machine, State* state);
         virtual unsigned int execute(Project& project);
         virtual void execute_impl(State* state)=0;
-        
-    protected:
-        unsigned int machine_id, state_id;
 };
 
 
-class OpStateCreate : public Operation
+class OpStateCreate : public StateOperation
 {
     public:
         OpStateCreate(Machine* machine, float x, float y);
@@ -26,27 +31,23 @@ class OpStateCreate : public Operation
         OpStateCreate* clone();
 
     private:
-        unsigned int machine_id;
         float x, y;
 };
 
 
-class OpStateDelete : public Operation
+class OpStateDelete : public StateOperation
 {
     public:
         OpStateDelete(Machine* machine, State* state);
         unsigned int execute(Project& project);
         OpStateDelete* clone();
-    
-    private:
-        unsigned int machine_id, state_id;
 };
 
 
 void delete_state(Machine* machine, State* state);
 
 
-class OpStateMove : public Operation
+class OpStateMove : public StateOperation
 {
     public:
         OpStateMove(Machine* machine, State* state, float x, float y);
@@ -56,12 +57,9 @@ class OpStateMove : public Operation
         bool may_collapse_impl(Operation& other);
         void collapse(Operation& other);
 
-    private:
-        unsigned int machine_id, state_id;       
+    private:      
         float x, y;
 };
-
-
 
 
 class OpStateType : public StateChgOperation
@@ -78,7 +76,6 @@ class OpStateType : public StateChgOperation
     private:
         int type;
 };
-
 
 
 class OpStateConfig : public StateChgOperation

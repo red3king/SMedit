@@ -3,11 +3,13 @@
 #include "signals.h"
 
 
+// Generic
+
+MachineOperation::MachineOperation(Machine* machine) : MachineRelatedOperation(machine) { }
+
+
 // Change
-MachineChgOperation::MachineChgOperation(Machine* machine)
-{
-    machine_id = machine->id;
-}
+MachineChgOperation::MachineChgOperation(Machine* machine) : MachineOperation(machine) { }
 
 
 unsigned int MachineChgOperation::execute(Project& project)
@@ -20,7 +22,7 @@ unsigned int MachineChgOperation::execute(Project& project)
 
 
 // Create
-OpMachineCreate::OpMachineCreate(string name)
+OpMachineCreate::OpMachineCreate(string name) : MachineOperation(nullptr)
 {
     this->name = name;
 }
@@ -44,9 +46,9 @@ OpMachineCreate* OpMachineCreate::clone()
 
 
 // Delete
-OpMachineDelete::OpMachineDelete(Machine* machine)
+OpMachineDelete::OpMachineDelete(Machine* machine) : MachineOperation(machine)
 {
-    id = machine->id;
+
 }
 
 
@@ -58,11 +60,11 @@ OpMachineDelete* OpMachineDelete::clone()
 
 unsigned int OpMachineDelete::execute(Project& project)
 {
-    signals.fire_model_changed(MACHINE, PRE_DELETE, id);
-    int i = project.get_mindex_by_id(id);
+    signals.fire_model_changed(MACHINE, PRE_DELETE, machine_id);
+    int i = project.get_mindex_by_id(machine_id);
     delete project.machines[i];
     project.machines.erase(project.machines.begin() + i);
-    return id;
+    return machine_id;
 }
 
 

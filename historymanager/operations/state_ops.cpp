@@ -3,13 +3,18 @@
 #include "signals.h"
 
 
+// Generic
+StateOperation::StateOperation(Machine* machine, State* state) : MachineRelatedOperation(machine)
+{
+    if(state != nullptr)
+        state_id = state->id;
+    else
+        state_id = 0;
+}
+
 
 // Abstract modify
-StateChgOperation::StateChgOperation(Machine* machine, State* state)
-{
-    machine_id = machine->id;
-    state_id = state->id;
-}
+StateChgOperation::StateChgOperation(Machine* machine, State* state) : StateOperation(machine, state) { }
 
 
 unsigned int StateChgOperation::execute(Project& project)
@@ -24,9 +29,8 @@ unsigned int StateChgOperation::execute(Project& project)
 
 // Create
 
-OpStateCreate::OpStateCreate(Machine* machine, float x, float y)
+OpStateCreate::OpStateCreate(Machine* machine, float x, float y) : StateOperation(machine, nullptr)
 {
-    machine_id = machine->id;
     this->x = x;
     this->y = y;
 }
@@ -58,11 +62,7 @@ OpStateCreate* OpStateCreate::clone()
 
 // Delete
 
-OpStateDelete::OpStateDelete(Machine* machine, State* state)
-{
-    machine_id = machine->id;
-    state_id = state->id;
-}
+OpStateDelete::OpStateDelete(Machine* machine, State* state) : StateOperation(machine, state) { }
 
 
 void delete_state(Machine* machine, State* state)
@@ -137,10 +137,8 @@ OpStateDelete* OpStateDelete::clone()
 
 // Move
 
-OpStateMove::OpStateMove(Machine* machine, State* state, float x, float y)
+OpStateMove::OpStateMove(Machine* machine, State* state, float x, float y) : StateOperation(machine, state)
 {
-    machine_id = machine->id;
-    state_id = state->id;
     this->x = x;
     this->y = y;
 }
