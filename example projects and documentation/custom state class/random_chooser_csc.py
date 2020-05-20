@@ -27,7 +27,6 @@ class RandomChooser(CustomState):
             }
         ]
 
-
     @staticmethod
     def get_configuration_definition():
         return [
@@ -38,10 +37,7 @@ class RandomChooser(CustomState):
         ]
 
 
-    def execute_impl(self, vars_dict, trigger_event):
-        import random
-        from models.event import Event
-       
+    def execute_impl(self, vars_dict, trigger_event):      
         percent_a = self.get_config_value("percent A")
 
         if random.randint(0, 100) < percent_a:
@@ -50,5 +46,3 @@ class RandomChooser(CustomState):
             event = Event("B")
             
         return self.feed_event(event)
-        
-

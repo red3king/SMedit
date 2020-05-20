@@ -13,18 +13,24 @@ class CustomStateClassDef(ABC):
         
         local_dict = {}
         self.class_code = file_name_to_data[self.get_py_filename()]
-        exec(self.class_code, globals(), local_dict)
-        self.ClassObject = None
+        self.snap = globals()
+        exec(self.class_code, self.snap)
         
-        for varname in local_dict:
-            obj = local_dict[varname]
-           
-            if not isclass(obj):
+        for varname in self.snap:
+            val = self.snap[varname]
+            
+            if not isclass(val):
                 continue
             
-            if issubclass(obj, CustomState):
-                self.ClassObject = obj
-                break
+            if issubclass(val, CustomState):
+                self._classname = varname
+        
+        def instantiator(machine, state_def):
+            tmp = locals()
+            exec('instance = ' + self._classname + '(machine, state_def)', self.snap, tmp)
+            return tmp['instance']
+        
+        self.ClassObject = instantiator
         
     def get_py_filename(self):
         return "csc_" + str(self.id) + ".py"

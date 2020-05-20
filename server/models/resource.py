@@ -10,8 +10,7 @@ class Resource(ABC):
 
     @staticmethod
     def create(resource_def):
-        Subclass = resource_def.ResourceSubclass
-        return Subclass(resource_def)
+        return resource_def.create()
 
     @property
     def name(self):

@@ -49,10 +49,8 @@ class InitialState(State):
 class CodeState(State):
     def __init__(self, machine, state_def):
         super().__init__(machine, state_def)
-        
-        local_dict = {}
-        exec(self.code, globals(), local_dict)
-        self.code_func = local_dict["code_func"]
+        self.snap = globals().copy()
+        exec(self.code, self.snap)
 
     @property
     def code(self):
@@ -63,8 +61,14 @@ class CodeState(State):
         # This way, the code state can:
         #   - choose its successor in code
         #   - send data in the event for the next state to process via trigger_event, if desired.
+        
+        self.snap['vars_dict'] = vars_dict
+        self.snap['trigger_event'] = trigger_event
+        exec('event = code_func(vars_dict, trigger_event)', self.snap)
+        del self.snap['vars_dict']
+        del self.snap['trigger_event']
 
-        event = self.code_func(vars_dict, trigger_event)
+        event = self.snap['event']
         srop = self.feed_event(event)
         
         if srop is not None:

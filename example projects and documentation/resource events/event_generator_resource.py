@@ -1,3 +1,5 @@
+import random
+
 
 class EventGenerator(PeriodicScanResource):
     # Randomly fires either event A or event B every 1.7 seconds
@@ -9,9 +11,7 @@ class EventGenerator(PeriodicScanResource):
     def duration_milliseconds(self):
         return 1700
     
-    def on_tick_impl(self):
-        import random
-        
+    def on_tick_impl(self):       
         if random.randint(0, 1):
             self.fire_event('A')
         

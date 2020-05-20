@@ -3,10 +3,6 @@ from models.resource import *
 
 class ResourceDef(object):
 
-    @property 
-    def ResourceSubclass(self):
-        return self._subclass
-
     @property
     def name(self):
         return self._name
@@ -15,24 +11,26 @@ class ResourceDef(object):
     def id(self):
         return self._id
 
+    def create(self):
+        # create instance of subclass
+        codestr = 'instance = ' + self._subclassname + '(resource_def)'
+        self.snap['resource_def'] = self
+        exec(codestr, self.snap)
+        return self.snap['instance']
+
     def __init__(self, json_dict, file_name_to_data):
         self._name = json_dict["name"]       # str
         self._id = json_dict["id"]           # uint
-
         self.code = file_name_to_data[self.name]
 
-        local_dict = {}
-        self._subclass = None
-
-        exec(self.code, globals(), local_dict)
+        self.snap = globals().copy()
+        exec(self.code, self.snap)
         
-        for obj_name in local_dict:
-            obj = local_dict[obj_name]
+        for name in self.snap:
+            val = self.snap[name]
             
-            if not isinstance(obj, type):
+            if not isinstance(val, type):
                 continue
-
-            if issubclass(obj, Resource) and obj not in PREDEFINED_RESOURCE_CLASSES:
-                self._subclass = obj
-                break
-
+            
+            if issubclass(val, Resource) and val not in PREDEFINED_RESOURCE_CLASSES:
+                self._subclassname = name

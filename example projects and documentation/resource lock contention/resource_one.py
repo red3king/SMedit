@@ -1,5 +1,3 @@
-#from models.Resource import Resource
-
 
 class NothingResource(Resource):
 
@@ -17,5 +15,4 @@ class NothingResource(Resource):
 
     def stop_impl(self):
         pass
-
 
