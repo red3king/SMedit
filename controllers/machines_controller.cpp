@@ -35,7 +35,7 @@ MachinesController::MachinesController(HistoryManager* history_manager, Glib::Re
     gui_context = new GUIContext(gl_area, history_manager, GAM_BUILD);
     draw_context = &gui_context->gui_state.draw_context;
 
-    list_view_controller = new ListViewController(tree_view, "Name:");
+    list_view_controller = new ListViewController(tree_view, "Machine Prototype:");
     list_view_controller->selection_changed_details.connect(sigc::mem_fun(this, &MachinesController::on_selection_changed));
 
     selected_resourcelock_ctrl = new SelectedResourceLock(history_manager, builder);

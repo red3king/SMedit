@@ -435,7 +435,7 @@
     "resources": [
         {
             "id": 25,
-            "name": "ev gen",
+            "name": "event generator",
             "path": "event_generator_resource.py"
         }
     ]
