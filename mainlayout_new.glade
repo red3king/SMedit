@@ -5,6 +5,8 @@
   <object class="GtkAccelGroup" id="accelgrp"/>
   <object class="GtkApplicationWindow" id="main_window">
     <property name="can_focus">False</property>
+    <property name="default_width">1280</property>
+    <property name="default_height">800</property>
     <accel-groups>
       <group name="accelgrp"/>
     </accel-groups>
@@ -229,6 +231,7 @@
                     <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkTreeView" id="csc_tree_view">
+                        <property name="width_request">150</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="margin_top">15</property>
@@ -406,6 +409,7 @@ etc...
                     <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkTreeView" id="resource_tree_view">
+                        <property name="width_request">150</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="margin_left">10</property>
@@ -551,6 +555,7 @@ etc...
                     <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkTreeView" id="machine_tree_view">
+                        <property name="width_request">150</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="margin_top">15</property>
@@ -775,7 +780,7 @@ etc...
                         <child>
                           <object class="GtkGLArea" id="machine_edit_gl_area">
                             <property name="width_request">640</property>
-                            <property name="height_request">580</property>
+                            <property name="height_request">780</property>
                             <property name="visible">True</property>
                             <property name="app_paintable">True</property>
                             <property name="can_focus">False</property>
@@ -785,7 +790,7 @@ etc...
                             <property name="margin_bottom">4</property>
                           </object>
                           <packing>
-                            <property name="expand">False</property>
+                            <property name="expand">True</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
@@ -1933,6 +1938,7 @@ etc...
                     <child>
                       <object class="GtkGrid">
                         <property name="visible">True</property>
+                        <property name="sensitive">False</property>
                         <property name="can_focus">False</property>
                         <child>
                           <object class="GtkLabel">
@@ -2053,6 +2059,7 @@ etc...
                     <child>
                       <object class="GtkPaned">
                         <property name="visible">True</property>
+                        <property name="sensitive">False</property>
                         <property name="can_focus">True</property>
                         <property name="hexpand">True</property>
                         <property name="vexpand">True</property>
