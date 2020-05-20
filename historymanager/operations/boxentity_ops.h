@@ -16,7 +16,7 @@ class OpBoxEntityResize : public MachineRelatedOperation
         void collapse(Operation& other);
 
     private:
-        unsigned int entity_id, machine_id;
+        unsigned int entity_id;
         BorderType resize_border;
         float new_position;
 };

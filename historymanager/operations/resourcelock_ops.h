@@ -20,8 +20,8 @@ class OpResourceLockCreate : public ResourceLockOperation
         unsigned int execute(Project& project);
 
     private:
-        float x, y;
-        unsigned int resource_id;         
+        float x, y;    
+        unsigned int resource_id;
 };
 
 
@@ -33,7 +33,6 @@ class OpResourceLockDelete : public ResourceLockOperation
         unsigned int execute(Project& project);
     
     private:
-        unsigned int resourcelock_id;
 };
 
 
@@ -48,6 +47,5 @@ class OpResourceLockMove : public ResourceLockOperation
         void collapse(Operation& other);
 
     private:
-        unsigned int resourcelock_id;
         float x, y;
 };
