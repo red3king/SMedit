@@ -24,6 +24,8 @@ class DrawContext
         void move_raw(float world_x, float world_y);
         void zoom_raw(float zoom_factor);   // straight up set zoom factor
 
+        void backup_params();
+        void restore_params();
         void reset();
 
         NVGcontext* vg;
@@ -50,7 +52,8 @@ class DrawContext
 
         Gtk::GLArea* get_gl_area();
 
-        float zoom_factor, woffset_x, woffset_y;
+        float zoom_factor, woffset_x, woffset_y,
+            zoom_factor_bak, woffset_x_bak, woffset_y_bak;
         
     private:
         Gtk::GLArea* gl_area;  // to get screen size

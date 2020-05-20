@@ -8,6 +8,9 @@ DrawContext::DrawContext(Gtk::GLArea* gl_area)
 {
     this->gl_area = gl_area;
     reset();
+    woffset_x_bak = 0;
+    woffset_y_bak = 0;
+    zoom_factor_bak = 1;
 }
 
 
@@ -33,6 +36,22 @@ void DrawContext::set_nvg_context(NVGcontext* vg)
 
     notif_icon_lock = icon_lock;
     notif_icon_error = nvgCreateImage(vg, "resources/icons/error.png", 0);
+}
+
+
+void DrawContext::backup_params()
+{
+    woffset_x_bak = woffset_x;
+    woffset_y_bak = woffset_y;
+    zoom_factor_bak = zoom_factor;
+}
+
+
+void DrawContext::restore_params()
+{
+    woffset_x = woffset_x_bak;
+    woffset_y = woffset_y_bak;
+    zoom_factor = zoom_factor_bak;
 }
 
 

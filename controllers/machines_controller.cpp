@@ -61,23 +61,24 @@ void MachinesController::on_focus_operation(Operation* operation, unsigned int r
 {
     int id = -1;
     
-    if(is_instance<MachineChgOperation>(operation))
+    if(is_machine_related_operation(operation))
     {
-        auto op = (MachineChgOperation*) operation;
+        auto op = (MachineRelatedOperation*) operation;
         id = op->machine_id;
     }
-    
-    if(is_instance<OpMachineCreate>(operation))
+       
+    else if(is_instance<OpMachineCreate>(operation))
         id = result;
     
     if(id == -1)
         return;
+
+    list_view_controller->select_item(id);
     
     if(selected_machine_id == id)
         return;
-    
-    list_view_controller->select_item(id);
-    on_selection_changed(id, true);
+
+    on_selection_changed(id, false);
 }
 
 

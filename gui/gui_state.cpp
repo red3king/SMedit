@@ -20,6 +20,8 @@ GUIState::GUIState(GUIAreaMode execution_mode, RunningState* running_state, Bann
     
     signals.focus_operation.connect(sigc::mem_fun(this, &GUIState::on_focus_operation));    
     signals.model_changed.connect(sigc::mem_fun(this, &GUIState::on_model_changed));
+    signals.pre_gui_rebuild.connect(sigc::mem_fun(this, &GUIState::pre_gui_rebuild));
+    signals.gui_rebuild.connect(sigc::mem_fun(this, &GUIState::post_gui_rebuild));
 }
 
 
@@ -305,9 +307,22 @@ void GUIState::update_lock_notifications()
 }
 
 
+void GUIState::pre_gui_rebuild()
+{
+    draw_context.backup_params();
+}
+
+
+void GUIState::post_gui_rebuild()
+{
+    draw_context.restore_params();
+}
+
+
 void GUIState::on_focus_operation(Operation* operation, unsigned int result)
 {
-    gl_area->queue_render();
+    if(is_machine_related_operation(operation))
+        gl_area->queue_render();
 }
 
 

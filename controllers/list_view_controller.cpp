@@ -60,9 +60,6 @@ void ListViewController::select_item(unsigned int id)
 
 void ListViewController::on_selection_changed()
 {
-    if(is_setting)
-        return;
-    
     auto iter = selection->get_selected();
 
     if(!iter)

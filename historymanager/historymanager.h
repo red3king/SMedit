@@ -16,7 +16,7 @@ class HistoryManager
         
         sigc::signal<void, bool, bool> signal_changed;  // may undo, may redo
         sigc::signal<void, bool> signal_unsaved_changes; // true if unsaved changes
-
+        
         unsigned int submit_operation(Operation& operation);
         void undo();
         void redo();
