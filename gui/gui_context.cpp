@@ -31,6 +31,18 @@ GUIContext::GUIContext(Gtk::GLArea* gl_area, HistoryManager* history_manager, GU
         running_state->select_machine.connect(sigc::mem_fun(*this, &GUIContext::rs_hndl_select_machine));
         running_state->select_state.connect(sigc::mem_fun(*this, &GUIContext::rs_hndl_select_state));
     }
+    
+    else if(mode == GAM_BUILD)
+    {
+        signals.focus_operation.connect(sigc::mem_fun(this, &GUIContext::on_focus_operation));
+    }
+}
+
+
+void GUIContext::on_focus_operation(Operation* operation, unsigned int result)
+{
+    if(is_machine_related_operation(operation))
+        update();
 }
 
 

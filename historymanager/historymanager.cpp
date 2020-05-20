@@ -68,6 +68,8 @@ void HistoryManager::undo()
     
     if(op != nullptr)
         signals.fire_focus_operation(op, result);
+    
+    signals.fire_post_gui_rebuild_signal();
 }
 
 

@@ -31,7 +31,7 @@ class Signals
         sigc::signal<void, EntityType, SignalType, unsigned int, ChangeType> model_changed;
         sigc::signal<void, Machine*, EntityType, Entity*> model_selected;
         
-        sigc::signal<void> pre_gui_rebuild, gui_rebuild;
+        sigc::signal<void> pre_gui_rebuild, gui_rebuild, post_gui_rebuild;
 
         sigc::signal<void, Operation*, unsigned int> focus_operation;  // UI listens to this to focus to the element corresponding to the undone / redone operation
 
@@ -46,7 +46,8 @@ class Signals
 
         void fire_gui_rebuild_signal();
         void fire_pre_gui_rebuild_signal();
-
+        void fire_post_gui_rebuild_signal();
+        
         void fire_project_saved();
         void fire_project_loaded();
 

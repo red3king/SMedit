@@ -74,11 +74,7 @@ void MachinesController::on_focus_operation(Operation* operation, unsigned int r
         return;
 
     list_view_controller->select_item(id);
-    
-    if(selected_machine_id == id)
-        return;
-
-    on_selection_changed(id, false);
+    on_selection_changed(id, true);
 }
 
 

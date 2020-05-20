@@ -68,11 +68,13 @@ class GUIContext
         HistoryManager* history_manager;
 
     private:
-
+        
         RunningState* running_state;
 
         void calc_to_state_zoom(State* state, float& target_x, float& target_y, float& target_zoom);
 
+        void on_focus_operation(Operation* operation, unsigned int result);
+        
         bool has_current_operation();
         void register_gtk_signal_handlers();
         void register_sm_signal_handlers();

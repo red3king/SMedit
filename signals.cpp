@@ -60,6 +60,12 @@ void Signals::fire_pre_gui_rebuild_signal()
 }
 
 
+void Signals::fire_post_gui_rebuild_signal()
+{
+    post_gui_rebuild.emit();
+}
+
+
 void Signals::fire_project_saved()
 {
     project_save.emit();
