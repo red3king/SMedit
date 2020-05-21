@@ -42,6 +42,8 @@ RunController::RunController(HistoryManager* history_manager, ProjectInfo* proje
     builder->get_widget("lopt_auto_pan", lopt_auto_pan_cb);
     builder->get_widget("lopt_open_spawned", lopt_open_spawned_cb);
     builder->get_widget("sopt_min_trans_time", sopt_min_trans_time_entry);
+    
+    builder->get_widget("log_text_view", log_text_view);
 
     gui_context = new GUIContext(gl_area, history_manager, GAM_RUN, running_state, &banner_displayer);
     animation_timer = new AnimationTimer(gui_context);
@@ -67,8 +69,42 @@ RunController::RunController(HistoryManager* history_manager, ProjectInfo* proje
 
     broadcast_events.machine_created.connect(sigc::mem_fun(this, &RunController::banner_on_mach_create));
     broadcast_events.machine_deleted.connect(sigc::mem_fun(this, &RunController::banner_on_mach_delete));
-
+    broadcast_events.print_message.connect(sigc::mem_fun(this, &RunController::on_print_message));
+    
+    _reset_print_log();
     update_enabled();
+}
+
+
+void RunController::_reset_print_log()
+{
+    auto buffer = log_text_view->get_buffer();
+    buffer->set_text("");
+}
+
+
+void RunController::_add_print_message(string message)
+{
+    message = message + "\n";
+    auto buffer = log_text_view->get_buffer();
+    
+    auto iter = buffer->get_iter_at_offset(0);
+    buffer->insert(iter, message);
+    
+    int log_text_lines = buffer->get_line_count();
+    if(log_text_lines > MAX_LOG_LINES)
+    {
+        auto end = buffer->end();
+        auto begin = buffer->get_iter_at_line_offset(MAX_LOG_LINES, 0);
+        buffer->erase(begin, end);
+    }
+}
+
+
+void RunController::on_print_message(int machine_id, int state_id, int log_level, string message)
+{
+    string prefix = running_state->get_running_machine(machine_id).name + ": ";
+    _add_print_message(prefix + message);
 }
 
 

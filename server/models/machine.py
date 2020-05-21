@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from utils import Signal
-from broadcasts import StateChangeBroadcast
+from broadcasts import StateChangeBroadcast, PrintMessageBroadcast
 from models.transition import TransitionFactory
 from models.transition_def import TransitionType
 from models.srop import *
@@ -25,7 +25,7 @@ class Machine(object):
         self.spawn_request_signal = Signal()          # (machine (self), string name of task, dict<str, object> args)
         self.attempt_acquire_locks_signal = Signal()  # (list<resource ids>)
         self.release_locks_signal = Signal()          # (list<resource ids>)
-        
+
         # construct State objects
         id_to_state = {}
         for state_def in machine_def.state_defs:
@@ -51,6 +51,10 @@ class Machine(object):
             for var_name in machine_args:
                 val = machine_args[var_name]
                 self.set_variable(var_name, val)
+
+    def print_message(self, log_level, log_message):
+        broadcast = PrintMessageBroadcast(self.id, self.current_state.id, log_level, log_message)
+        self.broadcast_signal(broadcast)
 
     def dump_state(self):
         return {

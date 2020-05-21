@@ -56,10 +56,11 @@ class RunningState
         sigc::signal<void, int, Project*, Machine*> select_machine;    // int is running maching id. mach def may be nullptr to un-select
         sigc::signal<void, int> select_state;
 
+        int current_machine_id;  // id of RunningMachine displayed on screen. not def id.
+        
     private:
         Project* current_project;
         vector<RunningMachine> running_machines;
-        int current_machine_id;  // id of RunningMachine displayed on screen. not def id.
 
         bool terminated_timer_running;
         sigc::connection terminated_timer_connection;

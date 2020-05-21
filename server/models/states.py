@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 
 from common import ValueType
+from project_logging import LogLevel
+
 from models.srop import *
 from models.state_def import StateType
 from models.state import *
@@ -61,13 +63,20 @@ class CodeState(State):
         # This way, the code state can:
         #   - choose its successor in code
         #   - send data in the event for the next state to process via trigger_event, if desired.
-        
+               
+        def log(message, log_level=LogLevel.STANDARD):
+            self.machine.print_message(log_level, message)
+               
         self.snap['vars_dict'] = vars_dict
         self.snap['trigger_event'] = trigger_event
+        self.snap['log'] = log
+        
         exec('event = code_func(vars_dict, trigger_event)', self.snap)
+        
         del self.snap['vars_dict']
         del self.snap['trigger_event']
-
+        del self.snap['log']
+        
         event = self.snap['event']
         srop = self.feed_event(event)
         

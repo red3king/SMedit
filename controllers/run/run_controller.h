@@ -17,6 +17,7 @@
 
 
 enum HashState { HS_UNKNOWN, HS_SAME, HS_DIFFERENT };
+#define MAX_LOG_LINES 300
 
 
 class RunController
@@ -59,7 +60,11 @@ class RunController
         // options controls
         Gtk::Entry *sopt_min_trans_time_entry;
         Gtk::CheckButton *lopt_auto_pan_cb, *lopt_open_spawned_cb;
-
+        
+        // state displays
+        Gtk::TextView* log_text_view;
+        
+        
         Gdk::RGBA rgb_same, rgb_unknown, rgb_different;
 
         void on_project_saved();
@@ -67,6 +72,8 @@ class RunController
 
         void on_project_open();
         void on_project_close();
+        
+        void on_print_message(int machine_id, int state_id, int log_level, string message);
 
         void on_connection_attempt_complete(ConnectionResult result);
         
@@ -82,6 +89,10 @@ class RunController
         void on_start_click();
         void on_pause_click();
 
+        // print message stuff
+        void _reset_print_log();
+        void _add_print_message(string message);
+        
         // options click callbacks
         void on_lopt_auto_pan_changed();
         void on_lopt_open_spawned_changed();

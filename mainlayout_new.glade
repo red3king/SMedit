@@ -2073,7 +2073,6 @@ etc...
                     <child>
                       <object class="GtkPaned">
                         <property name="visible">True</property>
-                        <property name="sensitive">False</property>
                         <property name="can_focus">True</property>
                         <property name="hexpand">True</property>
                         <property name="vexpand">True</property>
@@ -2110,17 +2109,27 @@ etc...
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkTextView" id="log_text_view">
+                              <object class="GtkScrolledWindow">
+                                <property name="height_request">225</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
-                                <property name="margin_left">4</property>
-                                <property name="margin_right">4</property>
-                                <property name="margin_top">4</property>
-                                <property name="margin_bottom">4</property>
-                                <property name="hexpand">True</property>
-                                <property name="vexpand">True</property>
-                                <property name="wrap_mode">word</property>
-                                <property name="monospace">True</property>
+                                <property name="shadow_type">in</property>
+                                <child>
+                                  <object class="GtkTextView" id="log_text_view">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="margin_left">4</property>
+                                    <property name="margin_right">4</property>
+                                    <property name="margin_top">4</property>
+                                    <property name="margin_bottom">4</property>
+                                    <property name="editable">False</property>
+                                    <property name="left_margin">4</property>
+                                    <property name="right_margin">4</property>
+                                    <property name="top_margin">4</property>
+                                    <property name="bottom_margin">4</property>
+                                    <property name="monospace">True</property>
+                                  </object>
+                                </child>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -2130,13 +2139,14 @@ etc...
                             </child>
                           </object>
                           <packing>
-                            <property name="resize">False</property>
+                            <property name="resize">True</property>
                             <property name="shrink">True</property>
                           </packing>
                         </child>
                         <child>
                           <object class="GtkBox">
                             <property name="visible">True</property>
+                            <property name="sensitive">False</property>
                             <property name="can_focus">False</property>
                             <property name="margin_left">4</property>
                             <property name="margin_right">4</property>

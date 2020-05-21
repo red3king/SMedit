@@ -1,6 +1,9 @@
 #include "broadcast_events.h"
 #include "log.h"
 
+#include <string>
+using std::string;
+
 
 BroadcastEvents::BroadcastEvents()
 {
@@ -42,6 +45,10 @@ void BroadcastEvents::handle_broadcast(json broadcast)
 
         case BT_MACHINE_DELETE:
             handle_machine_deleted(data);
+            break;
+            
+        case BT_PRINT_MESSAGE:
+            handle_print_message(data);
             break;
 
         default:
@@ -93,4 +100,21 @@ void BroadcastEvents::handle_machine_deleted(json data)
     machine_deleted.emit(machine_id);
 }
 
+
+void BroadcastEvents::handle_print_message(json data)
+{
+    int machine_id, state_id, level;
+    string message;
+    
+    try
+    {
+        machine_id = data["machine_id"];
+        state_id = data["state_id"];
+        message = data["message"];
+        level = data["level"];
+    }
+    
+    catch(nlohmann::detail::type_error& ex) { log("handle_machine_deleted missing field"); return; }
+    print_message.emit(machine_id, state_id, level, message);
+}
 

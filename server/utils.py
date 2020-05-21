@@ -1,3 +1,4 @@
+import sys
 from os import system, name
 from types import MethodType, FunctionType
 
@@ -42,7 +43,5 @@ class Signal(object):
 
     def __call__(self, *args, **kwargs):
         return self.fire(*args, **kwargs)
-
-
 
 

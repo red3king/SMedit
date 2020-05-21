@@ -5,6 +5,7 @@ class BroadcastType(object):
     MACHINE_STATE_CHANGE = 0
     MACHINE_CREATE = 1
     MACHINE_DELETE = 2
+    PRINT_MESSAGE = 3
 
 
 class Broadcast(ABC):
@@ -73,5 +74,27 @@ class StateChangeBroadcast(Broadcast):
             "vars": self.vars_dict
         }
 
+        return broadcast_dict
+
+
+class PrintMessageBroadcast(Broadcast):
+    def __init__(self, machine_id, state_id, log_level, message):
+        self.log_level = log_level
+        self.machine_id = machine_id
+        self.state_id = state_id
+        self.message = message
+
+    @property
+    def broadcast_type(self):
+        return BroadcastType.PRINT_MESSAGE
+
+    def to_dict_impl(self):
+        broadcast_dict = {
+            "machine_id": self.machine_id,
+            "state_id": self.state_id,
+            "message": self.message,
+            "level": self.log_level
+        }
+        
         return broadcast_dict
 
