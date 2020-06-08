@@ -22,7 +22,7 @@ class AsyncOperation(ABC):
         self.paused = False
         self.finished = Signal()  # no arg signal, call this when done to un-set srop from machine.
 
-    def pause(self):
+    def pause(self):       
         self.paused = True
         self.pause_impl()
 
@@ -174,9 +174,9 @@ class RunLaterCancelAOP(AsyncOperation):
     def set_task_finished(self):
         self.state = self.S_DEFAULT
         self.seconds_elapsed = 0
-        self.start_time = None
+        self.start_time = None        
         self.finished()
-
+        
     @abstractmethod
     def launch_task(self, seconds_wait):
         '''put launch code here. seconds_wait will be self.delay or less if task was previously held up'''
@@ -257,13 +257,14 @@ class RunNextStateROP(StateResultOperation, RunLaterCancelAOP):
     RunLaterCancelAOP for running/scheduling code inside Twisted's reactor
     '''
 
-    def __init__(self, machine, next_state, timeout=0):
+    def __init__(self, machine, next_state, timeout=0, trigger_event=None):
         RunLaterCancelAOP.__init__(self)
         StateResultOperation.__init__(self, machine)
         
         self.next_state = next_state
         self.timeout = timeout
         self.call_id = None
+        self.trigger_event = trigger_event
 
     def launch_task(self, seconds_wait):
         if self.call_id is not None:
@@ -292,6 +293,12 @@ class RunNextStateROP(StateResultOperation, RunLaterCancelAOP):
         self.machine.send_release_locks_signal(release_lock_ids)
         can_proceed = self.machine.send_lock_request_signal(acquire_lock_ids)
         
+        # LOH i think the issue is that:
+        # when the event from the resource comes in,
+        # it cancels the currently-running srop
+        # the current srop is a state change srop that didn't call finish(), 
+        # so it stayed current ( ? )
+        
         if not can_proceed:
             return
         
@@ -299,7 +306,7 @@ class RunNextStateROP(StateResultOperation, RunLaterCancelAOP):
     
     def go_next_state(self):
         self.machine.set_next_state(self.next_state)
-        next_srop = self.machine.update()
+        next_srop = self.machine.update(self.trigger_event)
         
         self.set_task_finished()
 

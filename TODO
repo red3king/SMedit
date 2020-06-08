@@ -1,6 +1,12 @@
 TODO
-    - change all paths to relative (rn my csc path is /home/rory/..../csc.py)
-    - make the custom state class and resource file choosers start in the currrent proj directory
+
+    - draw transitions going between 2 states apart from each other so they can be differentiated
+    - persist which corner a loopback transition is in, in the save file and in the gui after undoing and redoing
+    - implement controller for project file which maniuplates a list of strings, each containing an event name that should be held in a queue instead of immediately pushed into the machine
+
+    - tab should be 4 spaces in code editor
+
+
     
     - implement the local and server options:
         - enable/disable autopan

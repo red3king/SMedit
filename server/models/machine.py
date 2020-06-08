@@ -95,7 +95,7 @@ class Machine(object):
         for transition in states:
             if transition.match_event(event):
                 state = states[transition]
-                return EventRunNextStateROP(self, state)
+                return EventRunNextStateROP(self, state, trigger_event=event)
 
         return None
 
@@ -162,7 +162,7 @@ class Machine(object):
         self.log("set_next_state(" + next_state.describe() + ")")
         self.current_state = next_state
 
-    def update(self):
+    def update(self, trigger_event=None):
         self.log("update()")
         
         #moved below so broadcast for entering terminal/return state
@@ -173,7 +173,7 @@ class Machine(object):
         broadcast = StateChangeBroadcast(self.id, self.current_state.id, self.vars_dict)
         self.broadcast_signal(broadcast)
         
-        srop = self.current_state.execute(self.vars_dict)
+        srop = self.current_state.execute(self.vars_dict, trigger_event)
 
         return srop
 
@@ -200,16 +200,16 @@ class Machine(object):
         successor_state = None
         timeout_state = None
 
-        self.log(str(states))
-
         for transition in states:
             state = states[transition]
 
             if transition.type == TransitionType.TIMEOUT:
                 timeout_state = state
+                break
 
             elif transition.type == TransitionType.CATCHALL:
                 successor_state = state
+                break
 
         if successor_state is not None:
             return RunNextStateROP(self, successor_state)
