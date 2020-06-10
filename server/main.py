@@ -4,7 +4,7 @@ from twisted.internet.protocol import Factory
 from twisted.internet import reactor, protocol
 from twisted.internet.endpoints import TCP4ServerEndpoint
 
-
+from custom_import import install_netloader
 from command_handler import CommandHandler
 from project_runner import ProjectRunner
 from utils import clear
@@ -56,14 +56,16 @@ class LJFactory(Factory):
 
 def main():
     clear()
-    print("\n    ====== smsrv v0.0.1 ======\n")
-    print("loading...")
+    print("\n    ====== smsrv v0.0.1 ======")
+    print("\tprep netloader...")
+    install_netloader()
 
+    print("\tload project runner...")
     project_runner = ProjectRunner()
     command_handler = CommandHandler(project_runner)
     factory = LJFactory(command_handler)
 
-    print("running reactor\n")
+    print("\trunning reactor")
     
     endpoint = TCP4ServerEndpoint(reactor, 24203)
     endpoint.listen(factory)

@@ -18,7 +18,7 @@ string save_code(ProjectInfo& project_info, State* state, string save_path)
 
     string filename = state->name + "_" + std::to_string(state->id) + ".py";
     string save_name = save_path + "/" + filename;
-    project_info.add_file(filename, state->code);
+    project_info.add_file(filename, PFT_CODE_STATE, state->code);
     std::ofstream cfile(save_name);
     cfile << state->code;
     cfile.close();
@@ -63,7 +63,7 @@ IOResult save_project(Project& project, ProjectInfo& project_info, string save_p
         // save project
         json jdata = project.to_json();
         string jstr = jdata.dump(4);
-        project_info.add_file("project.json", jstr);
+        project_info.add_file("project.json", PFT_PROJFILE, jstr);
         string json_filename = save_path + "/project.json";
         std::ofstream jfile(json_filename);
         jfile << jstr;
@@ -121,6 +121,10 @@ IOResult save_project(Project& project, ProjectInfo& project_info, string save_p
 IOResult load_project(Project& project, ProjectInfo& project_info, string load_path)
 {
     project_info.reset();
+
+
+    // Load Project.json file
+    
     string json_filename = load_path + "/project.json";
     std::ifstream jfile(json_filename);
     
@@ -133,7 +137,7 @@ IOResult load_project(Project& project, ProjectInfo& project_info, string load_p
     {
         file_str = string(std::istreambuf_iterator<char>(jfile),
                         std::istreambuf_iterator<char>());
-        project_info.add_file("project.json", file_str);
+        project_info.add_file("project.json", PFT_PROJFILE, file_str);
     }
     
     catch(...)
@@ -158,6 +162,9 @@ IOResult load_project(Project& project, ProjectInfo& project_info, string load_p
                                 // This could get slow when projects get big.
     project_info.saved_project = project;
 
+    
+    // Load code state py files, and include py files:
+    
     unsigned int state_id;
     for(const auto& entry : filesystem::directory_iterator(load_path))
     {
@@ -165,12 +172,7 @@ IOResult load_project(Project& project, ProjectInfo& project_info, string load_p
         string filepath = (string) path;
         string filename = path.filename();
 
-        if(!get_code_py_id(filepath, state_id))
-            continue;
-        
-        State* state = dynamic_cast<State*>(project.get_entity_by_id(state_id));
-
-        if(state == nullptr)
+        if(filepath.find(".py") == string::npos)
             continue;
 
         std::ifstream codefile(filepath);
@@ -179,8 +181,22 @@ IOResult load_project(Project& project, ProjectInfo& project_info, string load_p
             return IOResult(false, "could not read " + filepath);
 
         string code((std::istreambuf_iterator<char>(codefile)), std::istreambuf_iterator<char>());
-        project_info.add_file(filename, code);
-        state->code = code;
+        
+        // Code state file
+        if(get_code_py_id(filepath, state_id))
+        {
+            State* state = dynamic_cast<State*>(project.get_entity_by_id(state_id));
+
+            if(state == nullptr)
+                continue;
+
+            project_info.add_file(filename, PFT_CODE_STATE, code);
+            state->code = code;
+        }
+        
+        // Must be include file
+        else 
+            project_info.add_file(filename, PFT_INCLUDE, code);        
     }   
   
     // Code states with nothing saved should get the default function stub 
@@ -219,14 +235,16 @@ void ProjectInfo::reset()
     hash_calculated = false;
     hash = 0;
     filename_to_data.clear();
+    filename_to_type.clear();
     saved_project = Project();
     project_directory = "";
 }
 
 
-void ProjectInfo::add_file(string filename, string filedata)
+void ProjectInfo::add_file(string filename, ProjectFileType filetype, string filedata)
 {
     filename_to_data[filename] = filedata;
+    filename_to_type[filename] = filetype;
     hash_calculated = false;
 }
 
@@ -259,26 +277,48 @@ int ProjectInfo::get_num_files()
 }
 
 
+ProjectFileType ProjectInfo::get_filetype(int i)
+{
+    ProjectFileType file_type;
+    get_file_index(file_type, i);
+    return file_type;
+}
+
+
 int ProjectInfo::get_file_index(ProjectFileType& file_type, int i)
 {
     int l = filename_to_data.size();
     
     if(i < l)
     {
-        file_type = PFT_CODE_STATE;
+        auto it = filename_to_type.begin(); 
+        int ii = i;
+        
+        while(ii)
+        { 
+            it++;
+            ii--;
+        }
+        
+        file_type = it->second;
         return i;
     }
     
     int num_resources = saved_project.resources.size();
-    
+        
     if(i - l < num_resources)
     {
         file_type = PFT_RESOURCE;
         return i - l;
     }
     
-    file_type = PFT_CUSTOM_STATE_CLASS;
-    return i - l - num_resources;
+    int num_custom_stateclasses = saved_project.custom_state_classes.size();
+    
+    if(i - l - num_resources < num_custom_stateclasses)
+    {
+        file_type = PFT_CUSTOM_STATE_CLASS;
+        return i - l - num_resources;
+    }
 }
 
 
@@ -287,18 +327,24 @@ string ProjectInfo::get_filename(int i)
     ProjectFileType file_type;
     i = get_file_index(file_type, i);
     
-    if(file_type == PFT_CODE_STATE)
+    if(file_type == PFT_CODE_STATE || file_type == PFT_INCLUDE || file_type == PFT_PROJFILE)
     {
         auto it = filename_to_data.begin(); 
-        while(i--) it++;    // NOTE: can't simplify to it + i here, iterator does not support addition.
+        
+        while(i)
+        { 
+            it++;
+            i--;
+        }
+        
         return it->first;
     }
     
     else if(file_type == PFT_RESOURCE)
         return saved_project.resources[i]->name;            
     
-    // PFT_CUSTOM_STATE_CLASS
-    return saved_project.custom_state_classes[i]->get_py_filename();
+    else if(file_type == PFT_CUSTOM_STATE_CLASS)
+        return saved_project.custom_state_classes[i]->get_py_filename();
 }
 
 
@@ -307,7 +353,7 @@ string ProjectInfo::get_filedata(int i)
     ProjectFileType file_type;
     i = get_file_index(file_type, i);
     
-    if(file_type == PFT_CODE_STATE)
+    if(file_type == PFT_CODE_STATE || file_type == PFT_INCLUDE || file_type == PFT_PROJFILE)
     {
         auto it = filename_to_data.begin();
         while(i--) it++;
@@ -316,7 +362,7 @@ string ProjectInfo::get_filedata(int i)
     
     else if(file_type == PFT_RESOURCE)
     {
-        Resource *resource = saved_project.resources[i];
+        Resource* resource = saved_project.resources[i];
         string result;
         string absolute_path = make_absolute_path(project_directory, resource->path);
         file_to_string(absolute_path, result);
@@ -363,3 +409,4 @@ bool ProjectInfo::any_missing_files(string& missing_filenames)
     
     return any_missing;
 }
+

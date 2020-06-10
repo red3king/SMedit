@@ -136,18 +136,20 @@ class CommandHandler(object):
         """
         expects command_json = {
             "name": "filename.py",
-            "data": "023920b009f039"   #base64
+            "data": "023920b009f039",   #base64
+            "type": 2
         }
         """
         
         try:
             filename = command_json["name"]
             data = command_json["data"]
+            filetype = command_json["type"]
         
         except KeyError:
             raise InadequateUserException("missing field!")
 
-        self.project_runner.project_add_file(filename, data)
+        self.project_runner.project_add_file(filename, filetype, data)
         return self.success_response(message_id)
 
     def start_project_handler(self, client, message_id, command_json):

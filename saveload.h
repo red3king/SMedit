@@ -9,11 +9,12 @@
 using std::map;
 
 
-enum ProjectFileType { PFT_CODE_STATE, PFT_RESOURCE, PFT_CUSTOM_STATE_CLASS };
+enum ProjectFileType { PFT_CODE_STATE, PFT_RESOURCE, PFT_CUSTOM_STATE_CLASS, PFT_INCLUDE, PFT_NONE, PFT_PROJFILE };
 
 
 class ProjectInfo
 {
+    // TODO - refactor? this is a mess
     public:
         ProjectInfo();
 
@@ -22,21 +23,26 @@ class ProjectInfo
 
         bool has_project();
         void reset();
-        void add_file(string filename, string filedata);
+        void add_file(string filename, ProjectFileType filetype, string filedata);
         uint16_t get_hash();
 
-        // ProjectInfo returns file data from loaded code files,
-        // and data from external resource python files
-        int get_file_index(ProjectFileType& file_type, int i);
+        // ProjectInfo contains file data from loaded code files, include files,
+        // data from external resource python files, and custom state class defs
+
         int get_num_files();
         string get_filename(int i);
         string get_filedata(int i);
+        ProjectFileType get_filetype(int i);
         bool any_missing_files(string& missing_filenames);  // returns true if file referred to by Resource is missing
 
     private:
         bool hash_calculated;
         uint16_t hash;
+        
         map<string, string> filename_to_data;
+        map<string, ProjectFileType> filename_to_type;
+        
+        int get_file_index(ProjectFileType& file_type, int i);
 };
 
 

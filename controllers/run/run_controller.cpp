@@ -279,7 +279,8 @@ void RunController::on_deploy_click()
     {
         string filename = project_info->get_filename(i);
         string data = project_info->get_filedata(i);
-        auto upload = new AddFileAction(filename, data);
+        ProjectFileType filetype = project_info->get_filetype(i);
+        auto upload = new AddFileAction(filename, filetype, data);
         new_project->add_next_action(upload);
     }
     

@@ -1,18 +1,21 @@
 import binascii
 
 from utils import Signal
-from common import InadequateUserException
+from common import InadequateUserException, ProjectFileType
 from broadcasts import MachineCreateBroadcast, MachineDeleteBroadcast
+from custom_import import ProjectImportModules
 from models.project_def import ProjectDef
 from models.resource import Resource
 from models.machine import Machine
 from models.states import StateFactory
 
 
+
 class Project(object):
 
     def __init__(self):
         self.files = {}  # maps filename to string file data
+        self.filetypes = {} # maps filename to file type
         self.project_def =  None 
 
         self.running_machines = []
@@ -26,6 +29,7 @@ class Project(object):
         self.broadcast_signal = Signal()
         self.machine_id_counter = 0
         self.state_factory = None
+        self.import_modules = ProjectImportModules(self)
 
     @property
     def loaded(self):
@@ -163,11 +167,24 @@ class Project(object):
         
         self._loaded = True
 
-    def add_file(self, name, data):
+    def add_file(self, name, filetype, data):
         if self.loaded:
             raise InadequateUserException("project was already loaded, cannot add file.")
 
         self.files[name] = data
+        self.filetypes[name] = filetype
+
+    def get_file(self, name):
+        if name in self.files:
+            return self.files[name]
+        
+        return None
+    
+    def get_filetype(self, name):
+        if name in self.filetypes:
+            return self.filetypes[name]
+        
+        return None
 
     def calculate_hash(self):
         hash_val = 0

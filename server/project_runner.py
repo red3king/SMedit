@@ -1,5 +1,7 @@
 import base64
+
 from common import InadequateUserException
+from custom_import import set_project_modules, clear_project_modules
 from models.project import Project
 
 
@@ -34,7 +36,6 @@ class ProjectRunner(object):
     def set_command_handler(self, command_handler):
         self.command_handler = command_handler
    
-
     # commands
 
     def new_project(self):
@@ -44,18 +45,19 @@ class ProjectRunner(object):
         if hasattr(self, "project"):
             self.project.broadcast_signal -= self.on_broadcast
 
+        clear_project_modules()
         self.project = Project()
         self.project.broadcast_signal += self.on_broadcast
-
-    def project_add_file(self, file_name, filedata_b64):
+        set_project_modules(self.project.import_modules)
+        
+    def project_add_file(self, file_name, file_type, filedata_b64):
         try:
             file_data = base64.b64decode(filedata_b64)
             file_data = file_data.decode('ascii')
         except:
             raise InadequateUserException("ProjectRunner.project_add_file: file data not base64!")
 
-        self.project.add_file(file_name, file_data)
-
+        self.project.add_file(file_name, file_type, file_data)
 
     def start_project(self):
         if not self.project_loaded:
